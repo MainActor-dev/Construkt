@@ -1,9 +1,9 @@
-// 
+//
 //  👨‍💻 Created by @thatswiftdev on 02/11/25.
 //
 //  © 2025, https://github.com/thatswiftdev. All rights reserved.
 //
-//  
+//
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
 //  in the Software without restriction, including without limitation the rights
@@ -22,14 +22,13 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+import UIKit
 
-import Testing
-@testable import Construkt
-
-struct ConstruktTests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+final class RootViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "Construkt"
+        view.backgroundColor = .red
     }
-
 }
