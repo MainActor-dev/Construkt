@@ -10,7 +10,7 @@ cd Demo
 2. Build the app for iOS Simulator
 // turbo
 ```bash
-xcodebuild build -scheme Construkt -project Construkt.xcodeproj -destination 'generic/platform=iOS Simulator'
+xcodebuild build -scheme Construkt -project Construkt.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 3. Boot the Simulator and Open it
@@ -23,6 +23,7 @@ open -a Simulator
 4. Install and Launch the App
 // turbo
 ```bash
-xcrun simctl install booted $(xcodebuild -showBuildSettings -scheme Construkt -project Construkt.xcodeproj -destination 'generic/platform=iOS Simulator' | grep " BUILT_PRODUCTS_DIR =" | awk -F " = " '{print $2}')/Builder.app
-xcrun simctl launch booted $(xcodebuild -showBuildSettings -scheme Construkt -project Construkt.xcodeproj -destination 'generic/platform=iOS Simulator' | grep " PRODUCT_BUNDLE_IDENTIFIER =" | awk -F " = " '{print $2}')
+APP_PATH=$(xcodebuild -showBuildSettings -scheme Construkt -project Construkt.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 16' | grep " CONFIGURATION_BUILD_DIR =" | awk -F " = " '{print $2}')/Construkt.app
+xcrun simctl install "iPhone 16" "$APP_PATH"
+xcrun simctl launch "iPhone 16" com.koanba.Construkt
 ```

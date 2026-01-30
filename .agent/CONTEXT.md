@@ -19,7 +19,10 @@ Construkt is a declarative UIKit library that allows building iOS interfaces usi
 - **Build Configuration**: Fixed a duplicate output error in `Construkt.xcodeproj` by adding `Info.plist` to the `membershipExceptions` in the `.pbxproj` file.
 - **Workflows**: Project-specific automation is documented in `.agent/workflows/`.
 
-## 📝 Coding Standards
+## � Development Environment
+- **Simulator**: Always use the **iPhone 16** simulator for building and testing to ensure consistency in layout and performance verification.
+
+## �📝 Coding Standards
 - **UI Initialization**: Use the `Modified()` helper function for setting up `UIView` instances.
 - **Reactive UI**: Bind UI properties to observables using specialized modifiers (e.g., `.text(bind: $variable)`).
 - **Lifecycle**: Rely on the library's internal `DisposeBag` management for UI-bound subscriptions.
