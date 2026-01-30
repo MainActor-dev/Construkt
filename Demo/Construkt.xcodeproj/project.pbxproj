@@ -10,9 +10,22 @@
 		95DB7F4C2EB70976003FE2F7 /* Construkt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Construkt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		040DB5D92F2C9EA800CE57FA /* Exceptions for "Construkt" folder in "Construkt" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 95DB7F4B2EB70976003FE2F7 /* Construkt */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		95DB7F4E2EB70976003FE2F7 /* Construkt */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				040DB5D92F2C9EA800CE57FA /* Exceptions for "Construkt" folder in "Construkt" target */,
+			);
 			path = Construkt;
 			sourceTree = "<group>";
 		};
