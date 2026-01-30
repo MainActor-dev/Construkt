@@ -12,6 +12,7 @@ Construkt is a declarative UIKit library that allows building iOS interfaces usi
 
 ## � Examples
 - **BuilderDemo**: Comprehensive examples of complex UIs, navigation, and state management using the declarative syntax can be found in `Demo/BuilderDemo/`. Use these as a reference for best practices and available components.
+- **Construkt App**: The `Demo/Construkt/Application/RootViewController.swift` provides a clean, simple example of the "Welcome" UI using the library's core layout components like `VStackView`, `LabelView`, and `ButtonView`.
 
 ## �🛠 Recent Decisions & State
 - **Folder Structure**: The `BuilderDemo` source has been **unattached** from the main Xcode project to keep the core library clean. It now lives in `Demo/BuilderDemo/` (outside the synchronized `Construkt` group).
