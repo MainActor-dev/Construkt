@@ -1,0 +1,24 @@
+# Project Context: Construkt (Builder)
+
+## 🎯 Overview
+Construkt is a declarative UIKit library that allows building iOS interfaces using a syntax similar to SwiftUI but powered by UIKit and RxSwift.
+
+## 🏗 Architecture & Tech Stack
+- **Core Engine**: Located in `Sources/Construkt/Core/Builder/`.
+- **Declarative DSL**: Uses `ViewBuilder` protocols and `@resultBuilder` (`ViewResultBuilder`).
+- **Reactive State**: Powered by **RxSwift**. Custom `@Variable` property wrapper mimics SwiftUI's `@State`.
+- **Dependency Injection**: Uses the **Factory** library.
+- **Composition**: Heavy use of `VStackView`, `HStackView`, and small reusable `ViewBuilder` structs.
+
+## 🛠 Recent Decisions & State
+- **Folder Structure**: The `BuilderDemo` source has been **unattached** from the main Xcode project to keep the core library clean. It now lives in `Demo/BuilderDemo/` (outside the synchronized `Construkt` group).
+- **Build Configuration**: Fixed a duplicate output error in `Construkt.xcodeproj` by adding `Info.plist` to the `membershipExceptions` in the `.pbxproj` file.
+- **Workflows**: Project-specific automation is documented in `.agent/workflows/`.
+
+## 📝 Coding Standards
+- **UI Initialization**: Use the `Modified()` helper function for setting up `UIView` instances.
+- **Reactive UI**: Bind UI properties to observables using specialized modifiers (e.g., `.text(bind: $variable)`).
+- **Lifecycle**: Rely on the library's internal `DisposeBag` management for UI-bound subscriptions.
+
+---
+*Last Updated: 2026-01-30*
