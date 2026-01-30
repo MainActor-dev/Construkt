@@ -28,7 +28,43 @@ final class RootViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+    }
+    
+    private func setupUI() {
         title = "Construkt"
-        view.backgroundColor = .red
+        view.backgroundColor = .systemBackground
+        
+        view.embed(
+            VStackView {
+                SpacerView()
+                
+                LabelView("Welcome to Construkt")
+                    .font(.largeTitle)
+                    .color(.label)
+                    .alignment(.center)
+                
+                LabelView("The declarative UIKit library for modern iOS apps.")
+                    .font(.body)
+                    .color(.secondaryLabel)
+                    .alignment(.center)
+                    .numberOfLines(0)
+                
+                SpacerView(40)
+                
+                ButtonView("Get Started") { _ in
+                    print("🚀 Journey Started!")
+                }
+                .backgroundColor(.systemBlue, for: .normal)
+                .color(.white, for: .normal)
+                .cornerRadius(12)
+                .padding(h: 32, v: 12)
+                
+                SpacerView()
+            }
+            .spacing(16)
+            .padding(24)
+            .alignment(.center)
+        )
     }
 }
