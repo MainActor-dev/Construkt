@@ -8,7 +8,6 @@ final class RootViewController: UIViewController {
     
     // Tracks the current main view for transition(to:)
     var mainView: UIView?
-    let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,17 +34,13 @@ final class RootViewController: UIViewController {
                 return ErrorView(message: error)
             }
         }
-        .onAppear { [weak self] _ in
+        .onAppearOnce { [weak self] _ in
              self?.viewModel.load()
         }
         
         view.embed(stateView)
     }
     
-    // The original setupSubscriptions logic has been replaced via StateContainer
-    func setupSubscriptions() {
-        // No longer needed! StateContainer handles state observation.
-    }
 }
 
 #if DEBUG

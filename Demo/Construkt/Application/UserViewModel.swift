@@ -3,11 +3,6 @@ import RxSwift
 import RxCocoa
 import Factory
 
-// Assuming Variable is available from the Builder/Construkt module. 
-// If it's internal to the framework, I might need to import the module specifically.
-// Given the file structure, it seems everything is compiled together or 'Construkt' is the module.
-// I'll try without explicit import first, or import Construkt if known.
-
 class UserViewModel {
     
     // Use the Reusable Generic State
@@ -15,7 +10,6 @@ class UserViewModel {
     
     // Internal
     private let client = NetworkClient(interceptors: [LoggerInterceptor()])
-    private let disposeBag = DisposeBag()
     
     func load() {
         state = .loading

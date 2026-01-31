@@ -56,7 +56,6 @@ final class UserDetailViewController: UIViewController {
                     SpacerView()
                 }
                 .alignment(.center)
-                .height(min: UIScreen.main.bounds.height - 100)
             },
             safeArea: true
         )
