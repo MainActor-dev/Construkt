@@ -93,6 +93,10 @@ extension ModifiableView {
     public func perform(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
+    @discardableResult
+    public func visible(_ isVisible: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { $0.isHidden = !isVisible }
+    }
 }
 
 
