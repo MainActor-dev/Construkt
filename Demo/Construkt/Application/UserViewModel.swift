@@ -23,7 +23,7 @@ class UserViewModel {
         Task {
             do {
                 // Simulate network delay for demo
-                try await Task.sleep(nanoseconds: 5_000_000_000) // 5s
+                try await Task.sleep(nanoseconds: 1_000_000_000) // 5s
                 
                 let users: [User] = try await client.request(UsersEndpoint.getUsers)
                 

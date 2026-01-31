@@ -24,8 +24,11 @@ final class RootViewController: UIViewController {
             case .loading:
                 return LoadingView()
             case .loaded(let users):
-                return UsersTableView(users: users)
-                    .reference(&self.mainView)
+                return UsersTableView(users: users) { [weak self] user in
+                    let detailVC = UserDetailViewController(user: user)
+                    self?.navigationController?.pushViewController(detailVC, animated: true)
+                }
+                .reference(&self.mainView)
             case .empty(let message):
                 return EmptyView(message: message)
             case .error(let error):
