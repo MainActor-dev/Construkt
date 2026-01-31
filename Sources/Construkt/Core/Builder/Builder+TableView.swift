@@ -41,7 +41,23 @@ extension ModifiableView where Base: BuilderInternalTableView {
 
 }
 
-open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling {
+open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling, UpdatableView {
+    
+    public func update(with state: Any) {
+        // In a real implementation we would strictly check type equivalence or use a specific update payload.
+        // For this demo, assuming the state carries the data needed or triggers a refresh.
+        // However, TableView is powered by a `builder`. 
+        // If the upstream builder was updated, we just reload.
+        // But if the `State` passed here contains NEW data (e.g. .loaded([User])), 
+        // we need a mechanism to update the internal builder's data source if it's dynamic.
+        //
+        // Simple case: Just reloadData(). The `builder` is usually referenced by closure capture.
+        // If the closure captures a class/reference, it might already have new data.
+        // If it captures a value type, we might need to be replaced.
+        //
+        // For this Proof of Concept: We assume the builder logic is stable and we just need to refresh.
+        self.reloadData()
+    }
      
     public var builder: AnyIndexableViewBuilder!
     

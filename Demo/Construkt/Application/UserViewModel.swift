@@ -10,16 +10,10 @@ import Factory
 
 class UserViewModel {
     
-    enum State: Equatable {
-        case initial
-        case loading
-        case loaded([User])
-        case empty(String)
-        case error(String)
-    }
+    // Use the Reusable Generic State
+    @Variable private(set) var state = LoadableState<[User]>.initial
     
-    @Variable private(set) var state = State.initial
-    
+    // Internal
     private let client = NetworkClient(interceptors: [LoggerInterceptor()])
     private let disposeBag = DisposeBag()
     
@@ -29,7 +23,7 @@ class UserViewModel {
         Task {
             do {
                 // Simulate network delay for demo
-                try await Task.sleep(nanoseconds: 500_000_000) // 0.5s
+                try await Task.sleep(nanoseconds: 5_000_000_000) // 5s
                 
                 let users: [User] = try await client.request(UsersEndpoint.getUsers)
                 

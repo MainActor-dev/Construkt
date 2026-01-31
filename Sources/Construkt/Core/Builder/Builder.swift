@@ -89,6 +89,10 @@ extension ModifiableView {
     public func with(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
+    @discardableResult
+    public func perform(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, modifier: modifier)
+    }
 }
 
 

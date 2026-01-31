@@ -15,6 +15,32 @@ struct UsersTableView: ViewBuilder {
                 }
         })
         .separatorStyle(.singleLine)
+        .perform { view in
+             // In a cleaner implementation, we would bind the data source directly.
+             // Here we can access the underlying TableView and force an update if needed.
+             // But primarily, the StateContainer will call `update(with:)` on this view.
+             
+             // However, `TableView` creates `BuilderInternalTableView`.
+             // We need to ensure that when `StateContainer` calls `activeView.update(with: state)`,
+             // it reaches the `BuilderInternalTableView`.
+             // `View` is a closure returning `UIView`.
+             // So `activeView` IS `BuilderInternalTableView`.
+             
+             if let tableView = view as? BuilderInternalTableView {
+                 // For true "Smart Update", we should update the builder's items here.
+                 // This requires `BuilderInternalTableView` to expose a data updating method.
+                 // For now, the `update` method on `BuilderInternalTableView` does a reload.
+                 // We need to pass the new users to it.
+                 // Ideally, `DynamicItemViewBuilder` should be replaceable.
+                 
+                 // Protocol Hack for PoC:
+                 // We need to inject the new `users` list into the existing `tableView.builder`.
+                 if var builder = tableView.builder as? DynamicItemViewBuilder<User> {
+                      builder.items = users
+                      tableView.set(builder) // Re-set builder triggers reload
+                 }
+             }
+        }
     }
 }
 

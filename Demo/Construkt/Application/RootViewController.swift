@@ -15,34 +15,34 @@ final class RootViewController: UIViewController {
         title = "Construkt Users"
         view.backgroundColor = .systemBackground
         
-        setupSubscriptions()
+        let stateView = StateView(viewModel.$state) { [weak self] state in
+            guard let self = self else { return LabelView("Loading...") }
+            switch state {
+            case .initial:
+                return LabelView("Initializing...")
+                    .alignment(.center)
+            case .loading:
+                return LoadingView()
+            case .loaded(let users):
+                return UsersTableView(users: users)
+                    .reference(&self.mainView)
+            case .empty(let message):
+                return EmptyView(message: message)
+            case .error(let error):
+                return ErrorView(message: error)
+            }
+        }
+        .onAppear { [weak self] _ in
+             self?.viewModel.load()
+        }
+        
+        view.embed(stateView)
     }
     
+    // The original setupSubscriptions logic has been replaced via StateContainer
     func setupSubscriptions() {
-        viewModel.$state
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] state in
-                guard let self = self else { return }
-                switch state {
-                case .initial:
-                    self.viewModel.load()
-                    
-                case .loading:
-                    self.transition(to: LoadingView())
-                    
-                case .loaded(let users):
-                    self.transition(to: UsersTableView(users: users).reference(&self.mainView))
-                    
-                case .empty(let message):
-                    self.transition(to: EmptyView(message: message))
-                    
-                case .error(let error):
-                    self.transition(to: ErrorView(message: error))
-                }
-            })
-            .disposed(by: disposeBag)
+        // No longer needed! StateContainer handles state observation.
     }
-    
 }
 
 #if DEBUG
