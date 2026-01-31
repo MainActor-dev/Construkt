@@ -34,9 +34,45 @@ extension ModifiableView where Base: BuilderInternalTableView {
         ViewModifier(modifiableView) { $0.set(builder) }
     }
 
+    @discardableResult
+    public func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.separatorStyle, value: style)
+    }
+
+    /// Automatically handles smart updates for LoadableState by injecting new data into the builder.
+    /// - Parameter type: The type of the items in the list (e.g. User.self)
+    @discardableResult
+    public func enableSmartUpdate<T: Equatable>(_ type: T.Type) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { view in
+             view.updateHandler = { [weak view] state in
+                 guard let view = view else { return }
+                 // Smart Update Logic:
+                 // 1. Check if state is LoadableState<[T]> and is .loaded
+                 if let state = state as? LoadableState<[T]>,
+                    case .loaded(let items) = state,
+                    // 2. Check if builder is DynamicItemViewBuilder<T>
+                    let builder = view.builder as? DynamicItemViewBuilder<T> {
+                     // 3. Inject new data
+                     builder.items = items
+                     // 4. Trigger update
+                     view.set(builder)
+                 }
+             }
+        }
+    }
 }
 
-open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling {
+open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling, UpdatableView {
+    
+    public var updateHandler: ((Any) -> Void)?
+    
+    public func update(with state: Any) {
+        if let handler = updateHandler {
+            handler(state)
+        } else {
+            self.reloadData()
+        }
+    }
      
     public var builder: AnyIndexableViewBuilder!
     
