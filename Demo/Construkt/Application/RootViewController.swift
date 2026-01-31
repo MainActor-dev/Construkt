@@ -35,36 +35,38 @@ final class RootViewController: UIViewController {
         title = "Construkt"
         view.backgroundColor = .systemBackground
         
+        let names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace"]
+        
         view.embed(
-            VStackView {
-                SpacerView()
-                
-                LabelView("Welcome to Construkt")
-                    .font(.largeTitle)
-                    .color(.label)
-                    .alignment(.center)
-                
-                LabelView("The declarative UIKit library for modern iOS apps.")
-                    .font(.body)
-                    .color(.secondaryLabel)
-                    .alignment(.center)
-                    .numberOfLines(0)
-                
-                SpacerView(40)
-                
-                ButtonView("Get Started") { _ in
-                    print("🚀 Journey Started!")
+            TableView(
+                DynamicItemViewBuilder(names) { name in
+                    TableViewCell(padding: UIEdgeInsets(top: 6, left: 24, bottom: 6, right: 24)) {
+                        LabelView(name)
+                            .padding(16)
+                            .backgroundColor(.secondarySystemBackground)
+                            .cornerRadius(12)
+                    }
                 }
-                .backgroundColor(.systemBlue, for: .normal)
-                .color(.white, for: .normal)
-                .cornerRadius(12)
-                .padding(h: 32, v: 12)
-                
-                SpacerView()
-            }
-            .spacing(16)
-            .padding(24)
-            .alignment(.center)
+            )
+            .separatorStyle(.none)
         )
     }
 }
+#if DEBUG
+import SwiftUI
+
+struct RootViewController_Preview: SwiftUI.UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> RootViewController {
+        return RootViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: RootViewController, context: Context) {}
+}
+
+struct RootViewController_Previews: PreviewProvider {
+    static var previews: some SwiftUI.View {
+        RootViewController_Preview()
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+#endif

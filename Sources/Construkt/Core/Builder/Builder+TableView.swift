@@ -34,6 +34,11 @@ extension ModifiableView where Base: BuilderInternalTableView {
         ViewModifier(modifiableView) { $0.set(builder) }
     }
 
+    @discardableResult
+    public func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.separatorStyle, value: style)
+    }
+
 }
 
 open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling {
