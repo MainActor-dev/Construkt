@@ -1,0 +1,173 @@
+//
+//  👨‍💻 Created by @thatswiftdev on 26/09/25.
+//
+//  © 2025, https://github.com/thatswiftdev. All rights reserved.
+//
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+
+import UIKit
+
+extension NSCollectionLayoutItem {
+    static func withEntireSize() -> NSCollectionLayoutItem {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        return NSCollectionLayoutItem(layoutSize: itemSize)
+    }
+    
+    static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutItem {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: height
+        )
+        return NSCollectionLayoutItem(layoutSize: itemSize)
+    }
+}
+
+extension NSCollectionLayoutGroup {
+    static func vertically(
+        estimatedHeight: CGFloat,
+        insets: NSDirectionalEdgeInsets = .zero
+    ) -> NSCollectionLayoutGroup {
+        let item = NSCollectionLayoutItem.entireWidth(withHeight: .estimated(estimatedHeight))
+        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: .estimated(estimatedHeight))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        group.contentInsets = insets
+        return group
+    }
+    
+    static func vertically(
+        height: NSCollectionLayoutDimension,
+        insets: NSDirectionalEdgeInsets = .zero
+    ) -> NSCollectionLayoutGroup {
+        let item = NSCollectionLayoutItem.withEntireSize()
+        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: height)
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+        group.contentInsets = insets
+        return group
+    }
+    
+    static func horizontally(
+        estimatedWidth: CGFloat,
+        estimatedHeight: CGFloat,
+        insets: NSDirectionalEdgeInsets = .zero
+    ) -> NSCollectionLayoutGroup {
+        let item = NSCollectionLayoutItem(layoutSize: .init(
+            widthDimension: .estimated(estimatedWidth),
+            heightDimension: .estimated(estimatedHeight)
+        ))
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .estimated(estimatedWidth),
+            heightDimension: .estimated(estimatedHeight)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        group.contentInsets = insets
+        return group
+    }
+    
+    static func horizontally(
+        estimatedHeight: CGFloat,
+        insets: NSDirectionalEdgeInsets = .zero
+    ) -> NSCollectionLayoutGroup {
+        let item = NSCollectionLayoutItem(layoutSize: .init(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(estimatedHeight)
+        ))
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(estimatedHeight)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        group.contentInsets = insets
+        return group
+    }
+}
+
+extension NSCollectionLayoutSection {
+    static func layout(
+        group: NSCollectionLayoutGroup,
+        spacing: CGFloat = 0,
+        insets: NSDirectionalEdgeInsets = .zero,
+        decorationItems: [NSCollectionLayoutDecorationItem] = [],
+        supplementaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [],
+        scrolling: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil
+    ) -> NSCollectionLayoutSection {
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = spacing
+        section.contentInsets = insets
+        section.decorationItems = decorationItems
+        section.boundarySupplementaryItems = supplementaryItems
+        if let scrolling { section.orthogonalScrollingBehavior = scrolling }
+        return section
+    }
+}
+
+extension NSCollectionLayoutBoundarySupplementaryItem {
+    static func header(
+        height: NSCollectionLayoutDimension,
+        isSticky: Bool = false
+    ) -> NSCollectionLayoutBoundarySupplementaryItem {
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: .entireWidth(withHeight: height),
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .top
+        )
+        header.pinToVisibleBounds = isSticky
+        return header
+    }
+    
+    static func footer(
+        height: NSCollectionLayoutDimension,
+        isSticky: Bool = false
+    ) -> NSCollectionLayoutBoundarySupplementaryItem {
+        let header = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: .entireWidth(withHeight: height),
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .bottom
+        )
+        header.pinToVisibleBounds = isSticky
+        return header
+    }
+}
+
+extension NSCollectionLayoutDecorationItem {
+    static func background(insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
+        let background = NSCollectionLayoutDecorationItem.background(elementKind: "background")
+        background.contentInsets = insets
+        return background
+    }
+}
+
+extension NSCollectionLayoutSize {
+    static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutSize {
+        return NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: height
+        )
+    }
+    
+    static func withEntireSize() -> NSCollectionLayoutSize {
+        return NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .fractionalHeight(1.0)
+        )
+    }
+}

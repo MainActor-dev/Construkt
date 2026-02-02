@@ -23,11 +23,8 @@ final class MoviesViewController: UIViewController {
         let stateView = StateView(viewModel.$state) { [weak self] state in
             guard let self = self else { return LabelView("Loading...") }
             switch state {
-            case .initial:
-                 return LabelView("Initializing...")
-                    .alignment(.center)
-            case .loading:
-                return LoadingView()
+            case .initial, .loading:
+               return LoadingView()
             case .loaded(let movies):
                 return MoviesTableView(movies: movies) { [weak self] movie in
                     self?.showDetail(for: movie)

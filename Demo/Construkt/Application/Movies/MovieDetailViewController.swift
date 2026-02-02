@@ -1,5 +1,4 @@
 import UIKit
-import Construkt
 
 final class MovieDetailViewController: UIViewController {
     

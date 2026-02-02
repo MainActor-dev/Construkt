@@ -1,5 +1,4 @@
 import UIKit
-import Construkt
 
 struct LoadingView: ViewBuilder {
     var body: View {

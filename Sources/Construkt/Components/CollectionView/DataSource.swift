@@ -113,31 +113,6 @@ extension CollectionDiffableDataSource {
         return snapshot().sectionIdentifiers[safe: index]?.identifier.uniqueId
     }
     
-    // MARK: TODO (Might need this in the future)
-    func replace(
-        _ oldSection: SectionControllerIdentifier,
-        with sections: [SectionController],
-        completion: (() -> Void)? = nil,
-        animated: Bool = false
-    ) {
-        var snapshot = snapshot()
-        
-        defer {
-            applySnapshot(snapshot, completion: completion)
-        }
-                
-        let displayedSections = snapshot.sectionIdentifiers
-        let newSections = sections.filter { !displayedSections.contains($0) }
-        newSections.forEach { newSection in
-            snapshot.appendSections([newSection])
-            snapshot.appendItems(newSection.cells, toSection: newSection)
-        }
-        
-        if let oldSection = snapshot.sectionIdentifiers.section(identifier: oldSection) {
-            snapshot.deleteItems(oldSection.cells)
-        }
-    }
-    
     private func applySnapshot(
         _  snapshot: CollectionSnapshot,
         animated: Bool = false,
@@ -148,9 +123,5 @@ extension CollectionDiffableDataSource {
         } else {
             apply(snapshot, animatingDifferences: animated)
         }
-    }
-    
-    func reloadCurrentSections() {
-        applySnapshot(snapshot())
     }
 }

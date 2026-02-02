@@ -69,10 +69,6 @@ class CollectionListViewController: UIViewController {
             $0.clipsToBounds = false
         }
     }
-    
-    func reloadCurrentSections() {
-        dataSource.reloadCurrentSections()
-    }
 }
 
 // MARK: UICollectionViewDelegate
