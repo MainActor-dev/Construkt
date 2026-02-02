@@ -1,7 +1,7 @@
 import UIKit
 
-enum Skeleton<Cell: UICollectionViewCell> {
-    static func create(
+public enum Skeleton<Cell: UICollectionViewCell> {
+    public static func create(
         count: Int = 1,
         identifier: String = UUID().uuidString
     ) -> [CellController] {
@@ -11,7 +11,7 @@ enum Skeleton<Cell: UICollectionViewCell> {
         }
     }
     
-    static func create(id: AnyHashable) -> CellController {
+    public static func create(id: AnyHashable) -> CellController {
         return CellController(
             id: id,
             model: (),

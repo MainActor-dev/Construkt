@@ -34,7 +34,7 @@ struct HeroView: ViewBuilder {
                 .skeletonable(true)
             VStackView {
                 SpacerView()
-                    .backgroundColor(.blue)
+                    .backgroundColor(.clear)
                 VStackView {
                     SpacerView(1)
                     HStackView {

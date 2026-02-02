@@ -24,33 +24,34 @@
 
 import UIKit
 
-protocol SectionControllerIdentifier {
+public protocol SectionControllerIdentifier {
     var uniqueId: String { get }
 }
 
 extension SectionControllerIdentifier where Self == DefaultSectionIdentifier {
-    static var defaultIdentifier: DefaultSectionIdentifier {
+    public static var defaultIdentifier: DefaultSectionIdentifier {
         return DefaultSectionIdentifier()
     }
 }
 
 /// Best used when you only have one section and don't care about the `uniqueId`
-struct DefaultSectionIdentifier: SectionControllerIdentifier {
-    let uniqueId: String
+public struct DefaultSectionIdentifier: SectionControllerIdentifier {
+    public let uniqueId: String
     
-    init() {
+    public init() {
         self.uniqueId = String(describing: DefaultSectionIdentifier.self)
     }
 }
 
-struct SectionController {
+public struct SectionController {
     
-    typealias Identifier = SectionControllerIdentifier
+    public typealias Identifier = SectionControllerIdentifier
     
-    let identifier: SectionControllerIdentifier
-    let cells: [CellController]
+    public let identifier: SectionControllerIdentifier
+    public let cells: [CellController]
+    public var layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
     
-    init<ID: Identifier, T, C: UICollectionViewCell>(
+    public init<ID: Identifier, T, C: UICollectionViewCell>(
         identifier: ID = .defaultIdentifier,
         items: [T],
         state: CellControllerState = .loaded,
@@ -76,26 +77,36 @@ struct SectionController {
             )
         }
     }
+    
+    public init(
+        identifier: SectionControllerIdentifier,
+        cells: [CellController],
+        layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
+    ) {
+        self.identifier = identifier
+        self.cells = cells
+        self.layoutProvider = layoutProvider
+    }
 }
 
 extension SectionController: Equatable {
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.identifier.uniqueId == rhs.identifier.uniqueId
     }
 }
 
 extension SectionController: Hashable {
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(identifier.uniqueId)
     }
 }
 
 extension [SectionController] {
-    func section(identifier: SectionControllerIdentifier) -> SectionController? {
+    public func section(identifier: SectionControllerIdentifier) -> SectionController? {
         return first(where: { $0.identifier.uniqueId == identifier.uniqueId })
     }
     
-    func sectionIndex(identifier: SectionControllerIdentifier) -> Int? {
+    public func sectionIndex(identifier: SectionControllerIdentifier) -> Int? {
         return firstIndex(where: { $0.identifier.uniqueId == identifier.uniqueId })
     }
 }

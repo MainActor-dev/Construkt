@@ -14,6 +14,25 @@ public class MovieViewModel {
     
     /// Title describing the current list
     @Variable public private(set) var title: String = "Popular Movies"
+
+    // MARK: - Computed Properties
+    
+    public var popularMovies: [Movie] {
+        if case .loaded(let movies) = state {
+            return movies
+        }
+        return []
+    }
+    
+    public var heroMovie: Movie? {
+        return popularMovies.first
+    }
+    
+    public var isLoading: Bool {
+        if case .loading = state { return true }
+        if case .initial = state { return true }
+        return false
+    }
     
     // MARK: - Dependencies
     

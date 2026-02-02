@@ -28,7 +28,7 @@ import RxCocoa
 
 private typealias CollectionDelegate = UICollectionViewDelegate & UICollectionViewDataSourcePrefetching
 
-final class CellControllerAdapter: NSObject, CollectionDelegate {
+public final class CellControllerAdapter: NSObject, CollectionDelegate {
 
     private weak var dataSource: CollectionDiffableDataSource?
     
@@ -36,7 +36,7 @@ final class CellControllerAdapter: NSObject, CollectionDelegate {
     private var debounceInterval: TimeInterval = 0.5
     private var disposeBag = DisposeBag()
     
-    init(dataSource: CollectionDiffableDataSource) {
+    public init(dataSource: CollectionDiffableDataSource) {
         self.dataSource = dataSource
         super.init()
         setupRxBindings()
@@ -61,16 +61,16 @@ final class CellControllerAdapter: NSObject, CollectionDelegate {
     }
 
     // MARK: Selection
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         debouncedTapSubject.onNext(indexPath)
     }
 
     // MARK: Prefetch
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+    public func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         indexPaths.compactMap(item).forEach { $0.prefetch() }
     }
 
-    func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
+    public func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
         indexPaths.compactMap(item).forEach { $0.cancelPrefetch() }
     }
 }

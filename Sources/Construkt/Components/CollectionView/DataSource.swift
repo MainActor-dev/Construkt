@@ -24,11 +24,11 @@
 
 import UIKit
 
-typealias CellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
-typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionController, CellController>
-typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
+public typealias CellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
+public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionController, CellController>
+public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
 
-extension CollectionDiffableDataSource {
+public extension CollectionDiffableDataSource {
     func updateSections(
         _ sections: [SectionController],
         beforeItem: CellController? = nil,

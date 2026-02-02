@@ -24,13 +24,13 @@
 
 import UIKit
 
-enum CellControllerState: Equatable {
-    typealias TotalSkeleton = Int
+public enum CellControllerState: Equatable {
+    public typealias TotalSkeleton = Int
     case loading(TotalSkeleton)
     case loaded
 }
 
-struct CellController: Hashable {
+public struct CellController: Hashable {
     
     private let id: AnyHashable
     private let makeCell: (UICollectionView, IndexPath) -> UICollectionViewCell
@@ -38,7 +38,7 @@ struct CellController: Hashable {
     private let onPrefetch: (() -> Void)?
     private let onCancelPrefetch: (() -> Void)?
 
-    init<Cell: UICollectionViewCell, Model>(
+    public init<Cell: UICollectionViewCell, Model>(
         id: AnyHashable = UUID(),
         model: Model,
         registration: UICollectionView.CellRegistration<Cell, Model>,
@@ -65,27 +65,27 @@ struct CellController: Hashable {
         }
     }
 
-    static func == (lhs: CellController, rhs: CellController) -> Bool {
+    public static func == (lhs: CellController, rhs: CellController) -> Bool {
         lhs.id == rhs.id
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 
-    func cell(in collectionView: UICollectionView, at indexPath: IndexPath) -> UICollectionViewCell {
+    public func cell(in collectionView: UICollectionView, at indexPath: IndexPath) -> UICollectionViewCell {
         makeCell(collectionView, indexPath)
     }
 
-    func didSelect() {
+    public func didSelect() {
         onSelect?()
     }
 
-    func prefetch() {
+    public func prefetch() {
         onPrefetch?()
     }
 
-    func cancelPrefetch() {
+    public func cancelPrefetch() {
         onCancelPrefetch?()
     }
 }
