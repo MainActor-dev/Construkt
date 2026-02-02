@@ -1,23 +1,5 @@
 import UIKit
-import RxSwift
-
-struct UsersTableView: ViewBuilder {
-    let users: [User]
-    let onSelect: (User) -> Void
-    
-    var body: View {
-        TableView(DynamicItemViewBuilder(users) { user in
-            TableViewCell(title: user.name, subtitle: user.email)
-                .accessoryType(.disclosureIndicator)
-                .onSelect { context in
-                    onSelect(user)
-                    return false
-                }
-        })
-        .separatorStyle(.singleLine)
-        .enableSmartUpdate(User.self)
-    }
-}
+import Construkt
 
 struct LoadingView: ViewBuilder {
     var body: View {
@@ -27,7 +9,7 @@ struct LoadingView: ViewBuilder {
                     $0.startAnimating()
                     $0.color = .gray
                 }
-                LabelView("Loading Users...")
+                LabelView("Loading...")
                     .font(.systemFont(ofSize: 14))
                     .color(.secondaryLabel)
                     .alignment(.center)

@@ -1,63 +1,30 @@
 import UIKit
 import Factory
-import RxSwift
 
+// For this demo, we can just treat RootViewController as a simple container or 
+// just swap the window root in SceneDelegate (if I had access to it).
+// But to keep it simple and within the existing navigation flow:
 final class RootViewController: UIViewController {
-    
-    @Injected(Container.userViewModel) var viewModel: UserViewModel
-    
-    // Tracks the current main view for transition(to:)
-    var mainView: UIView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Construkt Users"
         view.backgroundColor = .systemBackground
         
-        let stateView = StateView(viewModel.$state) { [weak self] state in
-            guard let self = self else { return LabelView("Loading...") }
-            switch state {
-            case .initial:
-                return LabelView("Initializing...")
-                    .alignment(.center)
-            case .loading:
-                return LoadingView()
-            case .loaded(let users):
-                return UsersTableView(users: users) { [weak self] user in
-                    let detailVC = UserDetailViewController(user: user)
-                    self?.navigationController?.pushViewController(detailVC, animated: true)
-                }
-                .reference(&self.mainView)
-            case .empty(let message):
-                return EmptyView(message: message)
-            case .error(let error):
-                return ErrorView(message: error)
-            }
-        }
-        .onAppearOnce { [weak self] _ in
-             self?.viewModel.load()
-        }
+        // Immediately push or swap to MoviesViewController
+        // Since this is the "Root", we might want it to BE the movie list.
+        // But to avoid inheritance mess, let's just embed MoviesViewController as a child
+        // or subclass it?
+        // Simplest: This IS the navigation controller root.
         
-        view.embed(stateView)
-    }
-    
-}
-
-#if DEBUG
-import SwiftUI
-
-struct RootViewController_Preview: SwiftUI.UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> RootViewController {
-        return RootViewController()
-    }
-    
-    func updateUIViewController(_ uiViewController: RootViewController, context: Context) {}
-}
-
-struct RootViewController_Previews: PreviewProvider {
-    static var previews: some SwiftUI.View {
-        RootViewController_Preview()
-            .edgesIgnoringSafeArea(.all)
+        let moviesVC = MoviesViewController()
+        
+        // Embed standard child VC pattern
+        addChild(moviesVC)
+        view.addSubview(moviesVC.view)
+        moviesVC.view.frame = view.bounds
+        moviesVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        moviesVC.didMove(toParent: self)
+        
+        title = "Construkt Movies"
     }
 }
-#endif

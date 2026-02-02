@@ -1,0 +1,33 @@
+import Foundation
+
+public protocol MovieServiceProtocol {
+    func getPopularMovies(page: Int) async throws -> MovieResponse
+    func getTopRatedMovies(page: Int) async throws -> MovieResponse
+    func getNowPlayingMovies(page: Int) async throws -> MovieResponse
+    func getMovieDetails(id: Int) async throws -> Movie
+}
+
+public class MovieService: MovieServiceProtocol {
+    private let client: NetworkClient
+    
+    public init(client: NetworkClient = .init(configuration: NetworkConfiguration(baseURL: TMDBConfiguration.baseURL), 
+                                              interceptors: [TMDBRequestInterceptor()])) {
+        self.client = client
+    }
+    
+    public func getPopularMovies(page: Int = 1) async throws -> MovieResponse {
+        return try await client.request(MoviesEndpoint.getPopularMovies(page: page))
+    }
+    
+    public func getTopRatedMovies(page: Int = 1) async throws -> MovieResponse {
+        return try await client.request(MoviesEndpoint.getTopRated(page: page))
+    }
+    
+    public func getNowPlayingMovies(page: Int = 1) async throws -> MovieResponse {
+        return try await client.request(MoviesEndpoint.getNowPlaying(page: page))
+    }
+    
+    public func getMovieDetails(id: Int) async throws -> Movie {
+        return try await client.request(MoviesEndpoint.getMovieDetails(id: id))
+    }
+}
