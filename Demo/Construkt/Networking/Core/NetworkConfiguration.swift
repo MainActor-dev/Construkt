@@ -11,7 +11,6 @@ public struct NetworkConfiguration {
     
     // Default configuration for the Demo
     public static var `default`: NetworkConfiguration {
-        // Placeholder URL, will be overridden by specific endpoints or staging configs
-        return NetworkConfiguration(baseURL: URL(string: "https://jsonplaceholder.typicode.com")!)
+        return NetworkConfiguration(baseURL: URL(string: "https://api.themoviedb.org/3")!)
     }
 }

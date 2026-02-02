@@ -27,12 +27,6 @@ final class MoviesViewController: UIViewController {
                  return LabelView("Initializing...")
                     .alignment(.center)
             case .loading:
-                // Reusing LoadingView from UsersView.swift for now, or we can duplicate/move it to a shared place.
-                // Assuming UsersView.swift is still there or we should move LoadingView to Shared.
-                // For safety, I'll inline a simple loading view here if I can't guarantee LoadingView existence
-                // but since I haven't deleted UsersView yet, it should be fine.
-                // Better refactor: Move LoadingView/ErrorView/EmptyView to a Common file.
-                // For this step I will just reference them, assuming they are available globally in the module.
                 return LoadingView()
             case .loaded(let movies):
                 return MoviesTableView(movies: movies) { [weak self] movie in
