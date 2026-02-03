@@ -235,7 +235,7 @@ struct TopRatedCell: ViewBuilder {
                         }
                         .alignment(.center)
                     }
-                    .alignment(.leading)
+                    .alignment(.center)
                     .skeletonable(true)
                     SpacerView()
                 }
@@ -262,21 +262,23 @@ struct UpcomingCell: ViewBuilder {
                 .height(80)
             VStackView {
                 SpacerView()
-                VStackView {
-                    LabelView("COMING JUNE 24") // Placeholder
-                        .font(.systemFont(ofSize: 10, weight: .bold))
-                        .color(.white)
-                        .backgroundColor(UIColor.black.withAlphaComponent(0.5))
-                        .cornerRadius(4)
-                        .padding(h: 4, v: 2)
-                        .skeletonable(true)
-                    LabelView(movie.title)
-                        .font(.systemFont(ofSize: 16, weight: .semibold))
-                        .color(.white)
-                        .numberOfLines(2)
-                        .skeletonable(true)
+                ZStackView {
+                    VStackView(spacing: 2) {
+                        SpacerView()
+                        LabelView("COMING JUNE 24") // Placeholder
+                            .font(.systemFont(ofSize: 10, weight: .bold))
+                            .color(.white)
+                            .backgroundColor(UIColor.black.withAlphaComponent(0.5))
+                            .cornerRadius(4)
+                            .padding(h: 4, v: 2)
+                        LabelView(movie.title)
+                            .font(.systemFont(ofSize: 16, weight: .semibold))
+                            .color(.white)
+                            .numberOfLines(2)
+                            .skeletonable(true)
+                    }
+                    .alignment(.leading)
                 }
-                .alignment(.leading)
                 .padding(h: 12, v: 8)
             }
         }
