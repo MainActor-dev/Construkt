@@ -17,7 +17,7 @@ class HomeViewController: UIViewController {
     
     var body: View {
         CollectionView {
-            Section(id: HomeSection.hero, items: viewModel.popularMoviesObservable) { movie in
+            Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
                  Cell(movie, id: movie.id) { movie in
                       MovieCardView(movie: movie)
                  }
@@ -28,8 +28,23 @@ class HomeViewController: UIViewController {
             .layout { _ in
                 return HomeSection.hero.layout
             }
-            .skeleton(count: 1, when: viewModel.isLoadingObservable) {
+            .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
                 MovieCardView(movie: .placeholder)
+            }
+            
+            Section(id: HomeSection.popular, items: viewModel.popularSectionMoviesObservable) { movie in
+                Cell(movie, id: movie.id) { movie in
+                    PosterCell(movie: movie)
+                }
+                .onSelect { [weak self] movie in
+                    self?.showDetail(for: movie)
+                }
+            }
+            .layout { _ in
+                return HomeSection.popular.layout
+            }
+            .skeleton(count: 2, when: viewModel.isPopularSectionLoadingObservable) {
+                PosterCell(movie: .placeholder)
             }
         }
         .backgroundColor(UIColor("#0A0A0A"))
@@ -52,7 +67,7 @@ class HomeViewController: UIViewController {
     }
     
     private func fetchData() {
-        viewModel.loadPopularMovies()
+        viewModel.loadHomeData()
     }
     
     private func showDetail(for movie: Movie) {

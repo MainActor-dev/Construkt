@@ -16,10 +16,12 @@ enum HomeSection: String, SectionControllerIdentifier {
         case .popular:
             return .layout(
                 group: .horizontally(
-                    estimatedWidth: 128,
-                    estimatedHeight: 231,
-                    insets: .init(top: 0, leading: 16, bottom: 0, trailing: 16)
-                )
+                    width: .absolute(128),
+                    height: .estimated(200)
+                ),
+                spacing: 8,
+                insets:  .init(top: 16, leading: 16, bottom: 0, trailing: 16),
+                scrolling: .continuous
             )
         }
     }

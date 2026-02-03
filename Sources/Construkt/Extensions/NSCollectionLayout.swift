@@ -66,17 +66,17 @@ extension NSCollectionLayoutGroup {
     }
     
     static func horizontally(
-        estimatedWidth: CGFloat,
-        estimatedHeight: CGFloat,
+        width: NSCollectionLayoutDimension,
+        height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
         let item = NSCollectionLayoutItem(layoutSize: .init(
-            widthDimension: .estimated(estimatedWidth),
-            heightDimension: .estimated(estimatedHeight)
+            widthDimension: width,
+            heightDimension: height
         ))
         let groupSize = NSCollectionLayoutSize(
-            widthDimension: .estimated(estimatedWidth),
-            heightDimension: .estimated(estimatedHeight)
+            widthDimension: width,
+            heightDimension: height
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         group.contentInsets = insets

@@ -6,8 +6,14 @@ public class MovieViewModel {
     
     // MARK: - State
     
-    /// List of movies (Popular, Top Rated, etc.)
+    /// List of movies (Popular, Top Rated, etc.) - Main List
     @Variable public private(set) var state = LoadableState<[Movie]>.initial
+    
+    /// Now Playing Movies (Hero Section)
+    @Variable public private(set) var nowPlayingState = LoadableState<[Movie]>.initial
+    
+    /// Popular Movies (Popular Section)
+    @Variable public private(set) var popularState = LoadableState<[Movie]>.initial
     
     /// Detail of the selected movie
     @Variable public private(set) var selectedMovie: Movie? = nil
@@ -46,6 +52,40 @@ public class MovieViewModel {
             }
     }
     
+    public var nowPlayingMoviesObservable: Observable<[Movie]> {
+        $nowPlayingState.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
+    }
+    
+    public var isNowPlayingLoadingObservable: Observable<Bool> {
+        $nowPlayingState.asObservable().map { state in
+            if case .initial = state { return true }
+            if case .loading = state { return true }
+            return false
+        }
+    }
+    
+    public var popularSectionMoviesObservable: Observable<[Movie]> {
+        $popularState.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
+    }
+    
+    public var isPopularSectionLoadingObservable: Observable<Bool> {
+        $popularState.asObservable().map { state in
+            if case .initial = state { return true }
+            if case .loading = state { return true }
+            return false
+        }
+    }
+    
     // MARK: - Dependencies
     
     private let service: MovieServiceProtocol
@@ -56,23 +96,32 @@ public class MovieViewModel {
         self.service = service
     }
     
-    // MARK: - Actions
-    
-    public func loadPopularMovies() {
-        fetchMovies(title: "Popular Movies") { [weak self] in
-            try await self?.service.getPopularMovies(page: 1)
-        }
-    }
-    
-    public func loadTopRatedMovies() {
-        fetchMovies(title: "Top Rated Movies") { [weak self] in
-            try await self?.service.getTopRatedMovies(page: 1)
-        }
-    }
-    
-    public func loadNowPlayingMovies() {
-        fetchMovies(title: "Now Playing") { [weak self] in
-            try await self?.service.getNowPlayingMovies(page: 1)
+    public func loadHomeData() {
+        self.nowPlayingState = .loading
+        self.popularState = .loading
+        
+        Task {
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            // Fetch concurrently
+            async let nowPlaying = service.getNowPlayingMovies(page: 1)
+            async let popular = service.getPopularMovies(page: 1)
+            
+            do {
+                let nowPlayingResult = try await nowPlaying
+                let popularResult = try await popular
+                
+                await MainActor.run {
+                    self.nowPlayingState = .loaded(nowPlayingResult.results)
+                    self.popularState = .loaded(popularResult.results)
+                }
+            } catch {
+                await MainActor.run {
+                    // Start simplified handling, ideally handle individually
+                    self.nowPlayingState = .error(error.localizedDescription)
+                    self.popularState = .error(error.localizedDescription)
+                }
+            }
         }
     }
     
@@ -90,34 +139,6 @@ public class MovieViewModel {
             } catch {
                 print("Failed to fetch details for movie \(movie.id): \(error)")
                 // We keep the optimistically selected movie, maybe show an error toast in a real app
-            }
-        }
-    }
-    
-    // MARK: - Private Helpers
-    
-    private func fetchMovies(title: String, action: @escaping () async throws -> MovieResponse?) {
-        self.title = title
-        self.state = .loading
-        
-        Task {
-            /// Simulate loading for 2 seconds
-            try await Task.sleep(nanoseconds: 2_000_000_000)
-            do {
-                if let response = try await action() {
-                    let movies = response.results
-                    await MainActor.run {
-                        if movies.isEmpty {
-                            self.state = .empty("No movies found.")
-                        } else {
-                            self.state = .loaded(movies)
-                        }
-                    }
-                }
-            } catch {
-                await MainActor.run {
-                    self.state = .error(error.localizedDescription)
-                }
             }
         }
     }
