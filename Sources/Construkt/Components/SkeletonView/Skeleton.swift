@@ -13,7 +13,6 @@ public enum Skeleton<Cell: UICollectionViewCell> {
     }
     
     public static func create(id: AnyHashable, configure: ((Cell) -> Void)? = nil) -> CellController {
-        print("[BEKA] id", id)
         return CellController(
             id: id,
             model: (),

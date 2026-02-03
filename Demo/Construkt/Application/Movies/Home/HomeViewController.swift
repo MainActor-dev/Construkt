@@ -258,29 +258,27 @@ struct UpcomingCell: ViewBuilder {
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
                 .clipsToBounds(true)
-            
+            GradientView(colors: [.clear, .black.withAlphaComponent(0.8)])
+                .height(80)
             VStackView {
                 SpacerView()
-                GradientView(colors: [.clear, .black.withAlphaComponent(0.8)])
-                    .height(80)
+                VStackView {
+                    LabelView("COMING JUNE 24") // Placeholder
+                        .font(.systemFont(ofSize: 10, weight: .bold))
+                        .color(.white)
+                        .backgroundColor(UIColor.black.withAlphaComponent(0.5))
+                        .cornerRadius(4)
+                        .padding(h: 4, v: 2)
+                        .skeletonable(true)
+                    LabelView(movie.title)
+                        .font(.systemFont(ofSize: 16, weight: .semibold))
+                        .color(.white)
+                        .numberOfLines(2)
+                        .skeletonable(true)
+                }
+                .alignment(.leading)
+                .padding(h: 12, v: 8)
             }
-            
-            VStackView(spacing: 4) {
-                SpacerView()
-                LabelView("COMING JUNE 24") // Placeholder
-                    .font(.systemFont(ofSize: 10, weight: .bold))
-                    .color(.white)
-                    .backgroundColor(UIColor.black.withAlphaComponent(0.5))
-                    .cornerRadius(4)
-                
-                LabelView(movie.title)
-                    .font(.systemFont(ofSize: 16, weight: .semibold))
-                    .color(.white)
-                    .numberOfLines(1)
-                    .skeletonable(true)
-            }
-            .alignment(.leading)
-            .padding(12)
         }
         .cornerRadius(8)
         .clipsToBounds(true)
