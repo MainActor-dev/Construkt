@@ -73,6 +73,31 @@ class HeaderFooterViewController: UIViewController {
                 
                 return section
             }
+            
+            Section(id: DefaultSectionIdentifier(uniqueId: "empty_demo")) {
+                return [CellController]()
+            }
+            .header {
+                 Header {
+                    LabelView("Empty Section Demo")
+                        .font(.systemFont(ofSize: 20, weight: .bold))
+                        .padding(16)
+                 }
+            }
+            .emptyState {
+                VStackView {
+                    ImageView(systemName: "tray")
+                        .tintColor(.gray)
+                        .contentMode(.scaleAspectFit)
+                        
+                    LabelView("No items here!")
+                        .color(.gray)
+                        .alignment(.center)
+                }
+                .spacing(8)
+                .alignment(.center)
+                .padding(32)
+            }
         }
         .backgroundColor(.systemGroupedBackground)
     }

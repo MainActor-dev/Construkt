@@ -312,6 +312,36 @@ public struct Section: SectionObservable {
         return Section(observable: improved)
     }
     
+    public func header(_ handler: @escaping () -> Header) -> Section {
+        let improved = observable.map { sections in
+            sections.map { section in
+                return SectionController(
+                    identifier: section.identifier,
+                    cells: section.cells,
+                    header: handler().controller,
+                    footer: section.footer,
+                    layoutProvider: section.layoutProvider
+                )
+            }
+        }
+        return Section(observable: improved)
+    }
+    
+    public func footer(_ handler: @escaping () -> Footer) -> Section {
+        let improved = observable.map { sections in
+             sections.map { section in
+                 return SectionController(
+                     identifier: section.identifier,
+                     cells: section.cells,
+                     header: section.header,
+                     footer: handler().controller,
+                     layoutProvider: section.layoutProvider
+                 )
+             }
+         }
+         return Section(observable: improved)
+     }
+    
     public func skeleton<C, B>(
         _ type: C.Type,
         count: Int,
@@ -350,6 +380,108 @@ public struct Section: SectionObservable {
         return skeleton(HostingCell<Content>.self, count: count, when: binding) { cell in
             cell.host(placeholder())
         }
+    }
+    
+    public func emptyState(
+        layout: ((String) -> NSCollectionLayoutSection)? = nil,
+        @ViewResultBuilder _ content: @escaping () -> ViewConvertable
+    ) -> Section {
+        return Section(observable: observable.map { sections in
+            sections.map { section in
+                if section.cells.isEmpty {
+                    // Create Empty Cell
+                    let emptyCell = CellController(
+                        id: "empty_\(section.identifier.uniqueId)",
+                        model: (),
+                        registration: UICollectionView.CellRegistration<HostingCell<UIView>, Void> { cell, _, _ in
+                            let views = content().asViews()
+                            let stack = VStackView(views)
+                                .alignment(.center)
+                            cell.host(stack.build())
+                        },
+                        didSelect: nil
+                    )
+                    
+                    // Determine Layout
+                    let layoutProvider: (String) -> NSCollectionLayoutSection? = { env in
+                        // 1. Base Layout (Custom or Default Full Width)
+                        let sectionLayout: NSCollectionLayoutSection
+                        if let customLayout = layout {
+                            sectionLayout = customLayout(env)
+                        } else {
+                            // Default to Full Width for Empty State
+                            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(100))
+                            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(100))
+                            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                            sectionLayout = NSCollectionLayoutSection(group: group)
+                        }
+                        
+                        // 2. Inherit Header/Footer from Original Section Layout if available
+                        if let originalProvider = section.layoutProvider, let originalLayout = originalProvider(env) {
+                            var supplementaries = sectionLayout.boundarySupplementaryItems
+                            
+                            // Remove conflicting headers/footers from base layout to prioritize original
+                            supplementaries.removeAll { $0.elementKind == UICollectionView.elementKindSectionHeader }
+                            supplementaries.removeAll { $0.elementKind == UICollectionView.elementKindSectionFooter }
+                            
+                            // Add headers/footers from original layout
+                            let originalSupplementaries = originalLayout.boundarySupplementaryItems.filter {
+                                $0.elementKind == UICollectionView.elementKindSectionHeader ||
+                                $0.elementKind == UICollectionView.elementKindSectionFooter
+                            }
+                            supplementaries.append(contentsOf: originalSupplementaries)
+                            
+                            sectionLayout.boundarySupplementaryItems = supplementaries
+                            
+                            // Inherit content insets from original layout
+                            sectionLayout.contentInsets = originalLayout.contentInsets
+                        } else {
+                            // Fallback if no original layout (e.g. manually constructing if needed, similar to previous step)
+                             addSupplementaries(to: sectionLayout, from: section)
+                        }
+                        
+                        return sectionLayout
+                    }
+                    
+                    func addSupplementaries(to layout: NSCollectionLayoutSection, from section: SectionController) {
+                         var supplementaries = layout.boundarySupplementaryItems
+                         let hasHeader = supplementaries.contains { $0.elementKind == UICollectionView.elementKindSectionHeader }
+                         let hasFooter = supplementaries.contains { $0.elementKind == UICollectionView.elementKindSectionFooter }
+                         
+                         if !hasHeader, let _ = section.header {
+                             let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(50))
+                             let header = NSCollectionLayoutBoundarySupplementaryItem(
+                                 layoutSize: headerSize,
+                                 elementKind: UICollectionView.elementKindSectionHeader,
+                                 alignment: .top
+                             )
+                             supplementaries.append(header)
+                         }
+                         
+                         if !hasFooter, let _ = section.footer {
+                              let footerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(50))
+                              let footer = NSCollectionLayoutBoundarySupplementaryItem(
+                                  layoutSize: footerSize,
+                                  elementKind: UICollectionView.elementKindSectionFooter,
+                                  alignment: .bottom
+                              )
+                              supplementaries.append(footer)
+                         }
+                         layout.boundarySupplementaryItems = supplementaries
+                    }
+                    
+                    return SectionController(
+                        identifier: section.identifier,
+                        cells: [emptyCell],
+                        header: section.header,
+                        footer: section.footer,
+                        layoutProvider: layoutProvider
+                    )
+                }
+                return section
+            }
+        })
     }
     
     // Internal init for modifiers

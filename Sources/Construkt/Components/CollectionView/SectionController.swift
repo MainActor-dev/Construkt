@@ -41,6 +41,10 @@ public struct DefaultSectionIdentifier: SectionControllerIdentifier {
     public init() {
         self.uniqueId = String(describing: DefaultSectionIdentifier.self)
     }
+    
+    public init(uniqueId: String) {
+        self.uniqueId = uniqueId
+    }
 }
 
 public struct SectionController {

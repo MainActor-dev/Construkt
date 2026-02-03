@@ -57,6 +57,20 @@ class HomeViewController: UIViewController {
             .skeleton(count: 2, when: viewModel.isPopularSectionLoadingObservable) {
                 PosterCell(movie: .placeholder)
             }
+            .emptyState {
+                VStackView {
+                    ImageView(systemName: "tray")
+                        .tintColor(.gray)
+                        .contentMode(.scaleAspectFit)
+                        
+                    LabelView("No items here!")
+                        .color(.gray)
+                        .alignment(.center)
+                }
+                .spacing(8)
+                .alignment(.center)
+                .padding(32)
+            }
         }
         .backgroundColor(UIColor("#0A0A0A"))
         .with {
@@ -69,11 +83,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor("#0A0A0A")
-        
-        // Initial Embed
         view.embed(body)
-        
-        // Reactivity
         fetchData()
     }
     
