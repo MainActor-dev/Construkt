@@ -86,6 +86,18 @@ public class MovieViewModel {
         }
     }
     
+    public var isEmptyObservable: Observable<Bool> {
+        Observable.combineLatest(
+            nowPlayingMoviesObservable,
+            popularSectionMoviesObservable,
+            isNowPlayingLoadingObservable,
+            isPopularSectionLoadingObservable
+        ).map { nowPlaying, popular, isNowPlayingLoading, isPopularLoading in
+            if isNowPlayingLoading || isPopularLoading { return false }
+            return nowPlaying.isEmpty && popular.isEmpty
+        }
+    }
+    
     // MARK: - Dependencies
     
     private let service: MovieServiceProtocol
@@ -101,6 +113,7 @@ public class MovieViewModel {
         self.popularState = .loading
         
         Task {
+            // Simulate loading
             try await Task.sleep(nanoseconds: 2_000_000_000)
             
             // Fetch concurrently

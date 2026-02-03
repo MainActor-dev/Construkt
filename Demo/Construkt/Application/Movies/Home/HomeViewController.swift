@@ -20,6 +20,13 @@ class HomeViewController: UIViewController {
             heroSection
             popularSection
         }
+        .emptyState(when: viewModel.isEmptyObservable) {
+           EmptyView(
+            title: "No movies found",
+            subtitle: "Check your connection.",
+            buttonTitle: "Retry"
+           )
+        }
         .backgroundColor(UIColor("#0A0A0A"))
         .with {
             $0.collectionView.contentInsetAdjustmentBehavior = .never
@@ -49,7 +56,7 @@ class HomeViewController: UIViewController {
     private var heroSection: Section {
         Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
             Cell(movie, id: movie.id) { movie in
-                MovieCardView(movie: movie)
+                HeroView(movie: movie)
             }
             .onSelect { [weak self] movie in
                 self?.showDetail(for: movie)
@@ -59,7 +66,7 @@ class HomeViewController: UIViewController {
             return HomeSection.hero.layout
         }
         .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
-            MovieCardView(movie: .placeholder)
+            HeroView(movie: .placeholder)
         }
     }
     
@@ -86,29 +93,29 @@ class HomeViewController: UIViewController {
         .layout { _ in
             return HomeSection.popular.layout
         }
-        .skeleton(count: 2, when: viewModel.isPopularSectionLoadingObservable) {
+        .skeleton(count: 4, when: viewModel.isPopularSectionLoadingObservable) {
             PosterCell(movie: .placeholder)
         }
         .emptyState {
-            VStackView {
-                ImageView(systemName: "tray")
-                    .tintColor(.gray)
-                    .contentMode(.scaleAspectFit)
-                
-                LabelView("No items here!")
-                    .color(.gray)
-                    .alignment(.center)
-            }
-            .spacing(8)
-            .alignment(.center)
-            .padding(32)
+            EmptyView(title: "No items here!", subtitle: "Check your connection", buttonTitle: "Retry")
+//            VStackView {
+//                ImageView(systemName: "tray")
+//                    .tintColor(.gray)
+//                    .contentMode(.scaleAspectFit)
+//                
+//                LabelView("No items here!")
+//                    .color(.gray)
+//                    .alignment(.center)
+//            }
+//            .spacing(8)
+//            .alignment(.center)
+//            .padding(32)
         }
     }
 }
 
 // MARK: - Components
-
-struct MovieCardView: ViewBuilder {
+struct HeroView: ViewBuilder {
     let movie: Movie
     
     var body: View {

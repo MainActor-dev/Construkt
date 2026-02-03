@@ -142,4 +142,56 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
         adapter.collectionView(collectionView, cancelPrefetchingForItemsAt: indexPaths)
     }
+    
+    // MARK: - Empty State
+    
+    public var emptyStateProvider: (() -> UIView)?
+    private var emptyStateView: UIView?
+    
+    internal func updateEmptyState(show: Bool) {
+        if show {
+            if emptyStateView == nil {
+                guard let provider = emptyStateProvider else { return }
+                let view = provider()
+                view.translatesAutoresizingMaskIntoConstraints = false
+                addSubview(view)
+                NSLayoutConstraint.activate([
+                    view.centerXAnchor.constraint(equalTo: centerXAnchor),
+                    view.centerYAnchor.constraint(equalTo: centerYAnchor),
+                    view.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 20),
+                    view.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
+                    view.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: 20),
+                    view.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -20)
+                ])
+                emptyStateView = view
+            }
+            emptyStateView?.isHidden = false
+            collectionView.isHidden = true
+        } else {
+            emptyStateView?.isHidden = true
+            collectionView.isHidden = false
+        }
+    }
+}
+
+public extension CollectionView {
+    func emptyState<B: RxBinding>(when binding: B, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> CollectionView where B.T == Bool {
+        let views = content().asViews()
+        let view = VStackView(views)
+            .alignment(.center)
+            .build()
+        // Set the view provider (could be just the view instance)
+        modifiableView.emptyStateProvider = { view }
+        
+        // Subscribe to binding
+        binding.asObservable()
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak modifiableView] show in
+                modifiableView?.updateEmptyState(show: show)
+            })
+            .disposed(by: modifiableView.rxDisposeBag)
+            
+        return self
+    }
 }

@@ -42,16 +42,36 @@ struct ErrorView: ViewBuilder {
 }
 
 struct EmptyView: ViewBuilder {
-    let message: String
+    let title: String
+    let subtitle: String
+    let buttonTitle: String
     
     var body: View {
-        CenteredView {
-            LabelView(message)
-                .font(.systemFont(ofSize: 16))
-                .color(.secondaryLabel)
+        VStackView {
+            ImageView(systemName: "square.dashed")
+                .tintColor(.gray)
+                .contentMode(.scaleAspectFit)
+                .width(64)
+                .height(64)
+            LabelView(title)
+                .font(.systemFont(ofSize: 20, weight: .bold))
+                .color(.lightGray)
                 .alignment(.center)
+            LabelView(subtitle)
+                .font(.systemFont(ofSize: 14))
+                .color(.gray)
+                .alignment(.center)
+            SpacerView(12)
+            ButtonView(buttonTitle)
+                .font(.systemFont(ofSize: 15, weight: .bold))
+                .color(.black)
+                .backgroundColor(.white)
+                .cornerRadius(12)
+                .height(40)
+                .width(128)
         }
-        .backgroundColor(.systemBackground)
+        .spacing(12)
+        .alignment(.center)
     }
 }
 
