@@ -49,15 +49,21 @@ public struct SectionController {
     
     public let identifier: SectionControllerIdentifier
     public let cells: [CellController]
+    public let header: SupplementaryController?
+    public let footer: SupplementaryController?
     public var layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
     
     public init(
         identifier: SectionControllerIdentifier,
         cells: [CellController],
+        header: SupplementaryController? = nil,
+        footer: SupplementaryController? = nil,
         layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
     ) {
         self.identifier = identifier
         self.cells = cells
+        self.header = header
+        self.footer = footer
         self.layoutProvider = layoutProvider
     }
 }

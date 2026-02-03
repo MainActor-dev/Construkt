@@ -32,7 +32,18 @@ class HomeViewController: UIViewController {
                 MovieCardView(movie: .placeholder)
             }
             
-            Section(id: HomeSection.popular, items: viewModel.popularSectionMoviesObservable) { movie in
+            Section(
+                id: HomeSection.popular, 
+                items: viewModel.popularSectionMoviesObservable,
+                header: {
+                     Header {
+                        LabelView("Popular")
+                            .font(.systemFont(ofSize: 24, weight: .bold))
+                            .color(.white)
+                            .backgroundColor(.clear)
+                    }
+                }
+            ) { movie in
                 Cell(movie, id: movie.id) { movie in
                     PosterCell(movie: movie)
                 }

@@ -116,9 +116,6 @@ extension CollectionListViewController {
         collectionView.setCollectionViewLayout(layout, animated: false)
     }
     
-    func registerHeaderFooter(_ supplementaryViewProvider: CollectionDiffableDataSource.SupplementaryViewProvider?) {
-        dataSource.supplementaryViewProvider = supplementaryViewProvider
-    }
     
 //    func registerPagination(
 //        _ scrollView: UIScrollView,

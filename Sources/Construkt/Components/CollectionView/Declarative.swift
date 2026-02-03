@@ -88,7 +88,7 @@ extension Array: SectionObservable where Element == SectionController {
     public func asSectionObservable() -> Observable<[SectionController]> { .just(self) }
 }
 
-public protocol CellConvertible {
+public protocol CellConvertible: SectionComponent {
     func asCells() -> [CellController]
 }
 
@@ -100,7 +100,132 @@ extension Array: CellConvertible where Element == CellController {
     public func asCells() -> [CellController] { self }
 }
 
-// MARK: - Declaration Wrapper
+extension Array: SectionComponent where Element == CellController {}
+// MARK: - Section Constructs
+
+public protocol SectionComponent {}
+
+public struct Header: SectionComponent {
+    public let controller: SupplementaryController
+    
+    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+        self.controller = SupplementaryController(
+            elementKind: UICollectionView.elementKindSectionHeader,
+            viewType: HostingReusableView<VStackView>.self
+        ) { view in
+            let views = content().asViews()
+            view.host(VStackView(views))
+        }
+    }
+    
+    // Internal init for modifier
+    private init(_ controller: SupplementaryController) {
+        self.controller = controller
+    }
+    
+    public func hidden(_ isHidden: Bool) -> Header {
+        var copy = self.controller
+        copy.isHidden = isHidden
+        return Header(copy)
+    }
+}
+
+public struct Footer: SectionComponent {
+    public let controller: SupplementaryController
+    
+    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+        self.controller = SupplementaryController(
+            elementKind: UICollectionView.elementKindSectionFooter,
+            viewType: HostingReusableView<VStackView>.self
+        ) { view in
+             let views = content().asViews()
+             view.host(VStackView(views))
+        }
+    }
+    
+    // Internal init for modifier
+    private init(_ controller: SupplementaryController) {
+        self.controller = controller
+    }
+    
+    public func hidden(_ isHidden: Bool) -> Footer {
+        var copy = self.controller
+        copy.isHidden = isHidden
+        return Footer(copy)
+    }
+}
+
+// Ensure CellController conforms to SectionComponent (via CellConvertible wrapper)
+public struct CellComponent: SectionComponent {
+    let cells: [CellController]
+}
+
+extension CellController: SectionComponent {}
+
+// MARK: - Section Content Builder
+
+public struct SectionContent {
+    var cells: [CellController] = []
+    var header: SupplementaryController?
+    var footer: SupplementaryController?
+}
+
+@resultBuilder
+public struct SectionContentBuilder {
+    public static func buildBlock(_ components: SectionComponent...) -> SectionContent {
+        var content = SectionContent()
+        for component in components {
+            if let header = component as? Header {
+                content.header = header.controller // Take the last one or first? Let's say last one wins or first one? Usually unique.
+            } else if let footer = component as? Footer {
+                content.footer = footer.controller
+            } else if let cell = component as? CellController {
+                content.cells.append(cell)
+            } else if let cellConvertible = component as? CellConvertible {
+                content.cells.append(contentsOf: cellConvertible.asCells())
+            }
+        }
+        return content
+    }
+    
+    public static func buildExpression(_ expression: CellConvertible) -> SectionComponent {
+        return expression
+    }
+    
+    public static func buildExpression(_ expression: Header) -> SectionComponent {
+        return expression
+    }
+    
+    public static func buildExpression(_ expression: Footer) -> SectionComponent {
+        return expression
+    }
+    
+    public static func buildOptional(_ component: SectionComponent?) -> SectionComponent {
+         return component ?? CellComponent(cells: [])
+    }
+    
+    public static func buildEither(first: SectionComponent) -> SectionComponent {
+        return first
+    }
+
+    public static func buildEither(second: SectionComponent) -> SectionComponent {
+        return second
+    }
+    
+    public static func buildArray(_ components: [SectionComponent]) -> SectionComponent {
+        // Flatten cells
+        var cells: [CellController] = []
+        components.forEach {
+            if let cell = $0 as? CellController {
+                cells.append(cell)
+            } else if let convertible = $0 as? CellConvertible {
+                cells.append(contentsOf: convertible.asCells())
+            }
+        }
+        return CellComponent(cells: cells)
+    }
+}
+
 
 public struct Section: SectionObservable {
     private let observable: Observable<[SectionController]>
@@ -124,7 +249,7 @@ public struct Section: SectionObservable {
         @CellResultBuilder content: (T) -> [CellController]
     ) {
         let cells = items.flatMap { content($0) }
-        let section = SectionController(identifier: id, cells: cells, layoutProvider: nil)
+        let section = SectionController(identifier: id, cells: cells, header: nil, footer: nil, layoutProvider: nil)
         self.observable = .just([section])
     }
     
@@ -134,15 +259,9 @@ public struct Section: SectionObservable {
         binding: B,
         @CellResultBuilder content: @escaping (B.T) -> [CellController]
     ) {
-        // Map the binding value to a SectionController
         self.observable = binding.asObservable()
             .map { items in
-                let cells = content(items) // content(items) returns [CellController]? No, content takes B.T
-                // Wait, if B.T is [Item], then content expects [Item].
-                // The block should probably be T -> [CellController] if user passes items: binding.
-                
-                // Let's assume content handles the conversion.
-                return [SectionController(identifier: id, cells: cells, layoutProvider: nil)]
+                return [SectionController(identifier: id, cells: content(items), header: nil, footer: nil, layoutProvider: nil)]
             }
     }
     
@@ -150,14 +269,34 @@ public struct Section: SectionObservable {
     public init<B: RxBinding, Element>(
         id: SectionControllerIdentifier,
         items binding: B,
+        header: (() -> Header)? = nil,
+        footer: (() -> Footer)? = nil,
         @CellResultBuilder content: @escaping (Element) -> [CellController]
     ) where B.T == [Element] {
         self.observable = binding.asObservable()
             .map { items in
                 let cells = items.flatMap { content($0) }
-                return [SectionController(identifier: id, cells: cells, layoutProvider: nil)]
+                return [SectionController(identifier: id, cells: cells, header: header?().controller, footer: footer?().controller, layoutProvider: nil)]
             }
     }
+
+    /// Builder Initializer with Header/Footer support
+    public init(
+        id: SectionControllerIdentifier,
+        @SectionContentBuilder content: () -> SectionContent
+    ) {
+        let sectionContent = content()
+        let section = SectionController(
+            identifier: id, 
+            cells: sectionContent.cells, 
+            header: sectionContent.header, 
+            footer: sectionContent.footer, 
+            layoutProvider: nil
+        )
+        self.observable = .just([section])
+    }
+    
+    // MARK: Modifiers
     
     // MARK: Modifiers
     
@@ -190,6 +329,8 @@ public struct Section: SectionObservable {
                          return SectionController(
                             identifier: section.identifier,
                             cells: Skeleton<C>.create(count: count, configure: configure),
+                            header: section.header,
+                            footer: section.footer,
                             layoutProvider: section.layoutProvider
                          )
                     }
@@ -360,12 +501,30 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     }()
     
     private lazy var dataSource: CollectionDiffableDataSource = {
-        return CollectionDiffableDataSource(
+        let ds = CollectionDiffableDataSource(
             collectionView: collectionView,
             cellProvider: { (collectionView, index, item) in
                 return item.cell(in: collectionView, at: index)
             }
         )
+        
+        ds.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
+            // Identify section
+            guard let self = self,
+                  let identifier = self.dataSource.sectionIdentifier(at: indexPath.section),
+                  let section = self.dataSource.snapshot().sectionIdentifiers.first(where: { $0.identifier.uniqueId == identifier })
+            else { return nil }
+            
+            if kind == UICollectionView.elementKindSectionHeader, let header = section.header {
+                 return header.dequeue(collectionView, indexPath)
+            } else if kind == UICollectionView.elementKindSectionFooter, let footer = section.footer {
+                 return footer.dequeue(collectionView, indexPath)
+            }
+            
+            return nil
+        }
+        
+        return ds
     }()
     
     private lazy var adapter: CellControllerAdapter = {
@@ -410,6 +569,16 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                    layout.contentInsets = .zero
                    layout.decorationItems = []
                    layout.boundarySupplementaryItems = []
+                } else {
+                    // Filter hidden headers/footers
+                    layout.boundarySupplementaryItems = layout.boundarySupplementaryItems.filter { item in
+                        if item.elementKind == UICollectionView.elementKindSectionHeader {
+                            return !(sectionController.header?.isHidden ?? false)
+                        } else if item.elementKind == UICollectionView.elementKindSectionFooter {
+                            return !(sectionController.footer?.isHidden ?? false)
+                        }
+                        return true
+                    }
                 }
                 
                 return layout
@@ -419,6 +588,7 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         
         collectionView.setCollectionViewLayout(layout, animated: false)
     }
+    
     
     // MARK: - Delegate Forwarding
     
@@ -434,3 +604,4 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         adapter.collectionView(collectionView, cancelPrefetchingForItemsAt: indexPaths)
     }
 }
+

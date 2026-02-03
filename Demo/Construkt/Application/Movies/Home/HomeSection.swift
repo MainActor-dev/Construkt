@@ -21,6 +21,7 @@ enum HomeSection: String, SectionControllerIdentifier {
                 ),
                 spacing: 8,
                 insets:  .init(top: 16, leading: 16, bottom: 0, trailing: 16),
+                supplementaryItems: [.header(height: .absolute(30))],
                 scrolling: .continuous
             )
         }
