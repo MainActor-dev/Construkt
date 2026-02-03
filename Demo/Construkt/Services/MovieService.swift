@@ -10,8 +10,10 @@ public protocol MovieServiceProtocol {
 public class MovieService: MovieServiceProtocol {
     private let client: NetworkClient
     
-    public init(client: NetworkClient = .init(configuration: NetworkConfiguration(baseURL: TMDBConfiguration.baseURL), 
-                                              interceptors: [TMDBRequestInterceptor()])) {
+    public init(client: NetworkClient = .init(
+        configuration: NetworkConfiguration(baseURL: TMDBConfiguration.baseURL),
+        interceptors: [TMDBRequestInterceptor()])
+    ) {
         self.client = client
     }
     

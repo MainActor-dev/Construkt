@@ -70,13 +70,12 @@ public class MovieViewModel {
     }
     
     public var popularSectionMoviesObservable: Observable<[Movie]> {
-//        $popularState.asObservable().map { state in
-//            if case .loaded(let movies) = state {
-//                return movies
-//            }
-//            return []
-//        }
-        .just([])
+        $popularState.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
     }
     
     public var isPopularSectionLoadingObservable: Observable<Bool> {

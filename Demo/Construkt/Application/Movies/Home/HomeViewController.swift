@@ -17,60 +17,8 @@ class HomeViewController: UIViewController {
     
     var body: View {
         CollectionView {
-            Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
-                 Cell(movie, id: movie.id) { movie in
-                      MovieCardView(movie: movie)
-                 }
-                 .onSelect { [weak self] movie in
-                     self?.showDetail(for: movie)
-                 }
-            }
-            .layout { _ in
-                return HomeSection.hero.layout
-            }
-            .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
-                MovieCardView(movie: .placeholder)
-            }
-            
-            Section(
-                id: HomeSection.popular, 
-                items: viewModel.popularSectionMoviesObservable,
-                header: {
-                     Header {
-                        LabelView("Popular")
-                            .font(.systemFont(ofSize: 24, weight: .bold))
-                            .color(.white)
-                            .backgroundColor(.clear)
-                    }
-                }
-            ) { movie in
-                Cell(movie, id: movie.id) { movie in
-                    PosterCell(movie: movie)
-                }
-                .onSelect { [weak self] movie in
-                    self?.showDetail(for: movie)
-                }
-            }
-            .layout { _ in
-                return HomeSection.popular.layout
-            }
-            .skeleton(count: 2, when: viewModel.isPopularSectionLoadingObservable) {
-                PosterCell(movie: .placeholder)
-            }
-            .emptyState {
-                VStackView {
-                    ImageView(systemName: "tray")
-                        .tintColor(.gray)
-                        .contentMode(.scaleAspectFit)
-                        
-                    LabelView("No items here!")
-                        .color(.gray)
-                        .alignment(.center)
-                }
-                .spacing(8)
-                .alignment(.center)
-                .padding(32)
-            }
+            heroSection
+            popularSection
         }
         .backgroundColor(UIColor("#0A0A0A"))
         .with {
@@ -95,6 +43,67 @@ class HomeViewController: UIViewController {
         let detailVC = MovieDetailViewController(movie: movie)
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
+    // MARK: - Sections
+    
+    private var heroSection: Section {
+        Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
+            Cell(movie, id: movie.id) { movie in
+                MovieCardView(movie: movie)
+            }
+            .onSelect { [weak self] movie in
+                self?.showDetail(for: movie)
+            }
+        }
+        .layout { _ in
+            return HomeSection.hero.layout
+        }
+        .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
+            MovieCardView(movie: .placeholder)
+        }
+    }
+    
+    private var popularSection: Section {
+        Section(
+            id: HomeSection.popular,
+            items: viewModel.popularSectionMoviesObservable,
+            header: {
+                Header {
+                    LabelView("Popular")
+                        .font(.systemFont(ofSize: 24, weight: .bold))
+                        .color(.white)
+                        .backgroundColor(.clear)
+                }
+            }
+        ) { movie in
+            Cell(movie, id: movie.id) { movie in
+                PosterCell(movie: movie)
+            }
+            .onSelect { [weak self] movie in
+                self?.showDetail(for: movie)
+            }
+        }
+        .layout { _ in
+            return HomeSection.popular.layout
+        }
+        .skeleton(count: 2, when: viewModel.isPopularSectionLoadingObservable) {
+            PosterCell(movie: .placeholder)
+        }
+        .emptyState {
+            VStackView {
+                ImageView(systemName: "tray")
+                    .tintColor(.gray)
+                    .contentMode(.scaleAspectFit)
+                
+                LabelView("No items here!")
+                    .color(.gray)
+                    .alignment(.center)
+            }
+            .spacing(8)
+            .alignment(.center)
+            .padding(32)
+        }
+    }
 }
 
 // MARK: - Components
@@ -109,7 +118,7 @@ struct MovieCardView: ViewBuilder {
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
                 .clipsToBounds(true)
-
+            
             VStackView {
                 SpacerView()
                 VStackView {
