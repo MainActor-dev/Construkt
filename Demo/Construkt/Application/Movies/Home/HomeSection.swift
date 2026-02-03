@@ -2,7 +2,10 @@ import UIKit
 
 enum HomeSection: String, SectionControllerIdentifier {
     case hero
+    case categories
     case popular
+    case upcoming
+    case topRated
     
     var uniqueId: String { rawValue }
     
@@ -10,9 +13,20 @@ enum HomeSection: String, SectionControllerIdentifier {
         switch self {
         case .hero:
             return .layout(
-                group: .horizontally(height: .absolute(480)),
+                group: .horizontally(height: .absolute(550)),
                 insets: .init(top: 0, leading: 0, bottom: 16, trailing: 0),
                 scrolling: .groupPagingCentered
+            )
+        case .categories:
+            return .layout(
+                group: .horizontally(
+                    width: .estimated(100),
+                    height: .absolute(40)
+                ),
+                spacing: 12,
+                insets: .init(v: 16, h: 16),
+                supplementaryItems: [.header(height: .absolute(40))],
+                scrolling: .continuous
             )
         case .popular:
             return .layout(
@@ -21,9 +35,27 @@ enum HomeSection: String, SectionControllerIdentifier {
                     height: .estimated(200)
                 ),
                 spacing: 8,
-                insets:  .init(top: 16, leading: 16, bottom: 0, trailing: 16),
+                insets: .init(v: 16, h: 16),
                 supplementaryItems: [.header(height: .absolute(30))],
                 scrolling: .continuous
+            )
+        case .upcoming:
+            return .layout(
+                group: .horizontally(
+                    width: .absolute(280),
+                    height: .absolute(160)
+                ),
+                spacing: 12,
+                insets: .init(v: 16, h: 16),
+                supplementaryItems: [.header(height: .absolute(40))],
+                scrolling: .continuous
+            )
+        case .topRated:
+            return .layout(
+                group: .vertically(height: .absolute(100)),
+                spacing: 12,
+                insets: .init(v: 16, h: 16),
+                supplementaryItems: [.header(height: .absolute(40))]
             )
         }
     }

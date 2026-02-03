@@ -15,6 +15,12 @@ public class MovieViewModel {
     /// Popular Movies (Popular Section)
     @Variable public private(set) var popularState = LoadableState<[Movie]>.initial
     
+    /// Upcoming Movies (Upcoming Section)
+    @Variable public private(set) var upcomingState = LoadableState<[Movie]>.initial
+    
+    /// Top Rated Movies (Top Rated Section)
+    @Variable public private(set) var topRatedState = LoadableState<[Movie]>.initial
+    
     /// Detail of the selected movie
     @Variable public private(set) var selectedMovie: Movie? = nil
     
@@ -86,6 +92,40 @@ public class MovieViewModel {
         }
     }
     
+    public var upcomingMoviesObservable: Observable<[Movie]> {
+        $upcomingState.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
+    }
+    
+    public var isUpcomingLoadingObservable: Observable<Bool> {
+        $upcomingState.asObservable().map { state in
+            if case .initial = state { return true }
+            if case .loading = state { return true }
+            return false
+        }
+    }
+    
+    public var topRatedMoviesObservable: Observable<[Movie]> {
+        $topRatedState.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
+    }
+    
+    public var isTopRatedLoadingObservable: Observable<Bool> {
+        $topRatedState.asObservable().map { state in
+            if case .initial = state { return true }
+            if case .loading = state { return true }
+            return false
+        }
+    }
+    
     public var isEmptyObservable: Observable<Bool> {
         Observable.combineLatest(
             nowPlayingMoviesObservable,
@@ -111,6 +151,8 @@ public class MovieViewModel {
     public func loadHomeData() {
         self.nowPlayingState = .loading
         self.popularState = .loading
+        self.upcomingState = .loading
+        self.topRatedState = .loading
         
         Task {
             // Simulate loading
@@ -119,20 +161,31 @@ public class MovieViewModel {
             // Fetch concurrently
             async let nowPlaying = service.getNowPlayingMovies(page: 1)
             async let popular = service.getPopularMovies(page: 1)
+            async let upcoming = service.getPopularMovies(page: 2)
+            async let topRated = service.getTopRatedMovies(page: 1) // Reuse popular for top rated simulation
             
             do {
                 let nowPlayingResult = try await nowPlaying
                 let popularResult = try await popular
+                let upcomingResult = try await upcoming
+                let topRatedResult = try await topRated
                 
                 await MainActor.run {
-                    self.nowPlayingState = .loaded(nowPlayingResult.results)
+                    // Fallback to popular if nowPlaying is empty to ensure Hero section shows
+                    let heroMovies = nowPlayingResult.results.isEmpty ? popularResult.results : nowPlayingResult.results
+                    self.nowPlayingState = .loaded(heroMovies)
                     self.popularState = .loaded(popularResult.results)
+                    self.upcomingState = .loaded(upcomingResult.results)
+                    self.topRatedState = .loaded(topRatedResult.results)
                 }
             } catch {
                 await MainActor.run {
-                    // Start simplified handling, ideally handle individually
-                    self.nowPlayingState = .error(error.localizedDescription)
-                    self.popularState = .error(error.localizedDescription)
+                    print("Error loading home data: \(error)")
+                    // Fallback to placeholders for demo purposes so UI is visible even if network fails
+                    self.nowPlayingState = .loaded([.placeholder])
+                    self.popularState = .loaded([.placeholder, .placeholder, .placeholder, .placeholder])
+                    self.upcomingState = .loaded([.placeholder, .placeholder])
+                    self.topRatedState = .loaded([.placeholder, .placeholder, .placeholder])
                 }
             }
         }

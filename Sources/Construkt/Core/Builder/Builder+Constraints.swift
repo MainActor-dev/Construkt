@@ -45,6 +45,11 @@ extension ModifiableView {
     public func height(_ height: CGFloat) -> ViewModifier<Base> {
         self.height(height, priority: UILayoutPriority(999))
     }
+    
+    @discardableResult
+    public func size(width: CGFloat, height: CGFloat) -> ViewModifier<Base> {
+        self.width(width).height(height)
+    }
 
     @discardableResult
     public func height(_ height: CGFloat, priority: Float) -> ViewModifier<Base> {

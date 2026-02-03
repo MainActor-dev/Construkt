@@ -171,3 +171,9 @@ extension NSCollectionLayoutSize {
         )
     }
 }
+
+extension NSDirectionalEdgeInsets {
+    init(v: CGFloat, h: CGFloat) {
+        self.init(top: v, leading: h, bottom: v, trailing: h)
+    }
+}

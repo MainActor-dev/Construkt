@@ -4,7 +4,7 @@ struct PosterCell: ViewBuilder {
     let movie: Movie
     
     var body: View {
-        VStackView {
+        VStackView(spacing: 8) {
             ImageView(url: movie.posterURL)
                 .skeletonable(true)
                 .contentMode(.scaleAspectFill)
@@ -13,11 +13,19 @@ struct PosterCell: ViewBuilder {
                 .clipsToBounds(true)
                 .height(180)
             
-            LabelView(movie.title)
-                .font(.systemFont(ofSize: 14, weight: .medium))
-                .color(.white)
-                .numberOfLines(1)
-                .skeletonable(true)
+            VStackView(spacing: 4) {
+                LabelView(movie.title)
+                    .font(.systemFont(ofSize: 14, weight: .semibold))
+                    .color(.white)
+                    .numberOfLines(1)
+                    .skeletonable(true)
+                
+                LabelView("Adventure") // Placeholder genre
+                    .font(.systemFont(ofSize: 12))
+                    .color(.gray)
+                    .skeletonable(true)
+            }
+            .alignment(.leading)
         }
         .clipsToBounds(true)
     }
