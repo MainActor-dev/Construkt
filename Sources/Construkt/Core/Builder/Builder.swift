@@ -105,7 +105,10 @@ extension ModifiableView {
     
     @discardableResult
     public func skeletonable(_ isSkeletonAble: Bool) -> ViewModifier<Base> {
-        ViewModifier(modifiableView) { $0.isSkeletonable = isSkeletonAble }
+        ViewModifier(modifiableView) {
+            $0.isSkeletonable = isSkeletonAble
+            $0.skeletonConfig = .init(pausesOnBackground: false)
+        }
     }
 }
 

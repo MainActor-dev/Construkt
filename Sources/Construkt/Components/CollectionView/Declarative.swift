@@ -9,30 +9,37 @@ import UIKit
 
 // MARK: - Result Builders
 
+import RxSwift
+import RxCocoa
+
+// MARK: - Result Builders
+
 @resultBuilder
 public struct SectionResultBuilder {
-    public static func buildBlock() -> [SectionController] {
-        []
+    public static func buildBlock() -> Observable<[SectionController]> {
+        .just([])
     }
     
-    public static func buildBlock(_ values: SectionConvertible...) -> [SectionController] {
-        values.flatMap { $0.asSections() }
+    public static func buildBlock(_ components: SectionObservable...) -> Observable<[SectionController]> {
+        return Observable.combineLatest(components.map { $0.asSectionObservable() })
+            .map { $0.flatMap { $0 } }
     }
     
-    public static func buildIf(_ value: SectionConvertible?) -> [SectionController] {
-        value?.asSections() ?? []
+    public static func buildIf(_ value: SectionObservable?) -> Observable<[SectionController]> {
+        value?.asSectionObservable() ?? .just([])
     }
     
-    public static func buildEither(first: SectionConvertible) -> [SectionController] {
-        first.asSections()
+    public static func buildEither(first: SectionObservable) -> Observable<[SectionController]> {
+        first.asSectionObservable()
     }
     
-    public static func buildEither(second: SectionConvertible) -> [SectionController] {
-        second.asSections()
+    public static func buildEither(second: SectionObservable) -> Observable<[SectionController]> {
+        second.asSectionObservable()
     }
     
-    public static func buildArray(_ components: [[SectionController]]) -> [SectionController] {
-        components.flatMap { $0 }
+    public static func buildArray(_ components: [SectionObservable]) -> Observable<[SectionController]> {
+        Observable.combineLatest(components.map { $0.asSectionObservable() })
+            .map { $0.flatMap { $0 } }
     }
 }
 
@@ -69,16 +76,16 @@ public struct CellResultBuilder {
 
 // MARK: - Protocols
 
-public protocol SectionConvertible {
-    func asSections() -> [SectionController]
+public protocol SectionObservable {
+    func asSectionObservable() -> Observable<[SectionController]>
 }
 
-extension SectionController: SectionConvertible {
-    public func asSections() -> [SectionController] { [self] }
+extension SectionController: SectionObservable {
+    public func asSectionObservable() -> Observable<[SectionController]> { .just([self]) }
 }
 
-extension Array: SectionConvertible where Element == SectionController {
-    public func asSections() -> [SectionController] { self }
+extension Array: SectionObservable where Element == SectionController {
+    public func asSectionObservable() -> Observable<[SectionController]> { .just(self) }
 }
 
 public protocol CellConvertible {
@@ -95,61 +102,124 @@ extension Array: CellConvertible where Element == CellController {
 
 // MARK: - Declaration Wrapper
 
-public struct Section: SectionConvertible {
-    private let identifier: SectionControllerIdentifier
-    private var cells: [CellController]
-    private var layoutHandler: ((String) -> NSCollectionLayoutSection?)?
+public struct Section: SectionObservable {
+    private let observable: Observable<[SectionController]>
     
     // MARK: Initializers
     
-    /// Standard initializer with a builder block
+    /// Standard initializer with a builder block (Static)
     public init(
         id: SectionControllerIdentifier,
         @CellResultBuilder content: () -> [CellController]
     ) {
-        self.identifier = id
-        self.cells = content()
+        let cells = content()
+        let section = SectionController(identifier: id, cells: cells, layoutProvider: nil)
+        self.observable = .just([section])
     }
     
-    /// Data-binding initializer
+    /// Static Data-binding initializer
     public init<T>(
         id: SectionControllerIdentifier,
         items: [T],
         @CellResultBuilder content: (T) -> [CellController]
     ) {
-        self.identifier = id
-        self.cells = items.flatMap { content($0) }
+        let cells = items.flatMap { content($0) }
+        let section = SectionController(identifier: id, cells: cells, layoutProvider: nil)
+        self.observable = .just([section])
+    }
+    
+    /// Reactive Binding initializer
+    public init<B: RxBinding>(
+        id: SectionControllerIdentifier,
+        binding: B,
+        @CellResultBuilder content: @escaping (B.T) -> [CellController]
+    ) {
+        // Map the binding value to a SectionController
+        self.observable = binding.asObservable()
+            .map { items in
+                let cells = content(items) // content(items) returns [CellController]? No, content takes B.T
+                // Wait, if B.T is [Item], then content expects [Item].
+                // The block should probably be T -> [CellController] if user passes items: binding.
+                
+                // Let's assume content handles the conversion.
+                return [SectionController(identifier: id, cells: cells, layoutProvider: nil)]
+            }
+    }
+    
+    /// Reactive Binding with element iteration helper
+    public init<B: RxBinding, Element>(
+        id: SectionControllerIdentifier,
+        items binding: B,
+        @CellResultBuilder content: @escaping (Element) -> [CellController]
+    ) where B.T == [Element] {
+        self.observable = binding.asObservable()
+            .map { items in
+                let cells = items.flatMap { content($0) }
+                return [SectionController(identifier: id, cells: cells, layoutProvider: nil)]
+            }
     }
     
     // MARK: Modifiers
     
     public func layout(_ handler: @escaping (String) -> NSCollectionLayoutSection?) -> Section {
-        var copy = self
-        copy.layoutHandler = handler
-        return copy
+        // Apply layout to the inner section controllers when they emit
+        let improved = observable.map { sections in
+            sections.map { section in
+                var copy = section
+                copy.layoutProvider = handler
+                return copy
+            }
+        }
+        return Section(observable: improved)
     }
     
-    public func skeleton<C: UICollectionViewCell>(
+    public func skeleton<C, B>(
         _ type: C.Type,
         count: Int,
-        when condition: Bool
-    ) -> Section {
-        if condition {
-            var copy = self
-            copy.cells = Skeleton<C>.create(count: count, identifier: identifier.uniqueId)
-            return copy
+        when binding: B,
+        configure: ((C) -> Void)? = nil
+    ) -> Section where C: UICollectionViewCell, B: RxBinding, B.T == Bool {
+        
+        
+        let loadingObservable = binding.asObservable()
+                
+        let combined = Observable.combineLatest(observable, loadingObservable)
+            .map { (sections, isLoading) -> [SectionController] in
+                if isLoading {
+                    return sections.map { section in
+                         return SectionController(
+                            identifier: section.identifier,
+                            cells: Skeleton<C>.create(count: count, configure: configure),
+                            layoutProvider: section.layoutProvider
+                         )
+                    }
+                } else {
+                    return sections
+                }
+            }
+            
+        return Section(observable: combined)
+    }
+    
+    public func skeleton<Content: View, B: RxBinding>(
+        count: Int,
+        when binding: B,
+        placeholder: @escaping () -> Content
+    ) -> Section where B.T == Bool {
+        return skeleton(HostingCell<Content>.self, count: count, when: binding) { cell in
+            cell.host(placeholder())
         }
-        return self
+    }
+    
+    // Internal init for modifiers
+    private init(observable: Observable<[SectionController]>) {
+        self.observable = observable
     }
 
     // MARK: Convert
     
-    public func asSections() -> [SectionController] {
-        return [SectionController(
-            identifier: identifier,
-            cells: cells,
-            layoutProvider: layoutHandler
-        )]
+    public func asSectionObservable() -> Observable<[SectionController]> {
+        return observable
     }
 }
 
@@ -267,9 +337,15 @@ public struct CollectionView: ModifiableView {
     
     public let modifiableView = CollectionViewWrapperView()
     
-    public init(@SectionResultBuilder content: () -> [SectionController]) {
-        let sections = content()
-        modifiableView.update(sections: sections)
+    public init(@SectionResultBuilder content: () -> Observable<[SectionController]>) {
+        let sectionsObservable = content()
+        
+        sectionsObservable
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak modifiableView] sections in
+                modifiableView?.update(sections: sections)
+            })
+            .disposed(by: modifiableView.rxDisposeBag)
     }
 }
 

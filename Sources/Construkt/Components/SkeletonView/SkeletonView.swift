@@ -89,38 +89,28 @@ extension SkeletonView where Self: UIView {
     /// Precedence: view.shimmerConfigOverride ?? defaultConfig
     public func _startShimmer(
         in root: UIView,
-        defaultConfig: SkeletonConfig = .init(),
-        skipHidden: Bool = true
+        defaultConfig: SkeletonConfig = .init()
     ) {
-        for v in skeletonViews(in: root, skipHidden: skipHidden) {
+        for v in skeletonViews(in: root) {
             v.startShimmer(v.skeletonConfig ?? defaultConfig)
         }
         setSkeletonStatus(isShowing: true)
     }
 
     /// Stop shimmer on all matching subviews under `root`.
-    public func _stopShimmer(
-        in root: UIView,
-        skipHidden: Bool = false
-    ) {
-        for v in skeletonViews(in: root, skipHidden: skipHidden) {
+    public func _stopShimmer(in root: UIView) {
+        for v in skeletonViews(in: root) {
             v.stopShimmer()
         }
         setSkeletonStatus(isShowing: false)
     }
 
     /// Recursive finder that returns only the desired subclasses.
-    public func skeletonViews(
-        in view: UIView,
-        skipHidden: Bool = true
-    ) -> [UIView] {
+    public func skeletonViews(in view: UIView) -> [UIView] {
         var results: [UIView] = []
         for sub in view.subviews {
-            let visible = !sub.isHidden && sub.alpha > 0.0
-            if (!skipHidden || visible) || sub.isSkeletonable {
-                results.append(sub)
-            }
-            results += skeletonViews(in: sub, skipHidden: skipHidden)
+            if sub.isSkeletonable { results.append(sub) }
+            results += skeletonViews(in: sub)
         }
         return results
     }

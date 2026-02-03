@@ -3,9 +3,11 @@ import UIKit
 // Simple Image Cache to avoid re-downloading
 fileprivate let imageCache = NSCache<NSString, UIImage>()
 
-extension UIImageView {
-    func setImage(from url: URL, placeholder: UIImage? = nil) {
+public extension UIImageView {
+    func setImage(from url: URL?, placeholder: UIImage? = nil) {
         self.image = placeholder
+        
+        guard let url = url else { return }
         
         // Check cache
         if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) {

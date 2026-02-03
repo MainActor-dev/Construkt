@@ -28,6 +28,18 @@ public struct Movie: Decodable, Identifiable, Equatable {
         guard let path = backdropPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w780\(path)")
     }
+    
+    public static var placeholder: Movie {
+        Movie(
+            id: 0,
+            title: "Loading Movie Title",
+            overview: "Loading Description",
+            releaseDate: "2024-01-01",
+            posterPath: nil,
+            backdropPath: nil,
+            voteAverage: 0.0
+        )
+    }
 }
 
 public struct MovieResponse: Decodable {

@@ -23,15 +23,27 @@ public class MovieViewModel {
         }
         return []
     }
+
+    public var popularMoviesObservable: Observable<[Movie]> {
+        $state.asObservable().map { state in
+            if case .loaded(let movies) = state {
+                return movies
+            }
+            return []
+        }
+    }
     
     public var heroMovie: Movie? {
         return popularMovies.first
     }
-    
-    public var isLoading: Bool {
-        if case .loading = state { return true }
-        if case .initial = state { return true }
-        return false
+
+    public var isLoadingObservable: Observable<Bool> {
+        $state.asObservable()
+            .map { state in
+                if case .initial = state { return true }
+                if case .loading = state { return true }
+                return false
+            }
     }
     
     // MARK: - Dependencies
@@ -89,6 +101,8 @@ public class MovieViewModel {
         self.state = .loading
         
         Task {
+            /// Simulate loading for 2 seconds
+            try await Task.sleep(nanoseconds: 2_000_000_000)
             do {
                 if let response = try await action() {
                     let movies = response.results

@@ -51,33 +51,6 @@ public struct SectionController {
     public let cells: [CellController]
     public var layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
     
-    public init<ID: Identifier, T, C: UICollectionViewCell>(
-        identifier: ID = .defaultIdentifier,
-        items: [T],
-        state: CellControllerState = .loaded,
-        cellConfiguration: ((C, T) -> Void)?,
-        didSelect: ((T) -> Void)? = nil
-    ) {
-        self.identifier = identifier
-        switch state {
-        case .loaded:
-            self.cells = items.map { place in
-                return CellController(
-                    model: place,
-                    registration: CellRegistration<C, T> { cell, _, item in
-                        cellConfiguration?(cell, item)
-                    },
-                    didSelect: didSelect
-                )
-            }
-        case .loading(let total):
-            self.cells = Skeleton<C>.create(
-                count: total,
-                identifier: identifier.uniqueId
-            )
-        }
-    }
-    
     public init(
         identifier: SectionControllerIdentifier,
         cells: [CellController],

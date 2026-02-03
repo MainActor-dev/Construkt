@@ -27,6 +27,18 @@ public struct ImageView: ModifiableView {
         modifiableView.image = UIImage(systemName: name)
     }
 
+    public init(url: URL?, placeholder: UIImage? = nil) {
+        modifiableView.setImage(from: url, placeholder: placeholder)
+    }
+
+    public init(url: String?, placeholder: UIImage? = nil) {
+        if let urlString = url, let url = URL(string: urlString) {
+            modifiableView.setImage(from: url, placeholder: placeholder)
+        } else {
+            modifiableView.image = placeholder
+        }
+    }
+
     public init<Binding:RxBinding>(_ image: Binding) where Binding.T == UIImage {
         self.image(bind: image)
     }
