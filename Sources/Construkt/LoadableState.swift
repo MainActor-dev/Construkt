@@ -33,4 +33,18 @@ public enum LoadableState<T: Equatable>: Equatable, EquivalentState, CacheKeyPro
         default: return false
         }
     }
+    
+    // MARK: - Helpers
+    
+    public var isLoading: Bool {
+        switch self {
+        case .loading, .initial: return true
+        default: return false
+        }
+    }
+    
+    public var value: T? {
+        if case .loaded(let value) = self { return value }
+        return nil
+    }
 }
