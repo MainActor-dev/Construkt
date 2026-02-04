@@ -27,7 +27,7 @@ import UIKit
 
 public struct SupplementaryController {
     let elementKind: String
-    let dequeue: (UICollectionView, IndexPath) -> UICollectionReusableView
+    var dequeue: (UICollectionView, IndexPath) -> UICollectionReusableView
     var isHidden: Bool = false
     
     public init<ViewType: UICollectionReusableView>(
@@ -40,7 +40,18 @@ public struct SupplementaryController {
             configure(view)
         }
         self.dequeue = { collectionView, indexPath in
-            return collectionView.dequeueConfiguredReusableSupplementary(using: registration, for: indexPath)
+             return collectionView.dequeueConfiguredReusableSupplementary(using: registration, for: indexPath)
         }
+    }
+    
+    internal func asSkeleton() -> SupplementaryController {
+        var copy = self
+        let originalDequeue = self.dequeue
+        copy.dequeue = { collectionView, indexPath in
+            let view = originalDequeue(collectionView, indexPath)
+            view.setAnimatedSkeletonView(true)
+            return view
+        }
+        return copy
     }
 }

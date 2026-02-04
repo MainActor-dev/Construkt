@@ -197,6 +197,13 @@ class HomeViewController: UIViewController {
                 CategoryCell(genre: genre)
             }
         }
+        .skeleton(
+            count: 6,
+            when: viewModel.isLoadingGenres,
+            includeSupplementary: true
+        ) {
+            CategoryCell(genre: .placeholder)
+        }
         .layout { _ in
             return HomeSection.categories.layout
         }
@@ -224,7 +231,11 @@ class HomeViewController: UIViewController {
         .layout { _ in
             return HomeSection.popular.layout
         }
-        .skeleton(count: 4, when: viewModel.isPopularSectionLoadingObservable) {
+        .skeleton(
+            count: 4,
+            when: viewModel.isPopularSectionLoadingObservable,
+            includeSupplementary: true
+        ) {
             PosterCell(movie: .placeholder)
         }
     }
@@ -250,7 +261,11 @@ class HomeViewController: UIViewController {
         .layout { _ in
             return HomeSection.upcoming.layout
         }
-        .skeleton(count: 2, when: viewModel.isUpcomingLoadingObservable) {
+        .skeleton(
+            count: 2,
+            when: viewModel.isUpcomingLoadingObservable,
+            includeSupplementary: true
+        ) {
             UpcomingCell(movie: .placeholder)
         }
     }
@@ -294,6 +309,7 @@ struct TopRatedCell: ViewBuilder {
                     .color(UIColor.darkGray.withAlphaComponent(0.5)) // Faded number
                     .alignment(.center)
                     .width(40)
+                    .skeletonable(true)
                 
                 // Poster
                 ImageView(url: movie.posterURL)
@@ -356,7 +372,7 @@ struct UpcomingCell: ViewBuilder {
             VStackView {
                 SpacerView()
                 ZStackView {
-                    VStackView(spacing: 2) {
+                    VStackView(spacing: 4) {
                         SpacerView()
                         LabelView("COMING JUNE 24") // Placeholder
                             .font(.systemFont(ofSize: 10, weight: .bold))
@@ -364,6 +380,7 @@ struct UpcomingCell: ViewBuilder {
                             .backgroundColor(UIColor.black.withAlphaComponent(0.5))
                             .cornerRadius(4)
                             .padding(h: 4, v: 2)
+                            .skeletonable(true)
                         LabelView(movie.title)
                             .font(.systemFont(ofSize: 16, weight: .semibold))
                             .color(.white)
@@ -390,6 +407,7 @@ struct StandardHeader: ViewBuilder {
             LabelView(title)
                 .font(.systemFont(ofSize: 18, weight: .semibold))
                 .color(.white)
+                .skeletonable(true)
             
             SpacerView()
             
@@ -397,6 +415,7 @@ struct StandardHeader: ViewBuilder {
                 ButtonView(action) { _ in onAction?() }
                     .font(.systemFont(ofSize: 14))
                     .color(.lightGray)
+                    .skeletonable(true)
             }
         }
         .alignment(.center)
@@ -419,6 +438,7 @@ struct CategoryCell: ViewBuilder {
         .backgroundColor(UIColor(white: 1.0, alpha: 0.1)) // Glassy/Dark look
         .cornerRadius(20) // Pill shape
         .border(color: UIColor(white: 1.0, alpha: 0.2), lineWidth: 1)
+        .skeletonable(true)
     }
 }
 

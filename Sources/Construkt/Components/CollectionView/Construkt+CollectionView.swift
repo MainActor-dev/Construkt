@@ -135,12 +135,12 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                    layout.decorationItems = []
                    layout.boundarySupplementaryItems = []
                 } else {
-                    // Filter hidden headers/footers
+                    // Filter hidden or missing headers/footers
                     layout.boundarySupplementaryItems = layout.boundarySupplementaryItems.filter { item in
                         if item.elementKind == UICollectionView.elementKindSectionHeader {
-                            return !(sectionController.header?.isHidden ?? false)
+                            return sectionController.header != nil && !(sectionController.header?.isHidden ?? false)
                         } else if item.elementKind == UICollectionView.elementKindSectionFooter {
-                            return !(sectionController.footer?.isHidden ?? false)
+                            return sectionController.footer != nil && !(sectionController.footer?.isHidden ?? false)
                         }
                         return true
                     }
@@ -214,8 +214,11 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
     internal func setRefreshing(_ isRefreshing: Bool) {
         if isRefreshing {
-            if !(collectionView.refreshControl?.isRefreshing ?? false) {
-                collectionView.refreshControl?.beginRefreshing()
+            // Only begin refreshing if we are on screen to avoid "offscreen beginRefreshing" warning
+            if window != nil {
+                if !(collectionView.refreshControl?.isRefreshing ?? false) {
+                    collectionView.refreshControl?.beginRefreshing()
+                }
             }
         } else {
             if collectionView.refreshControl?.isRefreshing ?? false {

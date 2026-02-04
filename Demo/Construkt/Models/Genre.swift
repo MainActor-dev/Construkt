@@ -8,6 +8,10 @@ public struct Genre: Codable, Identifiable, Equatable, Hashable {
         self.id = id
         self.name = name
     }
+    
+    static var placeholder: Genre {
+        .init(id: -1, name: "Genre")
+    }
 }
 
 public struct GenreResponse: Codable {

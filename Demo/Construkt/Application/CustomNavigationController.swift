@@ -1,7 +1,7 @@
 
 import UIKit
 
-class MoviesNavigationController: UINavigationController, UIGestureRecognizerDelegate {
+class CustomNavigationController: UINavigationController, UIGestureRecognizerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()

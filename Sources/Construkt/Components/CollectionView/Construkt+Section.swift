@@ -200,7 +200,6 @@ public struct SectionResultBuilder {
 
 
 // MARK: - Section
-
 public struct Section: SectionObservable {
     private let observable: Observable<[SectionController]>
     
@@ -317,6 +316,8 @@ public struct Section: SectionObservable {
         _ type: C.Type,
         count: Int,
         when binding: B,
+        includeSuppmentary: Bool = false,
+        hideSupplementary: Bool = false,
         configure: ((C) -> Void)? = nil
     ) -> Section where C: UICollectionViewCell, B: RxBinding, B.T == Bool {
         
@@ -326,11 +327,17 @@ public struct Section: SectionObservable {
             .map { (sections, isLoading) -> [SectionController] in
                 if isLoading {
                     return sections.map { section in
+                         var header = hideSupplementary ? nil : section.header
+                         if includeSuppmentary { header = header?.asSkeleton() }
+                         
+                         var footer = hideSupplementary ? nil : section.footer
+                         if includeSuppmentary { footer = footer?.asSkeleton() }
+                         
                          return SectionController(
                             identifier: section.identifier,
                             cells: Skeleton<C>.create(count: count, configure: configure),
-                            header: section.header,
-                            footer: section.footer,
+                            header: header,
+                            footer: footer,
                             layoutProvider: section.layoutProvider
                          )
                     }
@@ -345,9 +352,17 @@ public struct Section: SectionObservable {
     public func skeleton<Content: View, B: RxBinding>(
         count: Int,
         when binding: B,
+        includeSupplementary: Bool = false,
+        hideSupplementary: Bool = false,
         placeholder: @escaping () -> Content
     ) -> Section where B.T == Bool {
-        return skeleton(HostingCell<Content>.self, count: count, when: binding) { cell in
+        return skeleton(
+            HostingCell<Content>.self,
+            count: count,
+            when: binding,
+            includeSuppmentary: includeSupplementary,
+            hideSupplementary: hideSupplementary
+        ) { cell in
             cell.host(placeholder())
         }
     }

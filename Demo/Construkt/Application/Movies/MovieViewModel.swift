@@ -141,6 +141,14 @@ public class MovieViewModel {
         }
     }
     
+    public var isLoadingGenres: Observable<Bool> {
+        $genresState.asObservable().map { state in
+            if case .initial = state { return true }
+            if case .loading = state { return true }
+            return false
+        }
+    }
+    
     public var genresObservable: Observable<[Genre]> {
         $genresState.asObservable().map { state in
             if case .loaded(let genres) = state {
@@ -163,6 +171,7 @@ public class MovieViewModel {
     public func loadHomeData() {
         self.nowPlayingState = .loading
         self.popularState = .loading
+        self.genresState = .loading
         self.upcomingState = .loading
         self.topRatedState = .loading
         

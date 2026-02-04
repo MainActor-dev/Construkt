@@ -57,5 +57,6 @@ public final class HostingReusableView<Content: View>: UICollectionReusableView 
         super.prepareForReuse()
         hostedView?.removeFromSuperview()
         hostedView = nil
+        setAnimatedSkeletonView(false)
     }
 }

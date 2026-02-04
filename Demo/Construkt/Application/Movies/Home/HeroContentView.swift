@@ -49,8 +49,8 @@ class HeroContentView: UIView {
                                     .color(UIColor.white.withAlphaComponent(0.8))
                                     .backgroundColor(UIColor.white.withAlphaComponent(0.2))
                                     .cornerRadius(4)
-                                    .padding(2)
-                                HStackView(spacing: 4) {
+                                    .padding(4)
+                                HStackView(spacing: 2) {
                                     ImageView(UIImage(systemName: "star.fill"))
                                         .tintColor(.systemYellow)
                                         .size(width: 12, height: 12)
@@ -62,7 +62,7 @@ class HeroContentView: UIView {
                                 .alignment(.center)
                             }
                             .skeletonable(true)
-                            .alignment(.leading)
+                            .alignment(.center)
                             
                             // Title
                             LabelView("-")
@@ -98,8 +98,8 @@ class HeroContentView: UIView {
     }
     
     func configure(with movie: Movie) {
-        if let path = movie.backdropPath, let url = URL(string: "https://image.tmdb.org/t/p/w500" + path) {
-             backgroundImageView?.setImage(from: url)
+        if let url = movie.backdropURL {
+            backgroundImageView?.setImage(from: url)
         }
         
         titleLabel?.text = movie.title
@@ -107,8 +107,7 @@ class HeroContentView: UIView {
     }
     
     // MARK: - Animation
-    
-    public func setScrollProgress(_ progress: CGFloat) {
+    func setScrollProgress(_ progress: CGFloat) {
         guard let container = contentContainer else { return }
         
         // progress: 0.0 (center) -> 1.0 (edge)
@@ -121,7 +120,7 @@ class HeroContentView: UIView {
         container.alpha = alpha
     }
     
-    public func setContentHidden(_ hidden: Bool, animated: Bool) {
+    func setContentHidden(_ hidden: Bool, animated: Bool) {
         setScrollProgress(hidden ? 1.0 : 0.0)
     }
 }
