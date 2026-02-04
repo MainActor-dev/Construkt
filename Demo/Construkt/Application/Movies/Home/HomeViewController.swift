@@ -15,8 +15,7 @@ class HomeViewController: UIViewController {
     
     private let viewModel = MovieViewModel()
     private let disposeBag = DisposeBag()
-    
-    // MARK: - Body
+    private weak var cachedHeroContainerView: UIView?
     
     var body: View {
         CollectionView {
@@ -40,8 +39,6 @@ class HomeViewController: UIViewController {
         }
     }
     
-    // MARK: - Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor("#0A0A0A")
@@ -59,9 +56,6 @@ class HomeViewController: UIViewController {
     }
     
     // MARK: - Sections
-    
-    // MARK: - Sections
-    
     private var heroSection: Section {
         Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
             Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
@@ -72,7 +66,7 @@ class HomeViewController: UIViewController {
             }
         }
         .layout { [weak self] _ in
-            var layout = HomeSection.hero.layout
+            let layout = HomeSection.hero.layout
             layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
                 self?.handleHeroScroll(items: items, offset: offset, env: env)
             }
@@ -91,43 +85,29 @@ class HomeViewController: UIViewController {
         // We need to find the actual cells to update them
         guard let collectionView = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
         
-        // Optimize: Create a map of index paths to visible cells for O(1) lookup
-        // Note: For orthogonal scrolling, "visibleCells" of the parent CV are the section containers.
-        // We still need our recursive finder or a better way.
-        // Let's assume our `findAllHeroCells` is efficient enough for this demo (only 3-4 items visible).
         
-        let heroCells = findAllHeroCells(in: collectionView)
+        let heroCells: [HeroCollectionCell]
+        
+        // Cache the container view to avoid expensive recursive searches
+        if let container = cachedHeroContainerView {
+            heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
+        } else {
+            // Initial search
+            heroCells = findAllHeroCells(in: collectionView)
+            if let firstCell = heroCells.first {
+                cachedHeroContainerView = firstCell.superview
+            }
+        }
         
         // Map visible items to their progress
         for item in items {
             // Distance of item center from viewport center
             let distanceFromCenter = abs(item.center.x - visibleRectCenter)
             
-            // Normalize distance: 0 at center, 1 at edge (containerWidth/2)
-            // We can tune the denominator to control how "strictly" it hides.
-            // Using containerWidth / 2 means it's fully hidden when it touches the edge.
+            // Normalize distance: 0 at center, 1 at edge
             let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
             
-            // Apply to matching cell
-            // Since we can't easily match item -> cell (cell might be reused/wrapped),
-            // and `findAllHeroCells` returns just a flat list of ALL hero cells (cached or visible).
-            // We need to match by IndexPath if possible, but `HeroContentView` doesn't know its index path.
-            // AND `HeroCollectionCell` is inside the orthogonal scroll view.
-            
-            // WORKAROUND:
-            // Since `items` corresponds to the cells in the orthogonal group.
-            // We can iterate the generic `heroCells` and try to match frames?
-            // Or simpler: Just rely on the fact that `heroCells` are the visible ones.
-            // But how do we know which cell corresponds to which layout item?
-            // The item has an `indexPath`. The cell *should* have the same index path.
-            // But `CollectionViewWrapperView` manages the diffable data source.
-            
-            // ROBUST MATCHING:
-            // Let's iterate `heroCells` and check their frame in the parent coordinate space.
-            // `item.frame` is in the orthogonal scroll view's coordinate space.
-            // `cell.frame` is also in that coordinate space.
-            // We can match loosely by center X.
-            
+            // Match layout item to cell by X position in the orthogonal scroll view
             if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
                  matchedCell.heroContentView.setScrollProgress(progress)
             }
