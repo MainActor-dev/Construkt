@@ -5,6 +5,7 @@ public enum MoviesEndpoint: Endpoint {
     case getTopRated(page: Int)
     case getNowPlaying(page: Int)
     case getMovieDetails(id: Int)
+    case getGenres
     
     public var path: String {
         switch self {
@@ -16,6 +17,8 @@ public enum MoviesEndpoint: Endpoint {
             return "/movie/now_playing"
         case .getMovieDetails(let id):
             return "/movie/\(id)"
+        case .getGenres:
+            return "/genre/movie/list"
         }
     }
     
@@ -29,7 +32,7 @@ public enum MoviesEndpoint: Endpoint {
              .getTopRated(let page),
              .getNowPlaying(let page):
             return ["page": String(page)]
-        case .getMovieDetails:
+        case .getMovieDetails, .getGenres:
             return nil
         }
     }

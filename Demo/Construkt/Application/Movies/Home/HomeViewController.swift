@@ -8,11 +8,8 @@
 import UIKit
 import RxSwift
 
-struct Category: Identifiable, Equatable {
-    let id: String
-    let name: String
-    let icon: String // System image name
-}
+import RxSwift
+
 
 class HomeViewController: UIViewController {
     
@@ -82,27 +79,19 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private let categories: [Category] = [
-        Category(id: "action", name: "Action", icon: "flame.fill"),
-        Category(id: "horror", name: "Horror", icon: "burn"),
-        Category(id: "comedy", name: "Comedy", icon: "face.smiling.fill"),
-        Category(id: "scifi", name: "Sci-Fi", icon: "sparkles"),
-        Category(id: "romance", name: "Romance", icon: "heart.fill"),
-        Category(id: "drama", name: "Drama", icon: "theatermasks.fill")
-    ]
     
     private var categorySection: Section {
         Section(
             id: HomeSection.categories,
-            items: Observable.just(categories),
+            items: viewModel.genresObservable,
             header: {
                 Header {
                     StandardHeader(title: "Categories", actionTitle: nil)
                 }
             }
-        ) { category in
-            Cell(category, id: category.id) { category in
-                CategoryCell(category: category)
+        ) { genre in
+            Cell(genre, id: "genre-\(genre.id)") { genre in
+                CategoryCell(genre: genre)
             }
         }
         .layout { _ in
@@ -140,9 +129,7 @@ class HomeViewController: UIViewController {
             id: HomeSection.upcoming,
             items: viewModel.upcomingMoviesObservable,
             header: {
-                Header {
-                    StandardHeader(title: "Upcoming", actionTitle: nil)
-                }
+                Header { StandardHeader(title: "Upcoming", actionTitle: nil) }
             }
         ) { movie in
             Cell(movie, id: "upcoming-\(movie.id)") { movie in
@@ -310,24 +297,18 @@ struct StandardHeader: ViewBuilder {
 }
 
 struct CategoryCell: ViewBuilder {
-    let category: Category
+    let genre: Genre
     
     var body: View {
         ZStackView {
             HStackView(spacing: 8) {
-                ImageView(UIImage(systemName: category.icon))
-                    .tintColor(.white)
-                    .width(16)
-                    .height(16)
-                    .contentMode(.scaleAspectFit)
-                
-                LabelView(category.name)
+                LabelView(genre.name)
                     .font(.systemFont(ofSize: 14, weight: .medium))
                     .color(.white)
+                    .alignment(.center)
+                    .padding(insets: .init(top: 8, left: 16, bottom: 8, right: 16))
             }
-            .alignment(.center)
         }
-        .padding(insets: .init(top: 8, left: 16, bottom: 8, right: 16))
         .backgroundColor(UIColor(white: 1.0, alpha: 0.1)) // Glassy/Dark look
         .cornerRadius(20) // Pill shape
         .border(color: UIColor(white: 1.0, alpha: 0.2), lineWidth: 1)

@@ -21,6 +21,9 @@ public class MovieViewModel {
     /// Top Rated Movies (Top Rated Section)
     @Variable public private(set) var topRatedState = LoadableState<[Movie]>.initial
     
+    /// Genres (Categories Section)
+    @Variable public private(set) var genresState = LoadableState<[Genre]>.initial
+    
     /// Detail of the selected movie
     @Variable public private(set) var selectedMovie: Movie? = nil
     
@@ -138,6 +141,15 @@ public class MovieViewModel {
         }
     }
     
+    public var genresObservable: Observable<[Genre]> {
+        $genresState.asObservable().map { state in
+            if case .loaded(let genres) = state {
+                return genres
+            }
+            return []
+        }
+    }
+    
     // MARK: - Dependencies
     
     private let service: MovieServiceProtocol
@@ -163,29 +175,32 @@ public class MovieViewModel {
             async let popular = service.getPopularMovies(page: 1)
             async let upcoming = service.getPopularMovies(page: 2)
             async let topRated = service.getTopRatedMovies(page: 1) // Reuse popular for top rated simulation
+            async let genres = service.getGenres()
             
             do {
                 let nowPlayingResult = try await nowPlaying
                 let popularResult = try await popular
                 let upcomingResult = try await upcoming
                 let topRatedResult = try await topRated
+                let genresResult = try await genres
                 
                 await MainActor.run {
-                    // Fallback to popular if nowPlaying is empty to ensure Hero section shows
                     let heroMovies = nowPlayingResult.results.isEmpty ? popularResult.results : nowPlayingResult.results
                     self.nowPlayingState = .loaded(heroMovies)
                     self.popularState = .loaded(popularResult.results)
                     self.upcomingState = .loaded(upcomingResult.results)
                     self.topRatedState = .loaded(topRatedResult.results)
+                    self.genresState = .loaded(genresResult.genres)
                 }
             } catch {
                 await MainActor.run {
-                    print("Error loading home data: \(error)")
-                    // Fallback to placeholders for demo purposes so UI is visible even if network fails
-                    self.nowPlayingState = .loaded([.placeholder])
-                    self.popularState = .loaded([.placeholder, .placeholder, .placeholder, .placeholder])
-                    self.upcomingState = .loaded([.placeholder, .placeholder])
-                    self.topRatedState = .loaded([.placeholder, .placeholder, .placeholder])
+                    self.nowPlayingState = .loaded([])
+                    self.popularState = .loaded([])
+                    self.upcomingState = .loaded([])
+                    self.popularState = .loaded([])
+                    self.upcomingState = .loaded([])
+                    self.topRatedState = .loaded([])
+                    self.genresState = .loaded([])
                 }
             }
         }
@@ -204,7 +219,6 @@ public class MovieViewModel {
                 }
             } catch {
                 print("Failed to fetch details for movie \(movie.id): \(error)")
-                // We keep the optimistically selected movie, maybe show an error toast in a real app
             }
         }
     }
