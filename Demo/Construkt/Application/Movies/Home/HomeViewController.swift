@@ -20,7 +20,7 @@ class HomeViewController: UIViewController {
         ZStackView {
             CollectionView {
                 heroSection
-                categorySection
+                genresSection
                 popularSection
                 upcomingSection
                 topRatedSection
@@ -43,7 +43,6 @@ class HomeViewController: UIViewController {
                 self?.fetchData()
             }
             .onScroll { [weak self] scrollView in
-                self?.handleHeroScroll(scrollView)
                 self?.handleNavBarScroll(scrollView)
             }
             navigationBar
@@ -133,59 +132,7 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private func handleHeroScroll(items: [NSCollectionLayoutVisibleItem], offset: CGPoint, env: NSCollectionLayoutEnvironment) {
-        let containerWidth = env.container.contentSize.width
-        // Calculate center of the visible rect based on scroll offset
-        let visibleRectCenter = offset.x + containerWidth / 2.0
-        
-        // We need to find the actual cells to update them
-        guard let collectionView = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
-        
-        
-        let heroCells: [HeroCollectionCell]
-        
-        // Cache the container view to avoid expensive recursive searches
-        if let container = cachedHeroContainerView {
-            heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
-        } else {
-            // Initial search
-            heroCells = findAllHeroCells(in: collectionView)
-            if let firstCell = heroCells.first {
-                cachedHeroContainerView = firstCell.superview
-            }
-        }
-        
-        // Map visible items to their progress
-        for item in items {
-            // Distance of item center from viewport center
-            let distanceFromCenter = abs(item.center.x - visibleRectCenter)
-            
-            // Normalize distance: 0 at center, 1 at edge
-            let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
-            
-            // Match layout item to cell by X position in the orthogonal scroll view
-            if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
-                matchedCell.heroContentView.setScrollProgress(progress)
-            }
-        }
-    }
-    
-    private func handleHeroScroll(_ scrollView: UIScrollView) {
-        // Vertical scroll handler - no-op for now unless we want parallax
-    }
-    
-    private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
-        var cells: [HeroCollectionCell] = []
-        if let cell = view as? HeroCollectionCell {
-            cells.append(cell)
-        }
-        for subview in view.subviews {
-            cells.append(contentsOf: findAllHeroCells(in: subview))
-        }
-        return cells
-    }
-    
-    private var categorySection: Section {
+    private var genresSection: Section {
         Section(
             id: HomeSection.categories,
             items: viewModel.genresObservable,
@@ -196,7 +143,7 @@ class HomeViewController: UIViewController {
             }
         ) { genre in
             Cell(genre, id: "genre-\(genre.id)") { genre in
-                CategoryCell(genre: genre)
+                GenresCell(genre: genre)
             }
         }
         .skeleton(
@@ -204,7 +151,7 @@ class HomeViewController: UIViewController {
             when: viewModel.isLoadingGenres,
             includeSupplementary: true
         ) {
-            CategoryCell(genre: .placeholder)
+            GenresCell(genre: .placeholder)
         }
         .layout { _ in
             return HomeSection.categories.layout
@@ -217,9 +164,9 @@ class HomeViewController: UIViewController {
             items: viewModel.popularSectionMoviesObservable,
             header: {
                 Header {
-                    StandardHeader(title: "Popular Now", actionTitle: "See All", onAction: {
+                    StandardHeader(title: "Popular Now", actionTitle: "See All") {
                         print("See All Tapped")
-                    })
+                    }
                 }
             }
         ) { movie in
@@ -248,9 +195,9 @@ class HomeViewController: UIViewController {
             items: viewModel.upcomingMoviesObservable,
             header: {
                 Header {
-                    StandardHeader(title: "Upcoming", actionTitle: "See All", onAction: {
+                    StandardHeader(title: "Upcoming", actionTitle: "See All") {
                         print("See All Tapped")
-                    })
+                    }
                 }
             }
         ) { movie in
@@ -299,148 +246,48 @@ class HomeViewController: UIViewController {
     }
 }
 
-struct TopRatedCell: ViewBuilder {
-    let index: Int
-    let movie: Movie
-    
-    var body: View {
-        ZStackView {
-            HStackView {
-                // Ranking Number
-                LabelView(index > 0 ? "\(index)" : "")
-                    .font(.systemFont(ofSize: 30, weight: .bold))
-                    .color(UIColor.darkGray.withAlphaComponent(0.5)) // Faded number
-                    .alignment(.center)
-                    .width(40)
-                    .skeletonable(true)
-                
-                // Poster
-                ImageView(url: movie.posterURL)
-                    .skeletonable(true)
-                    .contentMode(.scaleAspectFill)
-                    .backgroundColor(.darkGray)
-                    .clipsToBounds(true)
-                    .cornerRadius(8)
-                    .width(60, priority: .required)
-                    .height(90)
-                
-                // Info
-                VStackView(spacing: 4) {
-                    LabelView(movie.title)
-                        .font(.systemFont(ofSize: 16, weight: .semibold))
-                        .color(.white)
-                        .numberOfLines(2)
-                        .skeletonable(true)
-                    HStackView(spacing: 4) {
-                        ImageView(UIImage(systemName: "star.fill"))
-                            .tintColor(.systemYellow)
-                            .size(width: 12, height: 12)
-                        HStackView {
-                            LabelView(String(format: "%.1f", movie.voteAverage))
-                                .font(.systemFont(ofSize: 14))
-                                .color(.systemYellow)
-                            LabelView("DRAMA") // Placeholder genre
-                                .font(.systemFont(ofSize: 12))
-                                .color(.gray)
-                                .padding(insets: .init(top: 0, left: 8, bottom: 0, right: 0))
-                            SpacerView()
-                        }
-                        .alignment(.center)
-                    }
-                    .alignment(.center)
-                    .skeletonable(true)
-                    SpacerView()
-                }
+// MARK: - Helpers
+
+private extension HomeViewController {
+    private func handleHeroScroll(items: [NSCollectionLayoutVisibleItem], offset: CGPoint, env: NSCollectionLayoutEnvironment) {
+        let containerWidth = env.container.contentSize.width
+        let visibleRectCenter = offset.x + containerWidth / 2.0
+        
+        // We need to find the actual cells to update them
+        guard let collectionView = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
+        
+        let heroCells: [HeroCollectionCell]
+        
+        // Cache the container view to avoid expensive recursive searches
+        if let container = cachedHeroContainerView {
+            heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
+        } else {
+            // Initial search
+            heroCells = findAllHeroCells(in: collectionView)
+            if let firstCell = heroCells.first {
+                cachedHeroContainerView = firstCell.superview
             }
         }
-        .padding(12)
-        .backgroundColor(UIColor(white: 1.0, alpha: 0.05))
-        .cornerRadius(12)
-        .border(color: UIColor(white: 1.0, alpha: 0.1), lineWidth: 1)
-    }
-}
-
-struct UpcomingCell: ViewBuilder {
-    let movie: Movie
-    
-    var body: View {
-        ZStackView {
-            ImageView(url: movie.backdropURL)
-                .skeletonable(true)
-                .contentMode(.scaleAspectFill)
-                .backgroundColor(.darkGray)
-                .clipsToBounds(true)
-            GradientView(colors: [.clear, .black.withAlphaComponent(0.8)])
-                .height(80)
-            VStackView {
-                SpacerView()
-                ZStackView {
-                    VStackView(spacing: 4) {
-                        SpacerView()
-                        LabelView("COMING JUNE 24") // Placeholder
-                            .font(.systemFont(ofSize: 10, weight: .bold))
-                            .color(.white)
-                            .backgroundColor(UIColor.black.withAlphaComponent(0.5))
-                            .cornerRadius(4)
-                            .padding(h: 4, v: 2)
-                            .skeletonable(true)
-                        LabelView(movie.title)
-                            .font(.systemFont(ofSize: 16, weight: .semibold))
-                            .color(.white)
-                            .numberOfLines(2)
-                            .skeletonable(true)
-                    }
-                    .alignment(.leading)
-                }
-                .padding(h: 12, v: 8)
-            }
-        }
-        .cornerRadius(8)
-        .clipsToBounds(true)
-    }
-}
-
-struct StandardHeader: ViewBuilder {
-    let title: String
-    let actionTitle: String?
-    var onAction: (() -> Void)? = nil
-    
-    var body: View {
-        HStackView() {
-            LabelView(title)
-                .font(.systemFont(ofSize: 18, weight: .semibold))
-                .color(.white)
-                .skeletonable(true)
+        
+        // Map visible items to their progress
+        for item in items {
+            // Distance of item center from viewport center
+            let distanceFromCenter = abs(item.center.x - visibleRectCenter)
             
-            SpacerView()
+            // Normalize distance: 0 at center, 1 at edge
+            let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
             
-            if let action = actionTitle {
-                ButtonView(action) { _ in onAction?() }
-                    .font(.systemFont(ofSize: 14))
-                    .color(.lightGray)
-                    .skeletonable(true)
+            // Match layout item to cell by X position in the orthogonal scroll view
+            if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
+                matchedCell.heroContentView.setScrollProgress(progress)
             }
         }
-        .alignment(.center)
     }
-}
-
-struct CategoryCell: ViewBuilder {
-    let genre: Genre
     
-    var body: View {
-        ZStackView {
-            HStackView(spacing: 8) {
-                LabelView(genre.name)
-                    .font(.systemFont(ofSize: 14, weight: .medium))
-                    .color(.white)
-                    .alignment(.center)
-                    .padding(insets: .init(top: 8, left: 16, bottom: 8, right: 16))
-            }
-        }
-        .backgroundColor(UIColor(white: 1.0, alpha: 0.1)) // Glassy/Dark look
-        .cornerRadius(20) // Pill shape
-        .border(color: UIColor(white: 1.0, alpha: 0.2), lineWidth: 1)
-        .skeletonable(true)
+    private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
+        var cells: [HeroCollectionCell] = []
+        if let cell = view as? HeroCollectionCell { cells.append(cell) }
+        for subview in view.subviews { cells.append(contentsOf: findAllHeroCells(in: subview)) }
+        return cells
     }
 }
