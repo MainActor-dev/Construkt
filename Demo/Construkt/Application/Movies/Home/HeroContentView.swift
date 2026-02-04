@@ -27,7 +27,7 @@ class HeroContentView: UIView {
                     .backgroundColor(.darkGray)
                     .clipsToBounds(true)
                     .skeletonable(true)
-                    .with { [weak self] in self?.backgroundImageView = $0 }
+                    .reference(&backgroundImageView)
                 
                 // Content Gradient and Text
                 VStackView {
@@ -58,7 +58,7 @@ class HeroContentView: UIView {
                                         .font(.systemFont(ofSize: 12, weight: .bold))
                                         .color(.systemYellow)
                                         .skeletonable(true)
-                                        .with { [weak self] in self?.ratingLabel = $0 }
+                                        .reference(&ratingLabel)
                                 }
                                 .alignment(.center)
                             }
@@ -70,7 +70,7 @@ class HeroContentView: UIView {
                                 .color(.white)
                                 .numberOfLines(2)
                                 .skeletonable(true)
-                                .with { [weak self] in self?.titleLabel = $0 }
+                                .reference(&titleLabel)
                             
                             // Metadata
                             LabelView("Sci-Fi  •  2h 15m")
@@ -90,7 +90,7 @@ class HeroContentView: UIView {
                         }
                         .alignment(.leading)
                         .padding(16)
-                        .with { [weak self] in self?.contentContainer = $0 }
+                        .reference(&contentContainer)
                     }
                 }
             }

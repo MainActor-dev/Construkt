@@ -37,6 +37,14 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         return cv
     }()
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = UIColor("#FFFFFF") // Default to white for dark mode app
+        refreshControl.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        return refreshControl
+    }()
+    
     private lazy var dataSource: CollectionDiffableDataSource = {
         let ds = CollectionDiffableDataSource(
             collectionView: collectionView,
@@ -173,6 +181,31 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         }
     }
     
+    // MARK: - Refresh Control
+    
+    private var onRefresh: (() -> Void)?
+    
+    internal func setupRefreshControl(action: @escaping () -> Void) {
+        self.onRefresh = action
+        collectionView.refreshControl = refreshControl
+    }
+    
+    @objc private func handleRefresh() {
+        onRefresh?()
+    }
+    
+    internal func setRefreshing(_ isRefreshing: Bool) {
+        if isRefreshing {
+            if !(collectionView.refreshControl?.isRefreshing ?? false) {
+                collectionView.refreshControl?.beginRefreshing()
+            }
+        } else {
+            if collectionView.refreshControl?.isRefreshing ?? false {
+                collectionView.refreshControl?.endRefreshing()
+            }
+        }
+    }
+    
     // MARK: - Scroll Observation
     
     public var onScroll: ((UIScrollView) -> Void)?
@@ -221,28 +254,47 @@ public extension CollectionView {
             
         return self
     }
+}
+
+public extension ModifiableView where Base: CollectionViewWrapperView {
+    @discardableResult
+
+
+
+    func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
+        modifiableView.setupRefreshControl(action: action)
+        
+        binding.asObservable()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak modifiableView] isRefreshing in
+                modifiableView?.setRefreshing(isRefreshing)
+            })
+            .disposed(by: modifiableView.rxDisposeBag)
+            
+        return ViewModifier(modifiableView)
+    }
     
     @discardableResult
-    func onScroll(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+    func onScroll(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onScroll = handler
-        return self
+        return ViewModifier(modifiableView)
     }
     
     @discardableResult
-    func onWillBeginDragging(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+    func onWillBeginDragging(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onWillBeginDragging = handler
-        return self
+        return ViewModifier(modifiableView)
     }
     
     @discardableResult
-    func onDidEndDragging(_ handler: @escaping (UIScrollView, Bool) -> Void) -> CollectionView {
+    func onDidEndDragging(_ handler: @escaping (UIScrollView, Bool) -> Void) -> ViewModifier<Base> {
         modifiableView.onDidEndDragging = handler
-        return self
+        return ViewModifier(modifiableView)
     }
     
     @discardableResult
-    func onDidEndDecelerating(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+    func onDidEndDecelerating(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onDidEndDecelerating = handler
-        return self
+        return ViewModifier(modifiableView)
     }
 }

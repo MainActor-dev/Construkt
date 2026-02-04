@@ -18,24 +18,30 @@ class HomeViewController: UIViewController {
     private weak var cachedHeroContainerView: UIView?
     
     var body: View {
-        CollectionView {
-            heroSection
-            categorySection
-            popularSection
-            upcomingSection
-            topRatedSection
-        }
-        .emptyState(when: viewModel.isEmptyObservable) {
-           EmptyView(
-            title: "No movies found",
-            subtitle: "Check your connection.",
-            buttonTitle: "Retry"
-           )
-        }
-        .backgroundColor(UIColor("#0A0A0A"))
-        .with {
-            $0.collectionView.contentInsetAdjustmentBehavior = .never
-            $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        ZStackView {
+            CollectionView {
+                heroSection
+                categorySection
+                popularSection
+                upcomingSection
+                topRatedSection
+            }
+            .emptyState(when: viewModel.isEmptyObservable) {
+               EmptyView(
+                title: "No movies found",
+                subtitle: "Check your connection.",
+                buttonTitle: "Retry"
+               )
+            }
+            .backgroundColor(UIColor("#0A0A0A"))
+            .with {
+                $0.collectionView.contentInsetAdjustmentBehavior = .never
+                $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            }
+            .onRefresh(viewModel.isNowPlayingLoadingObservable) { [weak self] in
+                self?.viewModel.loadHomeData()
+            }
+            navigationBar
         }
     }
     
@@ -129,6 +135,34 @@ class HomeViewController: UIViewController {
         return cells
     }
     
+    private var navigationBar: View {
+        ZStackView {
+            GradientView(colors: [.black.withAlphaComponent(0.8), .clear])
+                .height(100)
+            CustomNavigationBar(
+                customTitle: LabelView("LUMIERE")
+                    .font(UIFont(name: "AvenirNext-Bold", size: 24) ?? .systemFont(ofSize: 24, weight: .bold))
+                    .color(.white)
+                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0)),
+                trailing: [
+                    ImageView(UIImage(systemName: "magnifyingglass"))
+                        .tintColor(.white)
+                        .size(width: 24, height: 24)
+                        .contentMode(.scaleAspectFit),
+                    
+                    ImageView(UIImage(systemName: "person.crop.circle.fill"))
+                       .tintColor(.gray)
+                       .size(width: 32, height: 32)
+                       .cornerRadius(16)
+                       .clipsToBounds(true)
+                       .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
+                       .border(color: .white, lineWidth: 1)
+                ]
+            )
+        }
+        .position(.top) // Pin to top without filling screen
+        .height(100) // Explicit height
+    }
     
     private var categorySection: Section {
         Section(
@@ -227,8 +261,6 @@ class HomeViewController: UIViewController {
         }
     }
 }
-
-// MARK: - Components
 
 struct TopRatedCell: ViewBuilder {
     let index: Int

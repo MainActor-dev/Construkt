@@ -151,7 +151,6 @@ public struct SectionContentBuilder {
 }
 
 // MARK: - Section Result Builder
-
 @resultBuilder
 public struct SectionResultBuilder {
     public static func buildBlock() -> Observable<[SectionController]> {

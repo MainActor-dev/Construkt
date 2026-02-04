@@ -23,47 +23,63 @@ final class MovieDetailViewController: UIViewController {
         
 
         view.embed (
-            VerticalScrollView {
-                VStackView(spacing: 16) {
-                    
-                    // Backdrop
-                    ImageView(nil)
-                        .contentMode(.scaleAspectFill)
-                        .clipsToBounds(true)
-                        .height(200)
-                        .backgroundColor(.secondarySystemBackground)
-                        .with { [weak self] view in
-                            if let url = self?.movie.backdropURL ?? self?.movie.posterURL {
-                                view.setImage(from: url)
-                            }
-                        }
-                    
+            ZStackView {
+                // Main Content
+                VerticalScrollView {
                     VStackView(spacing: 16) {
-                        LabelView(movie.title)
-                            .font(.preferredFont(forTextStyle: .title1))
-                            .numberOfLines(0)
                         
-                        HStackView(spacing: 8) {
-                            LabelView("Rate: \(String(format: "%.1f", movie.voteAverage))/10")
-                                .font(.preferredFont(forTextStyle: .subheadline))
-                                .color(.secondaryLabel)
+                        // Backdrop
+                        ImageView(nil)
+                            .contentMode(.scaleAspectFill)
+                            .clipsToBounds(true)
+                            .height(200)
+                            .backgroundColor(.secondarySystemBackground)
+                            .with { [weak self] view in
+                                if let url = self?.movie.backdropURL ?? self?.movie.posterURL {
+                                    view.setImage(from: url)
+                                }
+                            }
+                        
+                        VStackView(spacing: 16) {
+                            LabelView(movie.title)
+                                .font(.preferredFont(forTextStyle: .title1))
+                                .numberOfLines(0)
                             
-                            LabelView("•")
-                                .color(.secondaryLabel)
+                            HStackView(spacing: 8) {
+                                LabelView("Rate: \(String(format: "%.1f", movie.voteAverage))/10")
+                                    .font(.preferredFont(forTextStyle: .subheadline))
+                                    .color(.secondaryLabel)
+                                
+                                LabelView("•")
+                                    .color(.secondaryLabel)
+                                
+                                LabelView(movie.releaseDate ?? "")
+                                    .font(.preferredFont(forTextStyle: .subheadline))
+                                    .color(.secondaryLabel)
+                                
+                                SpacerView()
+                            }
                             
-                            LabelView(movie.releaseDate ?? "")
-                                .font(.preferredFont(forTextStyle: .subheadline))
-                                .color(.secondaryLabel)
-                            
-                            SpacerView()
+                            LabelView(movie.overview)
+                                .font(.preferredFont(forTextStyle: .body))
+                                .numberOfLines(0)
                         }
-                        
-                        LabelView(movie.overview)
-                            .font(.preferredFont(forTextStyle: .body))
-                            .numberOfLines(0)
+                        .padding(16)
                     }
-                    .padding(16)
                 }
+                .with { $0.contentInset.top = 50 } // Push content below navbar
+                
+                // Navigation Bar
+                ZStackView {
+                    CustomNavigationBar(
+                        title: movie.title,
+                        onBack: { [weak self] in self?.navigationController?.popViewController(animated: true) },
+                        tintColor: .label
+                    )
+                    .with { $0.backgroundColor = .systemBackground.withAlphaComponent(0.95) }
+                }
+                .position(.top)
+                .height(48)
             }
         )
     }
