@@ -105,7 +105,9 @@ class HomeViewController: UIViewController {
             items: viewModel.popularSectionMoviesObservable,
             header: {
                 Header {
-                    StandardHeader(title: "Popular Now", actionTitle: "See All")
+                    StandardHeader(title: "Popular Now", actionTitle: "See All", onAction: {
+                        print("See All Tapped")
+                    })
                 }
             }
         ) { movie in
@@ -277,6 +279,7 @@ struct UpcomingCell: ViewBuilder {
 struct StandardHeader: ViewBuilder {
     let title: String
     let actionTitle: String?
+    var onAction: (() -> Void)? = nil
     
     var body: View {
         HStackView() {
@@ -287,7 +290,7 @@ struct StandardHeader: ViewBuilder {
             SpacerView()
             
             if let action = actionTitle {
-                ButtonView(action)
+                ButtonView(action) { _ in onAction?() }
                     .font(.systemFont(ofSize: 14))
                     .color(.lightGray)
             }
