@@ -39,6 +39,6 @@ struct HomeNavigationBar: ViewBuilder {
             )
         }
         .position(.top) // Pin to top without filling screen
-        .height(100) // Explicit height
+        .height(120) // Explicit height
     }
 }

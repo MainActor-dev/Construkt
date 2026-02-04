@@ -5,41 +5,49 @@ import RxCocoa
 public class MovieViewModel {
     
     // MARK: - State
-
-    @Variable private var nowPlayingState = LoadableState<[Movie]>.initial
-    @Variable private var genresState = LoadableState<[Genre]>.initial
-    @Variable private var popularState = LoadableState<[Movie]>.initial
-    @Variable private var upcomingState = LoadableState<[Movie]>.initial
-    @Variable private var topRatedState = LoadableState<[Movie]>.initial
-    @Variable private var selectedMovie: Movie? = nil
-
     
+    public struct HomeData: Equatable {
+        public internal(set) var nowPlaying: [Movie] = []
+        public internal(set) var popular: [Movie] = []
+        public internal(set) var upcoming: [Movie] = []
+        public internal(set) var topRated: [Movie] = []
+        public internal(set) var genres: [Genre] = []
+        
+        public var isEmpty: Bool {
+            nowPlaying.isEmpty && popular.isEmpty && upcoming.isEmpty && topRated.isEmpty && genres.isEmpty
+        }
+    }
+
+    @Variable private var state = LoadableState<HomeData>.initial
+    @Variable private var selectedMovie: Movie? = nil // Kept separate as it's a detail view state
+
     // MARK: - Observables
-    public var nowPlayingMovies: Observable<[Movie]> { $nowPlayingState.asObservable().mapItems() }
-    public var isNowPlayingLoading: Observable<Bool> { $nowPlayingState.asObservable().mapLoading() }
     
-    public var popularSectionMovies: Observable<[Movie]> { $popularState.asObservable().mapItems() }
-    public var isPopularSectionLoading: Observable<Bool> { $popularState.asObservable().mapLoading() }
+    // Unified Loading State
+    // Must emit (even empty) during loading to trigger combineLatest in skeleton modifier
+    private var homeData: Observable<HomeData> { $state.asObservable().mapValue().map { $0 ?? HomeData() } }
     
-    public var upcomingMovies: Observable<[Movie]> { $upcomingState.asObservable().mapItems() }
-    public var isUpcomingLoading: Observable<Bool> { $upcomingState.asObservable().mapLoading() }
+    public var nowPlayingMovies: Observable<[Movie]> { homeData.map { $0.nowPlaying } }
+    public var isNowPlayingLoading: Observable<Bool> { $state.asObservable().mapLoading() }
     
-    public var topRatedMovies: Observable<[Movie]> { $topRatedState.asObservable().mapItems() }
-    public var isTopRatedLoading: Observable<Bool> { $topRatedState.asObservable().mapLoading() }
+    public var popularSectionMovies: Observable<[Movie]> { homeData.map { $0.popular } }
+    public var isPopularSectionLoading: Observable<Bool> { $state.asObservable().mapLoading() }
     
-    public var genres: Observable<[Genre]> { $genresState.asObservable().mapItems() }
-    public var isLoadingGenres: Observable<Bool> { $genresState.asObservable().mapLoading() }
+    public var upcomingMovies: Observable<[Movie]> { homeData.map { $0.upcoming } }
+    public var isUpcomingLoading: Observable<Bool> { $state.asObservable().mapLoading() }
+    
+    public var topRatedMovies: Observable<[Movie]> { homeData.map { $0.topRated } }
+    public var isTopRatedLoading: Observable<Bool> { $state.asObservable().mapLoading() }
+    
+    public var genres: Observable<[Genre]> { homeData.map { $0.genres } }
+    public var isLoadingGenres: Observable<Bool> { $state.asObservable().mapLoading() }
     
     public var isEmptyObservable: Observable<Bool> {
         Observable.combineLatest(
-            nowPlayingMovies,
-            genres,
-            popularSectionMovies,
-            isNowPlayingLoading,
-            isPopularSectionLoading
-        ).map { nowPlaying, popular, genres, isNowPlayingLoading, isPopularLoading in
-            if isNowPlayingLoading || isPopularLoading { return false }
-            return nowPlaying.isEmpty && popular.isEmpty
+            $state.asObservable().mapLoading(),
+            homeData.map { $0.isEmpty }
+        ).map { isLoading, isEmpty in
+            return !isLoading && isEmpty
         }
     }
     
@@ -54,7 +62,7 @@ public class MovieViewModel {
     }
     
     public func loadHomeData() {
-        setLoading()
+        state = .loading
         
         Task {
             // Simulate loading
@@ -75,35 +83,21 @@ public class MovieViewModel {
                 let genresResult = try await genres
                 
                 await MainActor.run {
-                    let heroMovies = nowPlayingResult.results.isEmpty ? popularResult.results : nowPlayingResult.results
-                    self.nowPlayingState = .loaded(heroMovies)
-                    self.popularState = .loaded(popularResult.results)
-                    self.upcomingState = .loaded(upcomingResult.results)
-                    self.topRatedState = .loaded(topRatedResult.results)
-                    self.genresState = .loaded(genresResult.genres)
+                    var data = HomeData()
+                    data.nowPlaying = nowPlayingResult.results
+                    data.popular = popularResult.results
+                    data.upcoming = upcomingResult.results
+                    data.topRated = topRatedResult.results
+                    data.genres = genresResult.genres
+                    
+                    self.state = .loaded(data)
                 }
             } catch {
                 await MainActor.run {
-                    self.setEmpty()
+                    self.state = .loaded(HomeData()) // Or .error(error.localizedDescription)
                 }
             }
         }
-    }
-    
-    private func setLoading() {
-        nowPlayingState = .loading
-        popularState = .loading
-        upcomingState = .loading
-        topRatedState = .loading
-        genresState = .loading
-    }
-    
-    private func setEmpty() {
-        nowPlayingState = .loaded([])
-        popularState = .loaded([])
-        upcomingState = .loaded([])
-        topRatedState = .loaded([])
-        genresState = .loaded([])
     }
     
     public func selectMovie(_ movie: Movie) {
