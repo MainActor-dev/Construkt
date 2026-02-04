@@ -8,9 +8,6 @@
 import UIKit
 import RxSwift
 
-import RxSwift
-
-
 class HomeViewController: UIViewController {
     
     private let viewModel = MovieViewModel()
