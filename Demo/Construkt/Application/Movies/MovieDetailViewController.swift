@@ -2,6 +2,8 @@ import UIKit
 
 final class MovieDetailViewController: UIViewController {
     
+    private let viewModel = MovieViewModel()
+    
     private let movie: Movie
   
     init(movie: Movie) {

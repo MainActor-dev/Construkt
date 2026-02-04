@@ -5,7 +5,6 @@ import RxCocoa
 public class MovieViewModel {
     
     // MARK: - State
-    
     public struct HomeData: Equatable {
         public internal(set) var nowPlaying: LoadableState<[Movie]> = .initial
         public internal(set) var popular: LoadableState<[Movie]> = .initial
@@ -18,11 +17,11 @@ public class MovieViewModel {
         }
         
         public var isEmpty: Bool {
-            (nowPlaying.value?.isEmpty ?? true) &&
-            (popular.value?.isEmpty ?? true) &&
-            (upcoming.value?.isEmpty ?? true) &&
-            (topRated.value?.isEmpty ?? true) &&
-            (genres.value?.isEmpty ?? true)
+            (nowPlaying.value?.isEmpty == true) &&
+            (popular.value?.isEmpty == true) &&
+            (upcoming.value?.isEmpty == true) &&
+            (topRated.value?.isEmpty == true) &&
+            (genres.value?.isEmpty == true)
         }
     }
 
@@ -30,22 +29,39 @@ public class MovieViewModel {
     @Variable private var selectedMovie: Movie? = nil // Kept separate as it's a detail view state
 
     // MARK: - Observables
-    
-    // Unified State Stream
     private var homeData: Observable<HomeData> { $state.asObservable() }
     
-    public var nowPlayingMovies: Observable<[Movie]> { homeData.map { $0.nowPlaying }.mapItems() }
-    public var isNowPlayingLoading: Observable<Bool> { homeData.map { $0.nowPlaying }.mapLoading() }
+    // Now Playing
+    public var nowPlayingMovies: Observable<[Movie]> {
+        homeData.map { $0.nowPlaying }.mapItems()
+    }
+    public var isNowPlayingLoading: Observable<Bool> {
+        homeData.map { $0.nowPlaying }.mapLoading()
+    }
     
-    public var popularSectionMovies: Observable<[Movie]> { homeData.map { $0.popular }.mapItems() }
-    public var isPopularSectionLoading: Observable<Bool> { homeData.map { $0.popular }.mapLoading() }
+    // Popular
+    public var popularSectionMovies: Observable<[Movie]> {
+        homeData.map { $0.popular }.mapItems()
+    }
+    public var isPopularSectionLoading: Observable<Bool> {
+        homeData.map { $0.popular }.mapLoading()
+    }
     
-    public var upcomingMovies: Observable<[Movie]> { homeData.map { $0.upcoming }.mapItems() }
-    public var isUpcomingLoading: Observable<Bool> { homeData.map { $0.upcoming }.mapLoading() }
+    // Upcoming
+    public var upcomingMovies: Observable<[Movie]> {
+        homeData.map { $0.upcoming }.mapItems()
+    }
+    public var isUpcomingLoading: Observable<Bool> {
+        homeData.map { $0.upcoming }.mapLoading()
+    }
     
-    public var topRatedMovies: Observable<[Movie]> { homeData.map { $0.topRated }.mapItems() }
+    // Top-Rated
+    public var topRatedMovies: Observable<[Movie]> {
+        homeData.map { $0.topRated }.mapItems()
+    }
     public var isTopRatedLoading: Observable<Bool> { homeData.map { $0.topRated }.mapLoading() }
     
+    // Genres
     public var genres: Observable<[Genre]> { homeData.map { $0.genres }.mapItems() }
     public var isLoadingGenres: Observable<Bool> { homeData.map { $0.genres }.mapLoading() }
     
@@ -54,7 +70,6 @@ public class MovieViewModel {
     }
     
     // MARK: - Dependencies
-    
     private let service: MovieServiceProtocol
     
     // MARK: - Init
@@ -148,11 +163,7 @@ public class MovieViewModel {
         }
     }
     
-    public func selectMovie(_ movie: Movie) {
-        // Optimistic selection
-        self.selectedMovie = movie
-        
-        // Fetch full details
+    public func selectMovie(_ movie: Movie) {        
         Task {
             do {
                 let detailedMovie = try await service.getMovieDetails(id: movie.id)

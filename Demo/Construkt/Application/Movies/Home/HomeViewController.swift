@@ -6,12 +6,10 @@
 //
 
 import UIKit
-import RxSwift
 
 class HomeViewController: UIViewController {
     
     private let viewModel = MovieViewModel()
-    private let disposeBag = DisposeBag()
     private weak var cachedHeroContainerView: UIView?
     
     private var navBarBackgroundView: UIView?
