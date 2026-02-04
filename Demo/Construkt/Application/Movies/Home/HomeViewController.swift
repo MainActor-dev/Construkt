@@ -17,6 +17,8 @@ class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private weak var cachedHeroContainerView: UIView?
     
+    private var navBarBackgroundView: UIView?
+    
     var body: View {
         ZStackView {
             CollectionView {
@@ -37,9 +39,14 @@ class HomeViewController: UIViewController {
             .with {
                 $0.collectionView.contentInsetAdjustmentBehavior = .never
                 $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                $0.collectionView.showsVerticalScrollIndicator = false
             }
             .onRefresh(viewModel.isNowPlayingLoadingObservable) { [weak self] in
                 self?.viewModel.loadHomeData()
+            }
+            .onScroll { [weak self] scrollView in
+                self?.handleHeroScroll(scrollView)
+                self?.handleNavBarScroll(scrollView)
             }
             navigationBar
         }
@@ -59,6 +66,50 @@ class HomeViewController: UIViewController {
     private func showDetail(for movie: Movie) {
         let detailVC = MovieDetailViewController(movie: movie)
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    // MARK: - Scroll Handling
+    
+    private func handleNavBarScroll(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        // Fade in between 0 and 100pt scroll
+        let alpha = min(1.0, max(0.0, y / 100.0))
+        navBarBackgroundView?.alpha = alpha
+    }
+    
+    // MARK: - Navigation Bar
+    private var navigationBar: View {
+        ZStackView {
+            // Gradient Background
+            GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
+                .height(100)
+                .alpha(0) // Start transparent
+                .reference(&navBarBackgroundView)
+            
+            // Navbar Content
+            CustomNavigationBar(
+                customTitle: LabelView("LUMIERE")
+                    .font(UIFont(name: "AvenirNext-Bold", size: 24) ?? .systemFont(ofSize: 24, weight: .bold))
+                    .color(.white)
+                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0)),
+                trailing: [
+                    ImageView(UIImage(systemName: "magnifyingglass"))
+                        .tintColor(.white)
+                        .size(width: 24, height: 24)
+                        .contentMode(.scaleAspectFit),
+                    
+                    ImageView(UIImage(systemName: "person.crop.circle.fill"))
+                       .tintColor(.gray)
+                       .size(width: 32, height: 32)
+                       .cornerRadius(16)
+                       .clipsToBounds(true)
+                       .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
+                       .border(color: .white, lineWidth: 1)
+                ]
+            )
+        }
+        .position(.top) // Pin to top without filling screen
+        .height(100) // Explicit height
     }
     
     // MARK: - Sections
@@ -120,8 +171,8 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private func updateHeroAnimation(hidden: Bool) {
-         // Deprecated but kept for safety
+    private func handleHeroScroll(_ scrollView: UIScrollView) {
+         // Vertical scroll handler - no-op for now unless we want parallax
     }
     
     private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
@@ -133,35 +184,6 @@ class HomeViewController: UIViewController {
             cells.append(contentsOf: findAllHeroCells(in: subview))
         }
         return cells
-    }
-    
-    private var navigationBar: View {
-        ZStackView {
-            GradientView(colors: [.black.withAlphaComponent(0.8), .clear])
-                .height(100)
-            CustomNavigationBar(
-                customTitle: LabelView("LUMIERE")
-                    .font(UIFont(name: "AvenirNext-Bold", size: 24) ?? .systemFont(ofSize: 24, weight: .bold))
-                    .color(.white)
-                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0)),
-                trailing: [
-                    ImageView(UIImage(systemName: "magnifyingglass"))
-                        .tintColor(.white)
-                        .size(width: 24, height: 24)
-                        .contentMode(.scaleAspectFit),
-                    
-                    ImageView(UIImage(systemName: "person.crop.circle.fill"))
-                       .tintColor(.gray)
-                       .size(width: 32, height: 32)
-                       .cornerRadius(16)
-                       .clipsToBounds(true)
-                       .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
-                       .border(color: .white, lineWidth: 1)
-                ]
-            )
-        }
-        .position(.top) // Pin to top without filling screen
-        .height(100) // Explicit height
     }
     
     private var categorySection: Section {

@@ -214,22 +214,18 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     public var onDidEndDecelerating: ((UIScrollView) -> Void)?
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // print("DEBUG: scrollViewDidScroll")
         onScroll?(scrollView)
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        print("DEBUG: scrollViewWillBeginDragging")
         onWillBeginDragging?(scrollView)
     }
     
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        print("DEBUG: scrollViewDidEndDragging decel=\(decelerate)")
         onDidEndDragging?(scrollView, decelerate)
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print("DEBUG: scrollViewDidEndDecelerating")
         onDidEndDecelerating?(scrollView)
     }
 }
@@ -258,9 +254,6 @@ public extension CollectionView {
 
 public extension ModifiableView where Base: CollectionViewWrapperView {
     @discardableResult
-
-
-
     func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
         modifiableView.setupRefreshControl(action: action)
         

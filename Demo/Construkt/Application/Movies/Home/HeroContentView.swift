@@ -57,11 +57,11 @@ class HeroContentView: UIView {
                                     LabelView("-")
                                         .font(.systemFont(ofSize: 12, weight: .bold))
                                         .color(.systemYellow)
-                                        .skeletonable(true)
                                         .reference(&ratingLabel)
                                 }
                                 .alignment(.center)
                             }
+                            .skeletonable(true)
                             .alignment(.leading)
                             
                             // Title

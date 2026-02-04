@@ -119,12 +119,6 @@ public class BuilderInternalUILabel: UILabel, ViewBuilderEventHandling {
 
     var labelMargins: UIEdgeInsets = .zero
     
-//    deinit {
-//        print("deinit BuilderInternalUILabel")
-//    }
-    
-    // support for label padding
-    
     override public var intrinsicContentSize: CGSize {
         numberOfLines = 0       // don't forget!
         var s = super.intrinsicContentSize

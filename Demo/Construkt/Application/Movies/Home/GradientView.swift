@@ -7,24 +7,16 @@
 
 import UIKit
 
-public struct GradientView: ViewBuilder {
+public struct GradientView: ModifiableView {
     
-    public let colors: [UIColor]
-    public let startPoint: CGPoint
-    public let endPoint: CGPoint
+    public let modifiableView: UIView
     
     public init(
         colors: [UIColor],
         startPoint: CGPoint = CGPoint(x: 0.5, y: 0.0),
         endPoint: CGPoint = CGPoint(x: 0.5, y: 1.0)
     ) {
-        self.colors = colors
-        self.startPoint = startPoint
-        self.endPoint = endPoint
-    }
-    
-    public var body: View {
-        With(GradientViewInternal(colors: colors, startPoint: startPoint, endPoint: endPoint))
+        self.modifiableView = GradientViewInternal(colors: colors, startPoint: startPoint, endPoint: endPoint)
     }
 }
 
