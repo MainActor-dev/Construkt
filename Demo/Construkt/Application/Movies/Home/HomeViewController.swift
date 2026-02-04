@@ -25,12 +25,13 @@ class HomeViewController: UIViewController {
                 upcomingSection
                 topRatedSection
             }
-            .emptyState(when: viewModel.isEmptyObservable) {
-               EmptyView(
-                title: "No movies found",
-                subtitle: "Check your connection.",
-                buttonTitle: "Retry"
-               )
+            .emptyState(when: viewModel.isEmptyObservable) { [weak self] in
+                EmptyView(
+                    title: "No movies found",
+                    subtitle: "Check your connection.",
+                    buttonTitle: "Retry",
+                    onAction: { [weak self] in self?.fetchData() }
+                )
             }
             .backgroundColor(UIColor("#0A0A0A"))
             .with {
@@ -39,7 +40,7 @@ class HomeViewController: UIViewController {
                 $0.collectionView.showsVerticalScrollIndicator = false
             }
             .onRefresh(viewModel.isNowPlayingLoadingObservable) { [weak self] in
-                self?.viewModel.loadHomeData()
+                self?.fetchData()
             }
             .onScroll { [weak self] scrollView in
                 self?.handleHeroScroll(scrollView)
@@ -86,22 +87,23 @@ class HomeViewController: UIViewController {
             // Navbar Content
             CustomNavigationBar(
                 customTitle: LabelView("LUMIERE")
-                    .font(UIFont(name: "AvenirNext-Bold", size: 24) ?? .systemFont(ofSize: 24, weight: .bold))
-                    .color(.white)
-                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0)),
+                    .font(.systemFont(ofSize: 24, weight: .bold))
+                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0))
+                    .color(bind: viewModel.isNowPlayingLoadingObservable.map { isLoading in
+                        return isLoading ? .gray : .white
+                    }),
                 trailing: [
                     ImageView(UIImage(systemName: "magnifyingglass"))
                         .tintColor(.white)
                         .size(width: 24, height: 24)
                         .contentMode(.scaleAspectFit),
-                    
                     ImageView(UIImage(systemName: "person.crop.circle.fill"))
-                       .tintColor(.gray)
-                       .size(width: 32, height: 32)
-                       .cornerRadius(16)
-                       .clipsToBounds(true)
-                       .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
-                       .border(color: .white, lineWidth: 1)
+                        .tintColor(.gray)
+                        .size(width: 32, height: 32)
+                        .cornerRadius(16)
+                        .clipsToBounds(true)
+                        .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
+                        .border(color: .white, lineWidth: 1)
                 ]
             )
         }
@@ -163,13 +165,13 @@ class HomeViewController: UIViewController {
             
             // Match layout item to cell by X position in the orthogonal scroll view
             if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
-                 matchedCell.heroContentView.setScrollProgress(progress)
+                matchedCell.heroContentView.setScrollProgress(progress)
             }
         }
     }
     
     private func handleHeroScroll(_ scrollView: UIScrollView) {
-         // Vertical scroll handler - no-op for now unless we want parallax
+        // Vertical scroll handler - no-op for now unless we want parallax
     }
     
     private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
@@ -248,7 +250,8 @@ class HomeViewController: UIViewController {
                 Header {
                     StandardHeader(title: "Upcoming", actionTitle: "See All", onAction: {
                         print("See All Tapped")
-                    })                }
+                    })
+                }
             }
         ) { movie in
             Cell(movie, id: "upcoming-\(movie.id)") { movie in
@@ -441,8 +444,3 @@ struct CategoryCell: ViewBuilder {
         .skeletonable(true)
     }
 }
-
-
-// MARK: - Components
-
-

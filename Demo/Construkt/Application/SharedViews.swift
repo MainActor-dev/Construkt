@@ -45,6 +45,7 @@ struct EmptyView: ViewBuilder {
     let title: String
     let subtitle: String
     let buttonTitle: String
+    var onAction: (() -> Void)? = nil
     
     var body: View {
         VStackView {
@@ -62,7 +63,7 @@ struct EmptyView: ViewBuilder {
                 .color(.gray)
                 .alignment(.center)
             SpacerView(12)
-            ButtonView(buttonTitle)
+            ButtonView(buttonTitle) { _ in onAction?() }
                 .font(.systemFont(ofSize: 15, weight: .bold))
                 .color(.black)
                 .backgroundColor(.white)
