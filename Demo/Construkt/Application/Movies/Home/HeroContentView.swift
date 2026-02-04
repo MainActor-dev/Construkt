@@ -26,6 +26,7 @@ class HeroContentView: UIView {
                     .contentMode(.scaleAspectFill)
                     .backgroundColor(.darkGray)
                     .clipsToBounds(true)
+                    .skeletonable(true)
                     .with { [weak self] in self?.backgroundImageView = $0 }
                 
                 // Content Gradient and Text
@@ -56,6 +57,7 @@ class HeroContentView: UIView {
                                     LabelView("-")
                                         .font(.systemFont(ofSize: 12, weight: .bold))
                                         .color(.systemYellow)
+                                        .skeletonable(true)
                                         .with { [weak self] in self?.ratingLabel = $0 }
                                 }
                                 .alignment(.center)
@@ -67,12 +69,14 @@ class HeroContentView: UIView {
                                 .font(.systemFont(ofSize: 32, weight: .bold))
                                 .color(.white)
                                 .numberOfLines(2)
+                                .skeletonable(true)
                                 .with { [weak self] in self?.titleLabel = $0 }
                             
                             // Metadata
                             LabelView("Sci-Fi  •  2h 15m")
                                 .font(.systemFont(ofSize: 14))
                                 .color(.lightGray)
+                                .skeletonable(true)
                             
                             // Button
                             ButtonView("Watch Trailer")
@@ -81,6 +85,7 @@ class HeroContentView: UIView {
                                 .backgroundColor(.white)
                                 .cornerRadius(24)
                                 .height(48)
+                                .skeletonable(true)
                                 .width(CGFloat.greatestFiniteMagnitude)
                         }
                         .alignment(.leading)

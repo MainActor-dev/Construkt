@@ -73,7 +73,7 @@ class HomeViewController: UIViewController {
             return layout
         }
         .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
-            HeroView(movie: .placeholder)
+            Modified(HeroContentView()) { $0.configure(with: .placeholder) }
         }
     }
     
@@ -373,69 +373,5 @@ struct CategoryCell: ViewBuilder {
 
 
 // MARK: - Components
-struct HeroView: ViewBuilder {
-    let movie: Movie
-    
-    var body: View {
-        ZStackView {
-            ImageView(url: movie.backdropURL)
-                .skeletonable(true)
-                .contentMode(.scaleAspectFill)
-                .backgroundColor(.darkGray)
-                .clipsToBounds(true)
-            // Gradient Overlay
-            VStackView {
-                SpacerView()
-                GradientView(colors: [.clear, .black.withAlphaComponent(0.8), .black])
-                    .height(300)
-            }
-            VStackView(spacing: 8) {
-                SpacerView()
-                // Trending Badge & Rating
-                HStackView(spacing: 8) {
-                    LabelView("TRENDING NOW")
-                        .font(.systemFont(ofSize: 10, weight: .bold))
-                        .color(UIColor.white.withAlphaComponent(0.8))
-                        .backgroundColor(UIColor.white.withAlphaComponent(0.2))
-                        .cornerRadius(4)
-                        .padding(2)
-                    HStackView(spacing: 4) {
-                        ImageView(UIImage(systemName: "star.fill"))
-                            .tintColor(.systemYellow)
-                            .size(width: 12, height: 12)
-                        LabelView(String(format: "%.1f", movie.voteAverage))
-                            .font(.systemFont(ofSize: 12, weight: .bold))
-                            .color(.systemYellow)
-                    }
-                    .alignment(.center)
-                }
-                .alignment(.leading)
-                .skeletonable(true)
-                // Title
-                LabelView(movie.title)
-                    .font(.systemFont(ofSize: 32, weight: .bold))
-                    .color(.white)
-                    .numberOfLines(2)
-                    .skeletonable(true)
-                // Metadata
-                LabelView("Sci-Fi  •  2h 15m") // Placeholder data as we don't have genre/runtime yet
-                    .font(.systemFont(ofSize: 14))
-                    .color(.lightGray)
-                    .skeletonable(true)
-                // Watch Trailer Button
-                ButtonView("Watch Trailer")
-                    .font(.systemFont(ofSize: 16, weight: .semibold))
-                    .color(.black)
-                    .backgroundColor(.white)
-                    .cornerRadius(24)
-                    .height(48)
-                    .skeletonable(true)
-                    .width(CGFloat.greatestFiniteMagnitude) // Full width relative to container, or we'll wrap it
-            }
-            .alignment(.leading)
-            .padding(16)
-        }
-        .clipsToBounds(true)
-    }
-}
+
 
