@@ -172,6 +172,33 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
             collectionView.isHidden = false
         }
     }
+    
+    // MARK: - Scroll Observation
+    
+    public var onScroll: ((UIScrollView) -> Void)?
+    public var onWillBeginDragging: ((UIScrollView) -> Void)?
+    public var onDidEndDragging: ((UIScrollView, Bool) -> Void)?
+    public var onDidEndDecelerating: ((UIScrollView) -> Void)?
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // print("DEBUG: scrollViewDidScroll")
+        onScroll?(scrollView)
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        print("DEBUG: scrollViewWillBeginDragging")
+        onWillBeginDragging?(scrollView)
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        print("DEBUG: scrollViewDidEndDragging decel=\(decelerate)")
+        onDidEndDragging?(scrollView, decelerate)
+    }
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        print("DEBUG: scrollViewDidEndDecelerating")
+        onDidEndDecelerating?(scrollView)
+    }
 }
 
 public extension CollectionView {
@@ -192,6 +219,30 @@ public extension CollectionView {
             })
             .disposed(by: modifiableView.rxDisposeBag)
             
+        return self
+    }
+    
+    @discardableResult
+    func onScroll(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+        modifiableView.onScroll = handler
+        return self
+    }
+    
+    @discardableResult
+    func onWillBeginDragging(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+        modifiableView.onWillBeginDragging = handler
+        return self
+    }
+    
+    @discardableResult
+    func onDidEndDragging(_ handler: @escaping (UIScrollView, Bool) -> Void) -> CollectionView {
+        modifiableView.onDidEndDragging = handler
+        return self
+    }
+    
+    @discardableResult
+    func onDidEndDecelerating(_ handler: @escaping (UIScrollView) -> Void) -> CollectionView {
+        modifiableView.onDidEndDecelerating = handler
         return self
     }
 }

@@ -64,19 +64,89 @@ class HomeViewController: UIViewController {
     
     private var heroSection: Section {
         Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
-            Cell(movie, id: "hero-\(movie.id)") { movie in
-                HeroView(movie: movie)
+            Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
+                cell.configure(with: movie)
             }
             .onSelect { [weak self] movie in
                 self?.showDetail(for: movie)
             }
         }
-        .layout { _ in
-            return HomeSection.hero.layout
+        .layout { [weak self] _ in
+            var layout = HomeSection.hero.layout
+            layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
+                self?.handleHeroScroll(items: items, offset: offset, env: env)
+            }
+            return layout
         }
         .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
             HeroView(movie: .placeholder)
         }
+    }
+    
+    private func handleHeroScroll(items: [NSCollectionLayoutVisibleItem], offset: CGPoint, env: NSCollectionLayoutEnvironment) {
+        let containerWidth = env.container.contentSize.width
+        // Calculate center of the visible rect based on scroll offset
+        let visibleRectCenter = offset.x + containerWidth / 2.0
+        
+        // We need to find the actual cells to update them
+        guard let collectionView = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
+        
+        // Optimize: Create a map of index paths to visible cells for O(1) lookup
+        // Note: For orthogonal scrolling, "visibleCells" of the parent CV are the section containers.
+        // We still need our recursive finder or a better way.
+        // Let's assume our `findAllHeroCells` is efficient enough for this demo (only 3-4 items visible).
+        
+        let heroCells = findAllHeroCells(in: collectionView)
+        
+        // Map visible items to their progress
+        for item in items {
+            // Distance of item center from viewport center
+            let distanceFromCenter = abs(item.center.x - visibleRectCenter)
+            
+            // Normalize distance: 0 at center, 1 at edge (containerWidth/2)
+            // We can tune the denominator to control how "strictly" it hides.
+            // Using containerWidth / 2 means it's fully hidden when it touches the edge.
+            let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
+            
+            // Apply to matching cell
+            // Since we can't easily match item -> cell (cell might be reused/wrapped),
+            // and `findAllHeroCells` returns just a flat list of ALL hero cells (cached or visible).
+            // We need to match by IndexPath if possible, but `HeroContentView` doesn't know its index path.
+            // AND `HeroCollectionCell` is inside the orthogonal scroll view.
+            
+            // WORKAROUND:
+            // Since `items` corresponds to the cells in the orthogonal group.
+            // We can iterate the generic `heroCells` and try to match frames?
+            // Or simpler: Just rely on the fact that `heroCells` are the visible ones.
+            // But how do we know which cell corresponds to which layout item?
+            // The item has an `indexPath`. The cell *should* have the same index path.
+            // But `CollectionViewWrapperView` manages the diffable data source.
+            
+            // ROBUST MATCHING:
+            // Let's iterate `heroCells` and check their frame in the parent coordinate space.
+            // `item.frame` is in the orthogonal scroll view's coordinate space.
+            // `cell.frame` is also in that coordinate space.
+            // We can match loosely by center X.
+            
+            if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
+                 matchedCell.heroContentView.setScrollProgress(progress)
+            }
+        }
+    }
+    
+    private func updateHeroAnimation(hidden: Bool) {
+         // Deprecated but kept for safety
+    }
+    
+    private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
+        var cells: [HeroCollectionCell] = []
+        if let cell = view as? HeroCollectionCell {
+            cells.append(cell)
+        }
+        for subview in view.subviews {
+            cells.append(contentsOf: findAllHeroCells(in: subview))
+        }
+        return cells
     }
     
     
@@ -131,7 +201,10 @@ class HomeViewController: UIViewController {
             id: HomeSection.upcoming,
             items: viewModel.upcomingMoviesObservable,
             header: {
-                Header { StandardHeader(title: "Upcoming", actionTitle: nil) }
+                Header {
+                    StandardHeader(title: "Upcoming", actionTitle: "See All", onAction: {
+                        print("See All Tapped")
+                    })                }
             }
         ) { movie in
             Cell(movie, id: "upcoming-\(movie.id)") { movie in

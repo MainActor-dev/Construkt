@@ -108,7 +108,8 @@ extension NSCollectionLayoutSection {
         insets: NSDirectionalEdgeInsets = .zero,
         decorationItems: [NSCollectionLayoutDecorationItem] = [],
         supplementaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [],
-        scrolling: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil
+        scrolling: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil,
+        invalidationHandler: NSCollectionLayoutSectionVisibleItemsInvalidationHandler? = nil
     ) -> NSCollectionLayoutSection {
         let section = NSCollectionLayoutSection(group: group)
         section.interGroupSpacing = spacing
@@ -116,6 +117,7 @@ extension NSCollectionLayoutSection {
         section.decorationItems = decorationItems
         section.boundarySupplementaryItems = supplementaryItems
         if let scrolling { section.orthogonalScrollingBehavior = scrolling }
+        if let invalidationHandler { section.visibleItemsInvalidationHandler = invalidationHandler }
         return section
     }
 }
