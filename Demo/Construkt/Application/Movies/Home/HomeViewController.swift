@@ -16,6 +16,19 @@ class HomeViewController: UIViewController {
     
     private var navBarBackgroundView: UIView?
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor("#0A0A0A")
+        view.embed(body)
+        fetchData()
+    }
+    
+    private func fetchData() {
+        viewModel.loadHomeData()
+    }
+    
+    // MARK: - Layout
+    
     var body: View {
         ZStackView {
             CollectionView {
@@ -39,80 +52,25 @@ class HomeViewController: UIViewController {
                 $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 $0.collectionView.showsVerticalScrollIndicator = false
             }
-            .onRefresh(viewModel.isNowPlayingLoadingObservable) { [weak self] in
+            .onRefresh(viewModel.isNowPlayingLoading) { [weak self] in
                 self?.fetchData()
             }
             .onScroll { [weak self] scrollView in
                 self?.handleNavBarScroll(scrollView)
             }
-            navigationBar
-        }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor("#0A0A0A")
-        view.embed(body)
-        fetchData()
-    }
-    
-    private func fetchData() {
-        viewModel.loadHomeData()
-    }
-    
-    private func showDetail(for movie: Movie) {
-        let detailVC = MovieDetailViewController(movie: movie)
-        navigationController?.pushViewController(detailVC, animated: true)
-    }
-    
-    // MARK: - Scroll Handling
-    
-    private func handleNavBarScroll(_ scrollView: UIScrollView) {
-        let y = scrollView.contentOffset.y
-        // Fade in between 0 and 100pt scroll
-        let alpha = min(1.0, max(0.0, y / 100.0))
-        navBarBackgroundView?.alpha = alpha
-    }
-    
-    // MARK: - Navigation Bar
-    private var navigationBar: View {
-        ZStackView {
-            // Gradient Background
-            GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
-                .height(100)
-                .alpha(0) // Start transparent
-                .reference(&navBarBackgroundView)
-            
-            // Navbar Content
-            CustomNavigationBar(
-                customTitle: LabelView("LUMIERE")
-                    .font(.systemFont(ofSize: 24, weight: .bold))
-                    .padding(insets: .init(top: 0, left: 4, bottom: 0, right: 0))
-                    .color(bind: viewModel.isNowPlayingLoadingObservable.map { isLoading in
-                        return isLoading ? .gray : .white
-                    }),
-                trailing: [
-                    ImageView(UIImage(systemName: "magnifyingglass"))
-                        .tintColor(.white)
-                        .size(width: 24, height: 24)
-                        .contentMode(.scaleAspectFit),
-                    ImageView(UIImage(systemName: "person.crop.circle.fill"))
-                        .tintColor(.gray)
-                        .size(width: 32, height: 32)
-                        .cornerRadius(16)
-                        .clipsToBounds(true)
-                        .backgroundColor(UIColor(white: 1.0, alpha: 0.2))
-                        .border(color: .white, lineWidth: 1)
-                ]
+            HomeNavigationBar(
+                isLoading: viewModel.isNowPlayingLoading,
+                onBackgroundReference: { [weak self] view in
+                    self?.navBarBackgroundView = view
+                }
             )
         }
-        .position(.top) // Pin to top without filling screen
-        .height(100) // Explicit height
     }
     
     // MARK: - Sections
+    
     private var heroSection: Section {
-        Section(id: HomeSection.hero, items: viewModel.nowPlayingMoviesObservable) { movie in
+        Section(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
             Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
                 cell.configure(with: movie)
             }
@@ -127,7 +85,7 @@ class HomeViewController: UIViewController {
             }
             return layout
         }
-        .skeleton(count: 1, when: viewModel.isNowPlayingLoadingObservable) {
+        .skeleton(count: 1, when: viewModel.isNowPlayingLoading) {
             Modified(HeroContentView()) { $0.configure(with: .placeholder) }
         }
     }
@@ -135,10 +93,10 @@ class HomeViewController: UIViewController {
     private var genresSection: Section {
         Section(
             id: HomeSection.categories,
-            items: viewModel.genresObservable,
+            items: viewModel.genres,
             header: {
                 Header {
-                    StandardHeader(title: "Categories", actionTitle: nil)
+                    StandardHeader(title: "Genres", actionTitle: nil)
                 }
             }
         ) { genre in
@@ -161,7 +119,7 @@ class HomeViewController: UIViewController {
     private var popularSection: Section {
         Section(
             id: HomeSection.popular,
-            items: viewModel.popularSectionMoviesObservable,
+            items: viewModel.popularSectionMovies,
             header: {
                 Header {
                     StandardHeader(title: "Popular Now", actionTitle: "See All") {
@@ -182,7 +140,7 @@ class HomeViewController: UIViewController {
         }
         .skeleton(
             count: 4,
-            when: viewModel.isPopularSectionLoadingObservable,
+            when: viewModel.isPopularSectionLoading,
             includeSupplementary: true
         ) {
             PosterCell(movie: .placeholder)
@@ -192,7 +150,7 @@ class HomeViewController: UIViewController {
     private var upcomingSection: Section {
         Section(
             id: HomeSection.upcoming,
-            items: viewModel.upcomingMoviesObservable,
+            items: viewModel.upcomingMovies,
             header: {
                 Header {
                     StandardHeader(title: "Upcoming", actionTitle: "See All") {
@@ -213,7 +171,7 @@ class HomeViewController: UIViewController {
         }
         .skeleton(
             count: 2,
-            when: viewModel.isUpcomingLoadingObservable,
+            when: viewModel.isUpcomingLoading,
             includeSupplementary: true
         ) {
             UpcomingCell(movie: .placeholder)
@@ -223,7 +181,7 @@ class HomeViewController: UIViewController {
     private var topRatedSection: Section {
         Section(
             id: HomeSection.topRated,
-            items: viewModel.topRatedMoviesObservable.map { Array($0.enumerated()) },
+            items: viewModel.topRatedMovies.map { Array($0.enumerated()) },
             header: {
                 Header {
                     StandardHeader(title: "Top Rated", actionTitle: nil)
@@ -240,15 +198,24 @@ class HomeViewController: UIViewController {
         .layout { _ in
             return HomeSection.topRated.layout
         }
-        .skeleton(count: 3, when: viewModel.isTopRatedLoadingObservable) {
+        .skeleton(count: 3, when: viewModel.isTopRatedLoading) {
             TopRatedCell(index: 0, movie: .placeholder)
         }
     }
 }
 
+// MARK: - Navigation
+
+extension HomeViewController {
+    private func showDetail(for movie: Movie) {
+        let detailVC = MovieDetailViewController(movie: movie)
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+}
+
 // MARK: - Helpers
 
-private extension HomeViewController {
+extension HomeViewController {
     private func handleHeroScroll(items: [NSCollectionLayoutVisibleItem], offset: CGPoint, env: NSCollectionLayoutEnvironment) {
         let containerWidth = env.container.contentSize.width
         let visibleRectCenter = offset.x + containerWidth / 2.0
@@ -289,5 +256,12 @@ private extension HomeViewController {
         if let cell = view as? HeroCollectionCell { cells.append(cell) }
         for subview in view.subviews { cells.append(contentsOf: findAllHeroCells(in: subview)) }
         return cells
+    }
+    
+    private func handleNavBarScroll(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        // Fade in between 0 and 100pt scroll
+        let alpha = min(1.0, max(0.0, y / 100.0))
+        navBarBackgroundView?.alpha = alpha
     }
 }

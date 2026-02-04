@@ -5,156 +5,41 @@ import RxCocoa
 public class MovieViewModel {
     
     // MARK: - State
-    
-    /// List of movies (Popular, Top Rated, etc.) - Main List
-    @Variable public private(set) var state = LoadableState<[Movie]>.initial
-    
-    /// Now Playing Movies (Hero Section)
-    @Variable public private(set) var nowPlayingState = LoadableState<[Movie]>.initial
-    
-    /// Popular Movies (Popular Section)
-    @Variable public private(set) var popularState = LoadableState<[Movie]>.initial
-    
-    /// Upcoming Movies (Upcoming Section)
-    @Variable public private(set) var upcomingState = LoadableState<[Movie]>.initial
-    
-    /// Top Rated Movies (Top Rated Section)
-    @Variable public private(set) var topRatedState = LoadableState<[Movie]>.initial
-    
-    /// Genres (Categories Section)
-    @Variable public private(set) var genresState = LoadableState<[Genre]>.initial
-    
-    /// Detail of the selected movie
-    @Variable public private(set) var selectedMovie: Movie? = nil
-    
-    /// Title describing the current list
-    @Variable public private(set) var title: String = "Popular Movies"
 
-    // MARK: - Computed Properties
-    
-    public var popularMovies: [Movie] {
-        if case .loaded(let movies) = state {
-            return movies
-        }
-        return []
-    }
+    @Variable private var nowPlayingState = LoadableState<[Movie]>.initial
+    @Variable private var genresState = LoadableState<[Genre]>.initial
+    @Variable private var popularState = LoadableState<[Movie]>.initial
+    @Variable private var upcomingState = LoadableState<[Movie]>.initial
+    @Variable private var topRatedState = LoadableState<[Movie]>.initial
+    @Variable private var selectedMovie: Movie? = nil
 
-    public var popularMoviesObservable: Observable<[Movie]> {
-        $state.asObservable().map { state in
-            if case .loaded(let movies) = state {
-                return movies
-            }
-            return []
-        }
-    }
     
-    public var heroMovie: Movie? {
-        return popularMovies.first
-    }
-
-    public var isLoadingObservable: Observable<Bool> {
-        $state.asObservable()
-            .map { state in
-                if case .initial = state { return true }
-                if case .loading = state { return true }
-                return false
-            }
-    }
+    // MARK: - Observables
+    public var nowPlayingMovies: Observable<[Movie]> { $nowPlayingState.asObservable().mapItems() }
+    public var isNowPlayingLoading: Observable<Bool> { $nowPlayingState.asObservable().mapLoading() }
     
-    public var nowPlayingMoviesObservable: Observable<[Movie]> {
-        $nowPlayingState.asObservable().map { state in
-            if case .loaded(let movies) = state {
-                return movies
-            }
-            return []
-        }
-    }
+    public var popularSectionMovies: Observable<[Movie]> { $popularState.asObservable().mapItems() }
+    public var isPopularSectionLoading: Observable<Bool> { $popularState.asObservable().mapLoading() }
     
-    public var isNowPlayingLoadingObservable: Observable<Bool> {
-        $nowPlayingState.asObservable().map { state in
-            if case .initial = state { return true }
-            if case .loading = state { return true }
-            return false
-        }
-    }
+    public var upcomingMovies: Observable<[Movie]> { $upcomingState.asObservable().mapItems() }
+    public var isUpcomingLoading: Observable<Bool> { $upcomingState.asObservable().mapLoading() }
     
-    public var popularSectionMoviesObservable: Observable<[Movie]> {
-        $popularState.asObservable().map { state in
-            if case .loaded(let movies) = state {
-                return movies
-            }
-            return []
-        }
-    }
+    public var topRatedMovies: Observable<[Movie]> { $topRatedState.asObservable().mapItems() }
+    public var isTopRatedLoading: Observable<Bool> { $topRatedState.asObservable().mapLoading() }
     
-    public var isPopularSectionLoadingObservable: Observable<Bool> {
-        $popularState.asObservable().map { state in
-            if case .initial = state { return true }
-            if case .loading = state { return true }
-            return false
-        }
-    }
-    
-    public var upcomingMoviesObservable: Observable<[Movie]> {
-        $upcomingState.asObservable().map { state in
-            if case .loaded(let movies) = state {
-                return movies
-            }
-            return []
-        }
-    }
-    
-    public var isUpcomingLoadingObservable: Observable<Bool> {
-        $upcomingState.asObservable().map { state in
-            if case .initial = state { return true }
-            if case .loading = state { return true }
-            return false
-        }
-    }
-    
-    public var topRatedMoviesObservable: Observable<[Movie]> {
-        $topRatedState.asObservable().map { state in
-            if case .loaded(let movies) = state {
-                return movies
-            }
-            return []
-        }
-    }
-    
-    public var isTopRatedLoadingObservable: Observable<Bool> {
-        $topRatedState.asObservable().map { state in
-            if case .initial = state { return true }
-            if case .loading = state { return true }
-            return false
-        }
-    }
+    public var genres: Observable<[Genre]> { $genresState.asObservable().mapItems() }
+    public var isLoadingGenres: Observable<Bool> { $genresState.asObservable().mapLoading() }
     
     public var isEmptyObservable: Observable<Bool> {
         Observable.combineLatest(
-            nowPlayingMoviesObservable,
-            popularSectionMoviesObservable,
-            isNowPlayingLoadingObservable,
-            isPopularSectionLoadingObservable
-        ).map { nowPlaying, popular, isNowPlayingLoading, isPopularLoading in
+            nowPlayingMovies,
+            genres,
+            popularSectionMovies,
+            isNowPlayingLoading,
+            isPopularSectionLoading
+        ).map { nowPlaying, popular, genres, isNowPlayingLoading, isPopularLoading in
             if isNowPlayingLoading || isPopularLoading { return false }
             return nowPlaying.isEmpty && popular.isEmpty
-        }
-    }
-    
-    public var isLoadingGenres: Observable<Bool> {
-        $genresState.asObservable().map { state in
-            if case .initial = state { return true }
-            if case .loading = state { return true }
-            return false
-        }
-    }
-    
-    public var genresObservable: Observable<[Genre]> {
-        $genresState.asObservable().map { state in
-            if case .loaded(let genres) = state {
-                return genres
-            }
-            return []
         }
     }
     
@@ -169,11 +54,7 @@ public class MovieViewModel {
     }
     
     public func loadHomeData() {
-        self.nowPlayingState = .loading
-        self.popularState = .loading
-        self.genresState = .loading
-        self.upcomingState = .loading
-        self.topRatedState = .loading
+        setLoading()
         
         Task {
             // Simulate loading
@@ -183,7 +64,7 @@ public class MovieViewModel {
             async let nowPlaying = service.getNowPlayingMovies(page: 1)
             async let popular = service.getPopularMovies(page: 1)
             async let upcoming = service.getPopularMovies(page: 2)
-            async let topRated = service.getTopRatedMovies(page: 1) // Reuse popular for top rated simulation
+            async let topRated = service.getTopRatedMovies(page: 1)
             async let genres = service.getGenres()
             
             do {
@@ -203,16 +84,26 @@ public class MovieViewModel {
                 }
             } catch {
                 await MainActor.run {
-                    self.nowPlayingState = .loaded([])
-                    self.popularState = .loaded([])
-                    self.upcomingState = .loaded([])
-                    self.popularState = .loaded([])
-                    self.upcomingState = .loaded([])
-                    self.topRatedState = .loaded([])
-                    self.genresState = .loaded([])
+                    self.setEmpty()
                 }
             }
         }
+    }
+    
+    private func setLoading() {
+        nowPlayingState = .loading
+        popularState = .loading
+        upcomingState = .loading
+        topRatedState = .loading
+        genresState = .loading
+    }
+    
+    private func setEmpty() {
+        nowPlayingState = .loaded([])
+        popularState = .loaded([])
+        upcomingState = .loaded([])
+        topRatedState = .loaded([])
+        genresState = .loaded([])
     }
     
     public func selectMovie(_ movie: Movie) {

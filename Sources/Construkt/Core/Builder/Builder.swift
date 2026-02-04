@@ -65,8 +65,6 @@ extension View {
     }
 }
 
-
-
 // Allows view builder modifications to be made to a given UIView type
 public protocol ModifiableView: View {
     associatedtype Base: UIView
@@ -111,8 +109,6 @@ extension ModifiableView {
         }
     }
 }
-
-
 
 // Generic return type for building/chaining view modifiers
 public struct ViewModifier<Base:UIView>: ModifiableView {
