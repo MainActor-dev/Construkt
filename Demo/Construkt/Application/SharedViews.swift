@@ -62,7 +62,7 @@ struct EmptyView: ViewBuilder {
                 .font(.systemFont(ofSize: 14))
                 .color(.gray)
                 .alignment(.center)
-            SpacerView(12)
+            SpacerView(h: 12)
             ButtonView(buttonTitle) { _ in onAction?() }
                 .font(.systemFont(ofSize: 15, weight: .bold))
                 .color(.black)

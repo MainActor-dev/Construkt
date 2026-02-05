@@ -55,7 +55,7 @@ final class MovieDetailViewController: UIViewController {
                         .padding(top: 0, left: 20, bottom: 0, right: 20)
                         
                         // Spacer
-                        SpacerView(40)
+                        SpacerView(h: 40)
                     }
                 }
                 .with { $0.contentInsetAdjustmentBehavior = .never }
@@ -71,7 +71,7 @@ final class MovieDetailViewController: UIViewController {
             GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
                 .height(100)
                 .alpha(0) // Start transparent
-               
+            
             CustomNavigationBar(
                 leading: [
                     ButtonView()
@@ -104,7 +104,8 @@ final class MovieDetailViewController: UIViewController {
     }
     
     private func heroSection(details: Observable<MovieDetail>) -> View {
-        ContainerView {
+        ZStackView {
+            // Layer 1: Backdrop Image
             ImageView(nil)
                 .contentMode(.scaleAspectFill)
                 .clipsToBounds(true)
@@ -113,74 +114,92 @@ final class MovieDetailViewController: UIViewController {
                     context.view.setImage(from: context.value)
                 }
             
-            // Gradient Overlay
+            // Layer 2: Gradient Overlay
             LocalGradientView()
                 .position(.fill)
             
-            // Play Button Center
+            // Layer 3: Play Button (Centered in Hero)
             ImageView(UIImage(systemName: "play.circle.fill"))
                 .tintColor(.white)
                 .size(width: 64, height: 64)
                 .position(.center)
             
-            // Title and Metadata at bottom
-            VStackView(spacing: 8) {
-                LabelView(movie.title)
-                    .font(UIFont.systemFont(ofSize: 32, weight: .bold))
-                    .color(.white)
-                    .numberOfLines(2)
+            // Layer 4: Content Overlay (Pinned Bottom, Centered)
+            ZStackView {
+                VStackView(spacing: 8) {
+                    SpacerView()
+                    // Title
+                    LabelView(movie.title)
+                        .font(UIFont.systemFont(ofSize: 32, weight: .bold))
+                        .color(.white)
+                        .numberOfLines(2)
+                        .alignment(.center)
+                    
+                    // Metadata Row
+                    metadata(details: details)
+                    
+                    // Rating Row
+                    HStackView(spacing: 4) {
+                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
+                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
+                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
+                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
+                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
+                        
+                        LabelView(details.map { "\(String(format: "%.1f", $0.voteAverage)) (2.4k)" })
+                            .font(UIFont.systemFont(ofSize: 14))
+                            .color(.lightGray)
+                    }
                     .alignment(.center)
-                
-                LabelView("Director") // Placeholder
-                    .font(UIFont.systemFont(ofSize: 18, weight: .regular))
-                    .color(.gray)
-                    .hidden(true)
-                
-                HStackView(spacing: 12) {
+                }
+                .alignment(.center) // Center children horizontally
+            }
+            .padding(top: 0, left: 16, bottom: 20, right: 16) // Padding from edges
+            .position(.bottom) // Pin container to bottom of ZStack
+        }
+        .height(450)
+    }
+    
+    private func metadata(details: Observable<MovieDetail>) -> View {
+        ZStackView {
+            HStackView(spacing: 6) {
+                ZStackView {
                     LabelView(movie.releaseDate?.prefix(4).description ?? "2024")
                         .font(UIFont.systemFont(ofSize: 14))
                         .color(.lightGray)
-                    
-                    LabelView("•").color(.darkGray)
-                    
+                }
+                LabelView("•")
+                    .color(.darkGray)
+                    .font(.systemFont(ofSize: 10))
+                    .alignment(.center)
+                ZStackView {
                     LabelView(details.map { $0.genreText })
                         .font(UIFont.systemFont(ofSize: 14))
                         .color(.lightGray)
-                    
-                    LabelView("•").color(.darkGray)
-                    
+                }
+                LabelView("•")
+                    .color(.darkGray)
+                    .font(.systemFont(ofSize: 10))
+                    .alignment(.center)
+                ZStackView {
                     LabelView(details.map { $0.durationText })
                         .font(UIFont.systemFont(ofSize: 14))
                         .color(.lightGray)
-                     
-                    LabelView("•").color(.darkGray)
-                    
-                    ContainerView(
-                        LabelView("4K").font(UIFont.systemFont(ofSize: 10)).color(.lightGray).padding(top: 2, left: 4, bottom: 2, right: 4)
-                    )
-                        .border(color: .lightGray, lineWidth: 1)
-                        .cornerRadius(4)
                 }
-                .alignment(.center)
-                
-                HStackView(spacing: 4) {
-                    ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                    ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                    ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                    ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                    ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                    
-                    LabelView(details.map { "\(String(format: "%.1f", $0.voteAverage)) (2.4k)" })
-                        .font(UIFont.systemFont(ofSize: 14))
+                LabelView("•")
+                    .color(.darkGray)
+                    .font(.systemFont(ofSize: 10))
+                    .alignment(.center)
+                ZStackView {
+                    LabelView("4K")
+                        .font(UIFont.systemFont(ofSize: 10))
                         .color(.lightGray)
+                        .padding(top: 2, left: 4, bottom: 2, right: 4)
                 }
-                .alignment(.center)
-                .padding(top: 8, left: 0, bottom: 0, right: 0)
+                .border(color: .lightGray, lineWidth: 1)
+                .cornerRadius(4)
             }
-            .padding(top: 0, left: 20, bottom: 20, right: 20)
-            .position(.bottom)
         }
-        .height(450)
     }
     
     private var actionButtons: View {
@@ -196,7 +215,6 @@ final class MovieDetailViewController: UIViewController {
                     $0.tintColor = .black
                     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
                 }
-            
             ButtonView("Download")
                 .backgroundColor(UIColor(hex: "#1A1A1A"), for: .normal)
                 .color(.white, for: .normal)
@@ -338,15 +356,15 @@ extension UIColor {
     convenience init(hex: String, alpha: CGFloat = 1.0) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-
+        
         var rgb: UInt64 = 0
-
+        
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
-
+        
         let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
         let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
         let blue = CGFloat(rgb & 0x0000FF) / 255.0
-
+        
         self.init(red: red, green: green, blue: blue, alpha: alpha)
     }
 }
