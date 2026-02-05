@@ -1,0 +1,481 @@
+Command line invocation:
+    /Applications/Xcode-26.1.0.app/Contents/Developer/usr/bin/xcodebuild build -scheme Construkt -project Construkt.xcodeproj -destination "generic/platform=iOS Simulator"
+
+Resolve Package Graph
+
+
+Resolved source packages:
+  Factory: https://github.com/hmlongco/Factory.git @ 1.3.7
+  RxSwift: https://github.com/ReactiveX/RxSwift.git @ 6.10.1
+  SnapKit: https://github.com/SnapKit/SnapKit @ 5.7.1
+
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (16 targets)
+    Target 'Construkt' in project 'Construkt'
+        ➜ Explicit dependency on target 'RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'SnapKit' in project 'SnapKit'
+        ➜ Explicit dependency on target 'Factory' in project 'Factory'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+    Target 'RxSwift' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxSwift' in project 'RxSwift'
+    Target 'Factory' in project 'Factory'
+        ➜ Explicit dependency on target 'Factory' in project 'Factory'
+    Target 'Factory' in project 'Factory' (no dependencies)
+    Target 'SnapKit' in project 'SnapKit'
+        ➜ Explicit dependency on target 'SnapKit' in project 'SnapKit'
+        ➜ Explicit dependency on target 'SnapKit_SnapKit' in project 'SnapKit'
+    Target 'SnapKit' in project 'SnapKit'
+        ➜ Explicit dependency on target 'SnapKit_SnapKit' in project 'SnapKit'
+    Target 'SnapKit_SnapKit' in project 'SnapKit' (no dependencies)
+    Target 'RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxRelay' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxCocoaRuntime' in project 'RxSwift'
+    Target 'RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxCocoa' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxRelay' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxCocoaRuntime' in project 'RxSwift'
+    Target 'RxCocoaRuntime' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxCocoaRuntime' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+    Target 'RxSwift_RxCocoaRuntime' in project 'RxSwift' (no dependencies)
+    Target 'RxRelay' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxRelay' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift' in project 'RxSwift'
+    Target 'RxSwift_RxRelay' in project 'RxSwift' (no dependencies)
+    Target 'RxSwift' in project 'RxSwift'
+        ➜ Explicit dependency on target 'RxSwift_RxSwift' in project 'RxSwift'
+    Target 'RxSwift_RxSwift' in project 'RxSwift' (no dependencies)
+    Target 'RxSwift_RxCocoa' in project 'RxSwift' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Resources/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch arm64 -isysroot /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch x86_64 -isysroot /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x objective-c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -arch x86_64 -isysroot /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+Build description signature: 04bcc9807db24b82c4fbd40a4b6fbe8d
+Build description path: /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/XCBuildData/04bcc9807db24b82c4fbd40a4b6fbe8d.xcbuilddata
+ClangStatCache /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk /Users/mac/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-aa58e337a81609ab4fa365a8702acd8b.sdkstatcache
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt.xcodeproj
+    /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -o /Users/mac/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-aa58e337a81609ab4fa365a8702acd8b.sdkstatcache
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/SnapKit_SnapKit.bundle/Info.plist /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/SnapKit.build/Debug-iphonesimulator/SnapKit_SnapKit.build/empty-SnapKit_SnapKit.plist (in target 'SnapKit_SnapKit' from project 'SnapKit')
+    cd /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/SnapKit
+    builtin-infoPlistUtility /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/SnapKit.build/Debug-iphonesimulator/SnapKit_SnapKit.build/empty-SnapKit_SnapKit.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/SnapKit_SnapKit.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxCocoaRuntime.bundle/Info.plist /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxCocoaRuntime.build/empty-RxSwift_RxCocoaRuntime.plist (in target 'RxSwift_RxCocoaRuntime' from project 'RxSwift')
+    cd /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift
+    builtin-infoPlistUtility /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxCocoaRuntime.build/empty-RxSwift_RxCocoaRuntime.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxCocoaRuntime.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxCocoa.bundle/Info.plist /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxCocoa.build/empty-RxSwift_RxCocoa.plist (in target 'RxSwift_RxCocoa' from project 'RxSwift')
+    cd /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift
+    builtin-infoPlistUtility /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxCocoa.build/empty-RxSwift_RxCocoa.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxCocoa.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxRelay.bundle/Info.plist /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxRelay.build/empty-RxSwift_RxRelay.plist (in target 'RxSwift_RxRelay' from project 'RxSwift')
+    cd /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift
+    builtin-infoPlistUtility /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxRelay.build/empty-RxSwift_RxRelay.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxRelay.bundle/Info.plist
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxSwift.bundle/Info.plist /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxSwift.build/empty-RxSwift_RxSwift.plist (in target 'RxSwift_RxSwift' from project 'RxSwift')
+    cd /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift
+    builtin-infoPlistUtility /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/RxSwift.build/Debug-iphonesimulator/RxSwift_RxSwift.build/empty-RxSwift_RxSwift.plist -producttype com.apple.product-type.bundle -expandbuildsettings -format binary -platform iphonesimulator -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/RxSwift_RxSwift.bundle/Info.plist
+
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Attributes.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Button.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Constraints.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Container.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Context.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Controls.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Divider.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Dynamic.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Extensions.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ForEach.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Gestures.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Group.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Image.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Label.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Navigation.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Padding.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+RxSwift.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ScrollView.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Spacer.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Styles.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Switch.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TableView.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TextField.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Variable.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+View.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ViewController.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+With.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ZStack.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIColor+Extensions.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImage+Extensions.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Attributes.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Button.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Constraints.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Container.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Context.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Controls.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Divider.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Dynamic.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Extensions.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ForEach.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Gestures.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Group.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Image.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Label.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Navigation.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Padding.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+RxSwift.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ScrollView.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Spacer.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Styles.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Switch.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TableView.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TextField.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Variable.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+View.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ViewController.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+With.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ZStack.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIColor+Extensions.swift (in target 'Construkt' from project 'Construkt')
+warning: Skipping duplicate build file in Compile Sources build phase: /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImage+Extensions.swift (in target 'Construkt' from project 'Construkt')
+ProcessProductPackaging "" /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "AM6A64NDM6.com.koanba.Construkt";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent
+
+ProcessProductPackagingDER /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent.der (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    /usr/bin/derq query -f xml -i /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt.app-Simulated.xcent.der --raw
+
+SwiftDriver Construkt normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    builtin-SwiftDriver -- /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Construkt -Onone -enforce-exclusivity\=checked @/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt.SwiftFileList -DDEBUG -Xcc -fmodule-map-file\=/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/GeneratedModuleMaps-iphonesimulator/RxCocoaRuntime.modulemap -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -target x86_64-apple-ios15.0-simulator -g -module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-aa58e337a81609ab4fa365a8702acd8b.sdkstatcache -output-file-map /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt_const_extract_protocols.json -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-generated-files.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-own-target-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt-85a6e12900ec93e9ca5ede5c97d4c68f-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-project-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift/Sources/RxCocoaRuntime/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources-normal/x86_64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources/x86_64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt-Swift.h -working-directory /Users/mac/Developer/pr0j3ct5/Construkt/Demo -experimental-emit-module-separately -disable-cmo
+
+SwiftDriver Construkt normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    builtin-SwiftDriver -- /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Construkt -Onone -enforce-exclusivity\=checked @/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64/Construkt.SwiftFileList -DDEBUG -Xcc -fmodule-map-file\=/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/GeneratedModuleMaps-iphonesimulator/RxCocoaRuntime.modulemap -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -target arm64-apple-ios15.0-simulator -g -module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64 -c -j8 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-aa58e337a81609ab4fa365a8702acd8b.sdkstatcache -output-file-map /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64/Construkt-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64/Construkt.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64/Construkt_const_extract_protocols.json -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-generated-files.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-own-target-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt-85a6e12900ec93e9ca5ede5c97d4c68f-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-project-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift/Sources/RxCocoaRuntime/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources-normal/arm64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources/arm64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/arm64/Construkt-Swift.h -working-directory /Users/mac/Developer/pr0j3ct5/Construkt/Demo -experimental-emit-module-separately -disable-cmo
+
+ProcessInfoPlistFile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/Info.plist /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Info.plist (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    builtin-infoPlistUtility /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Info.plist -producttype com.apple.product-type.application -genpkginfo /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/assetcatalog_generated_info.plist -scanforprivacyfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/RxSwift_RxCocoa.bundle -scanforprivacyfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/RxSwift_RxCocoaRuntime.bundle -scanforprivacyfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/RxSwift_RxRelay.bundle -scanforprivacyfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/RxSwift_RxSwift.bundle -scanforprivacyfile /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/SnapKit_SnapKit.bundle -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/Construkt.app/Info.plist
+
+SwiftCompile normal x86_64 Compiling\ StandardHeader.swift,\ CustomNavigationBar.swift,\ GradientView.swift,\ HeroCollectionCell.swift,\ HeroContentView.swift,\ HomeSection.swift,\ HomeViewController.swift,\ PosterCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Supplementaries/StandardHeader.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/CustomNavigationBar.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/GradientView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroCollectionCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroContentView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeSection.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/PosterCell.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Supplementaries/StandardHeader.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/CustomNavigationBar.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/GradientView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroCollectionCell.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroContentView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeSection.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeViewController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/PosterCell.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftEmitModule normal x86_64 Emitting\ module\ for\ Construkt (in target 'Construkt' from project 'Construkt')
+
+EmitSwiftModule normal x86_64 (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ SectionController.swift,\ SupplementaryController.swift,\ Skeleton.swift,\ Builder+Padding.swift,\ Builder+RxSwift.swift,\ Builder+ScrollView.swift,\ Builder+Spacer.swift,\ Builder+Stack.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SectionController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SupplementaryController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/Skeleton.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Padding.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+RxSwift.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ScrollView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Spacer.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SectionController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SupplementaryController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/Skeleton.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Padding.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+RxSwift.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ScrollView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Spacer.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ MovieDetailViewController.swift,\ MovieViewModel.swift,\ TMDBConfiguration.swift,\ LoggerInterceptor.swift,\ TMDBRequestInterceptor.swift,\ MoviesEndpoint.swift,\ RequestBuilder.swift,\ MovieService.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieViewModel.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/TMDBConfiguration.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/LoggerInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/TMDBRequestInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/MoviesEndpoint.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/RequestBuilder.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Services/MovieService.swift (in target 'Construkt' from project 'Construkt')
+Failed frontend command:
+/Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Attributes.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Button.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Constraints.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Container.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Context.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Controls.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Divider.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Dynamic.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Extensions.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ForEach.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellControllerAdapter.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CollectionListViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Cell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+CollectionView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Section.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/DataSource.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/HostingReusableView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Helpers/UIColor+ext.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Helpers/UIView+ext.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Cells/GenresCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Cells/TopRatedCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Cells/UpcomingCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Supplementaries/HomeNavigationBar.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/Supplementaries/StandardHeader.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/CustomNavigationBar.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/GradientView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroCollectionCell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HeroContentView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeSection.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/HomeViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/Home/PosterCell.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieViewModel.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/AppDelegate.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/CustomNavigationController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/SceneDelegate.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/SharedViews.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Extensions/LoadableState+Rx.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Models/Cast.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Models/Genre.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Models/Movie.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Models/MovieDetail.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/HTTPMethod.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/NetworkClient.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/NetworkConfiguration.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/NetworkError.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/TMDBConfiguration.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/LoggerInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/RequestInterceptor.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/TMDBRequestInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/Endpoint.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/MoviesEndpoint.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/RequestBuilder.swift -primary-file /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Services/MovieService.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SectionController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SupplementaryController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/Skeleton.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/SkeletonConfig.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/SkeletonLayer.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/SkeletonView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Gestures.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Group.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Image.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Label.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Navigation.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Padding.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+RxSwift.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ScrollView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Spacer.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Styles.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Switch.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TableView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TextField.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Variable.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+View.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+With.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ZStack.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIColor+Extensions.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImage+Extensions.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImageView+Remote.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/Collection.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/NSCollectionLayout.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/Then.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/UICollectionView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/LoadableState.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/StateContainer.swift /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources/GeneratedAssetSymbols.swift -supplementary-output-file-map /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/supplementaryOutputs-5 -emit-localized-strings -emit-localized-strings-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64 -target x86_64-apple-ios15.0-simulator -module-can-import-version DeveloperToolsSupport 23.0.4 23.0.4 -module-can-import-version SwiftUI 7.1.13.1 7.1.13 -module-can-import-version UIKit 9126.1.12.1 9126.1.12 -load-resolved-plugin /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt-dependencies-1.json -enable-objc-interop -sdk /Applications/Xcode-26.1.0.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -I /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/PackageFrameworks -F /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/Construkt_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/mac/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/mac/Developer/pr0j3ct5/Construkt/Demo -enable-anonymous-context-mangled-names -file-compilation-dir /Users/mac/Developer/pr0j3ct5/Construkt/Demo -Xcc -fmodule-map-file\=/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/GeneratedModuleMaps-iphonesimulator/RxCocoaRuntime.modulemap -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-aa58e337a81609ab4fa365a8702acd8b.sdkstatcache -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-generated-files.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-own-target-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt-85a6e12900ec93e9ca5ede5c97d4c68f-VFS-iphonesimulator/all-product-headers.yaml -Xcc -iquote -Xcc /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Construkt-project-headers.hmap -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/SourcePackages/checkouts/RxSwift/Sources/RxCocoaRuntime/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources-normal/x86_64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources/x86_64 -Xcc -I/Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name Construkt -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.1 -target-sdk-name iphonesimulator26.1 -clang-target x86_64-apple-ios26.1-simulator -in-process-plugin-server-path /Applications/Xcode-26.1.0.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieDetailViewController.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieViewModel.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/TMDBConfiguration.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/LoggerInterceptor.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/TMDBRequestInterceptor.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MoviesEndpoint.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/RequestBuilder.o -o /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Build/Intermediates.noindex/Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieService.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieDetailViewController.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieViewModel.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/TMDBConfiguration.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/LoggerInterceptor.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/TMDBRequestInterceptor.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MoviesEndpoint.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/RequestBuilder.o -index-unit-output-path /Construkt.build/Debug-iphonesimulator/Construkt.build/Objects-normal/x86_64/MovieService.o -index-store-path /Users/mac/Library/Developer/Xcode/DerivedData/Construkt-dmvdvjzlicdgipdixgirozdsnyxg/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift:48:27: error: extra trailing closure passed in call
+            ContainerView {
+                          ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift:107:23: error: extra trailing closure passed in call
+        ContainerView {
+                      ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift:192:24: warning: 'imageEdgeInsets' was deprecated in iOS 15.0: This property is ignored when using UIButtonConfiguration
+                    $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
+                       ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift:204:24: warning: 'imageEdgeInsets' was deprecated in iOS 15.0: This property is ignored when using UIButtonConfiguration
+                    $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
+                       ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift:222:9: error: no exact matches in call to initializer 
+        VStackView(spacing: 16) {
+        ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift:52:12: note: candidate has partially matching parameter list ([any ViewConvertable])
+    public init(_ convertableViews: [ViewConvertable]) {
+           ^
+/Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Stack.swift:56:12: note: candidate has partially matching parameter list (any AnyIndexableViewBuilder)
+    public init(_ builder: AnyIndexableViewBuilder) {
+           ^
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieViewModel.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/TMDBConfiguration.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/LoggerInterceptor.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/TMDBRequestInterceptor.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/MoviesEndpoint.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/RequestBuilder.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Services/MovieService.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ Builder+With.swift,\ Builder+ZStack.swift,\ UIImageView+Remote.swift,\ NSCollectionLayout.swift,\ Then.swift,\ UICollectionView.swift,\ StateContainer.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+With.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ZStack.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImageView+Remote.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/NSCollectionLayout.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/Then.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/UICollectionView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/StateContainer.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+With.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ZStack.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Extensions/UIImageView+Remote.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/NSCollectionLayout.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/Then.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Extensions/UICollectionView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/StateContainer.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ Builder+Attributes.swift,\ Builder+Button.swift,\ Builder+Constraints.swift,\ Builder+Container.swift,\ Builder+Context.swift,\ Builder+Controls.swift,\ Builder+Divider.swift,\ Builder+Dynamic.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Attributes.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Button.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Constraints.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Container.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Context.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Controls.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Divider.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Dynamic.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Attributes.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Button.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Constraints.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Container.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Context.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Controls.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Divider.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Dynamic.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ Builder+Extensions.swift,\ Builder+ForEach.swift,\ CellController.swift,\ CellControllerAdapter.swift,\ CollectionListViewController.swift,\ Construkt+Cell.swift,\ Construkt+CollectionView.swift,\ Construkt+Section.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Extensions.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ForEach.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellControllerAdapter.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CollectionListViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Cell.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+CollectionView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Section.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Extensions.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ForEach.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CellControllerAdapter.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/CollectionListViewController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Cell.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+CollectionView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/Construkt+Section.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 Compiling\ Builder+Styles.swift,\ Builder+Switch.swift,\ Builder+TableView.swift,\ Builder+TextField.swift,\ Builder+Variable.swift,\ Builder+View.swift,\ Builder+ViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Styles.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Switch.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TableView.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TextField.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Variable.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+View.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ViewController.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Styles.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Switch.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TableView.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+TextField.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+Variable.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+View.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Core/Builder/Builder+ViewController.swift (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Construkt (in target 'Construkt' from project 'Construkt')
+
+EmitSwiftModule normal arm64 (in target 'Construkt' from project 'Construkt')
+    cd /Users/mac/Developer/pr0j3ct5/Construkt/Demo
+    
+
+SwiftDriverJobDiscovery normal x86_64 Compiling Builder+With.swift, Builder+ZStack.swift, UIImageView+Remote.swift, NSCollectionLayout.swift, Then.swift, UICollectionView.swift, StateContainer.swift (in target 'Construkt' from project 'Construkt')
+
+SwiftCompile normal arm64 Compiling\ TMDBConfiguration.swift,\ LoggerInterceptor.swift,\ RequestInterceptor.swift,\ TMDBRequestInterceptor.swift,\ Endpoint.swift,\ MoviesEndpoint.swift,\ RequestBuilder.swift,\ MovieService.swift,\ SectionController.swift,\ SupplementaryController.swift,\ Skeleton.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/TMDBConfiguration.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/LoggerInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/RequestInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/TMDBRequestInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/Endpoint.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/MoviesEndpoint.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/RequestBuilder.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Services/MovieService.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SectionController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/CollectionView/SupplementaryController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Sources/Construkt/Components/SkeletonView/Skeleton.swift (in target 'Construkt' from project 'Construkt')
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal x86_64 Compiling\ MovieDetailViewController.swift,\ MovieViewModel.swift,\ TMDBConfiguration.swift,\ LoggerInterceptor.swift,\ TMDBRequestInterceptor.swift,\ MoviesEndpoint.swift,\ RequestBuilder.swift,\ MovieService.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieViewModel.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Core/TMDBConfiguration.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/LoggerInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Interceptors/TMDBRequestInterceptor.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/MoviesEndpoint.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Networking/Request/RequestBuilder.swift /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Services/MovieService.swift (in target 'Construkt' from project 'Construkt')
+	SwiftCompile normal x86_64 /Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Movies/MovieDetailViewController.swift (in target 'Construkt' from project 'Construkt')
+	Building project Construkt with scheme Construkt
+(3 failures)

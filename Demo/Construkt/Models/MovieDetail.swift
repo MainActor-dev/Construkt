@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Movie: Decodable, Identifiable, Equatable {
+public struct MovieDetail: Decodable, Identifiable, Equatable {
     public let id: Int
     public let title: String
     public let overview: String
@@ -8,6 +8,12 @@ public struct Movie: Decodable, Identifiable, Equatable {
     public let posterPath: String?
     public let backdropPath: String?
     public let voteAverage: Double
+    
+    // Extended properties
+    public let runtime: Int?
+    public let genres: [Genre]?
+    public let credits: CreditsResponse?
+    public let similar: MovieResponse?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -17,6 +23,10 @@ public struct Movie: Decodable, Identifiable, Equatable {
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case voteAverage = "vote_average"
+        case runtime
+        case genres
+        case credits
+        case similar
     }
     
     public var posterURL: URL? {
@@ -29,29 +39,19 @@ public struct Movie: Decodable, Identifiable, Equatable {
         return URL(string: "https://image.tmdb.org/t/p/w780\(path)")
     }
     
-    public static var placeholder: Movie {
-        Movie(
-            id: 0,
-            title: "Loading Movie Title",
-            overview: "Loading Description",
-            releaseDate: "2024-01-01",
-            posterPath: nil,
-            backdropPath: nil,
-            voteAverage: 0.0
-        )
+    // Formatting helpers
+    public var durationText: String {
+        guard let runtime = runtime, runtime > 0 else { return "" }
+        let hours = runtime / 60
+        let minutes = runtime % 60
+        return "\(hours)h \(minutes)m"
     }
-}
-
-public struct MovieResponse: Decodable, Equatable {
-    public let page: Int
-    public let results: [Movie]
-    public let totalPages: Int
-    public let totalResults: Int
     
-    enum CodingKeys: String, CodingKey {
-        case page
-        case results
-        case totalPages = "total_pages"
-        case totalResults = "total_results"
+    public var genreText: String {
+        genres?.prefix(2).map { $0.name }.joined(separator: ", ") ?? ""
+    }
+    
+    public var director: Crew? {
+        credits?.crew.first(where: { $0.job == "Director" })
     }
 }

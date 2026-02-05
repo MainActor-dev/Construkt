@@ -26,10 +26,11 @@ public class MovieViewModel {
     }
 
     @Variable private var state = HomeData()
-    @Variable private var selectedMovie: Movie? = nil // Kept separate as it's a detail view state
-
+    @Variable private var selectedMovie: MovieDetail? = nil 
+    
     // MARK: - Observables
     private var homeData: Observable<HomeData> { $state.asObservable() }
+    public var movieDetails: Observable<MovieDetail?> { $selectedMovie.asObservable() }
     
     // Now Playing
     public var nowPlayingMovies: Observable<[Movie]> {

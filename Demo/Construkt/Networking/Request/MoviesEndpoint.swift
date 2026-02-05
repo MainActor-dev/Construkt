@@ -32,7 +32,9 @@ public enum MoviesEndpoint: Endpoint {
              .getTopRated(let page),
              .getNowPlaying(let page):
             return ["page": String(page)]
-        case .getMovieDetails, .getGenres:
+        case .getMovieDetails:
+            return ["append_to_response": "credits,similar"]
+        case .getGenres:
             return nil
         }
     }
