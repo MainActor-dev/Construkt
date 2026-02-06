@@ -7,7 +7,7 @@ final class MovieDetailViewController: UIViewController {
     // MARK: - Properties
     private let viewModel = MovieViewModel()
     private let movie: Movie
-    private let disposeBag = DisposeBag()
+    private weak var scrollView: UIView?
     
     // MARK: - Init
     init(movie: Movie) {
@@ -33,7 +33,7 @@ final class MovieDetailViewController: UIViewController {
         let casts = viewModel.movieCasts
             .observe(on: MainScheduler.instance)
             .share(replay: 1)
-            
+        
         setupUI(details: details, casts: casts)
         
         // Trigger fetch
@@ -43,6 +43,8 @@ final class MovieDetailViewController: UIViewController {
     // MARK: - Setup UI
     private func setupUI(details: Observable<MovieDetail?>, casts: Observable<[Cast]>) {
         let safeDetails = details.compactMap { $0 }
+        
+        view.subviews.forEach { $0.removeFromSuperview() }
         
         view.embed(
             ContainerView {
@@ -64,9 +66,16 @@ final class MovieDetailViewController: UIViewController {
                     }
                 }
                 .with { $0.contentInsetAdjustmentBehavior = .never }
+                .hidden(bind: viewModel.isLoadingDetails)
                 
                 // Overlay Navigation Bar
                 navigationBar
+                
+                // Loading Indicator
+                LoadingView()
+                    .visible(false)
+                    .hidden(bind: viewModel.isLoadingDetails.map { !$0 })
+                    .backgroundColor(.clear)
             }
         )
     }
@@ -134,7 +143,7 @@ final class MovieDetailViewController: UIViewController {
                 VStackView(spacing: 8) {
                     SpacerView()
                     // Title
-                    LabelView(movie.title)
+                    LabelView(details.map { $0.title })
                         .font(UIFont.systemFont(ofSize: 32, weight: .bold))
                         .color(.white)
                         .numberOfLines(2)
@@ -169,7 +178,7 @@ final class MovieDetailViewController: UIViewController {
         ZStackView {
             HStackView(spacing: 6) {
                 ZStackView {
-                    LabelView(movie.releaseDate?.prefix(4).description ?? "2024")
+                    LabelView(details.map { $0.releaseDate?.prefix(4).description ?? "2024" })
                         .font(UIFont.systemFont(ofSize: 14))
                         .color(.lightGray)
                 }
@@ -262,7 +271,7 @@ final class MovieDetailViewController: UIViewController {
             
             ScrollView(
                 HStackView {}
-                    .onReceive(casts.map { self.createCastViews(from: $0) }) { context in
+                    .onReceive(casts.map { [weak self] in self?.createCastViews(from: $0) ?? [] }) { context in
                         context.view.reset(to: context.value)
                     }
                     .spacing(16)
@@ -272,6 +281,7 @@ final class MovieDetailViewController: UIViewController {
             .bounces(false)
             .height(min: 120)
         }
+        .hidden(bind: casts.map { $0.isEmpty })
     }
     
     private func similarSection(details: Observable<MovieDetail>) -> View {
@@ -280,8 +290,16 @@ final class MovieDetailViewController: UIViewController {
                 .font(UIFont.systemFont(ofSize: 18, weight: .bold))
                 .color(.white)
             
-            VStackView(details.map { self.createSimilarViews(from: $0) })
-                .spacing(16)
+            ScrollView(
+                HStackView {}
+                    .onReceive(details.map { [weak self] in self?.createSimilarViews(from: $0) ?? [] }) { context in
+                        context.view.reset(to: context.value)
+                    }
+                    .spacing(16)
+                    .alignment(.top)
+            )
+            .showHorizontalIndicator(false)
+            .height(180)
         }
     }
     
@@ -301,7 +319,7 @@ final class MovieDetailViewController: UIViewController {
                 .height(60)
                 .clipsToBounds(true)
                 .contentMode(.scaleAspectFill)
-               
+            
             ZStackView {
                 VStackView(spacing: 4) {
                     LabelView(cast.name)
@@ -322,23 +340,14 @@ final class MovieDetailViewController: UIViewController {
         .width(max: 100, priority: .required)
         .alignment(.center)
         .padding(h: 2, v: 4)
+        .onTapGesture { _ in
+            print("Tapped on cast: \(cast.name)")
+        }
     }
     
     private func createSimilarViews(from details: MovieDetail) -> [View] {
         guard let similarMovies = details.similar?.results.prefix(9) else { return [] }
-        let chunked = Array(similarMovies).chunked(into: 3)
-        return chunked.map { rowMovies -> View in
-            var views: [View] = rowMovies.map { self.createMoviePoster($0) }
-            
-            // Add spacers if row is incomplete to align left
-            if rowMovies.count < 3 {
-                for _ in 0..<(3 - rowMovies.count) {
-                    views.append(ContainerView().with { $0.alpha = 0 })
-                }
-            }
-            
-            return HStackView(views).distribution(.fillEqually)
-        }
+        return similarMovies.map { createMoviePoster($0) }
     }
     
     private func createMoviePoster(_ movie: Movie) -> View {
@@ -347,9 +356,16 @@ final class MovieDetailViewController: UIViewController {
             .cornerRadius(8)
             .contentMode(.scaleAspectFill)
             .clipsToBounds(true)
+            .width(120)
+            .height(180)
             .with { view in
-                view.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 2/3).isActive = true
                 view.setImage(from: movie.posterURL)
+            }
+            .onTapGesture { [weak self] _ in
+                if let scrollView = self?.scrollView as? UIScrollView {
+                    scrollView.setContentOffset(.zero, animated: true)
+                }
+                self?.viewModel.selectMovie(movie)
             }
     }
 }

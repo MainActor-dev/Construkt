@@ -26,14 +26,39 @@ public class MovieViewModel {
     }
 
     @Variable private var state = HomeData()
-    @Variable private var selectedMovie: MovieDetail? = nil 
-    @Variable private var casts: LoadableState<[Cast]> = .initial 
+    @Variable private var selectedMovie: MovieDetail? = nil
+    @Variable private var casts: LoadableState<[Cast]> = .initial
+    @Variable private var isDetailsLoading: Bool = false
     
     // MARK: - Observables
     private var homeData: Observable<HomeData> { $state.asObservable() }
     public var movieDetails: Observable<MovieDetail?> { $selectedMovie.asObservable() }
     public var movieCasts: Observable<[Cast]> { $casts.asObservable().mapItems() }
     public var isCastsLoading: Observable<Bool> { $casts.asObservable().mapLoading() }
+    public var isLoadingDetails: Observable<Bool> { $isDetailsLoading.asObservable() }
+    
+    // ... (existing code)
+
+    public func selectMovie(_ movie: Movie) {        
+        self.isDetailsLoading = true
+        Task {
+            self.fetchMovieCasts(id: movie.id)
+            do {
+                // Simulate loading latency
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                let detailedMovie = try await service.getMovieDetails(id: movie.id)
+                await MainActor.run {
+                    self.selectedMovie = detailedMovie
+                    self.isDetailsLoading = false
+                }
+            } catch {
+                print("Failed to fetch details for movie \(movie.id): \(error)")
+                await MainActor.run {
+                    self.isDetailsLoading = false
+                }
+            }
+        }
+    }
     
     // Now Playing
     public var nowPlayingMovies: Observable<[Movie]> {
@@ -183,17 +208,5 @@ public class MovieViewModel {
         }
     }
     
-    public func selectMovie(_ movie: Movie) {        
-        Task {
-            self.fetchMovieCasts(id: movie.id)
-            do {
-                let detailedMovie = try await service.getMovieDetails(id: movie.id)
-                await MainActor.run {
-                    self.selectedMovie = detailedMovie
-                }
-            } catch {
-                print("Failed to fetch details for movie \(movie.id): \(error)")
-            }
-        }
-    }
+
 }
