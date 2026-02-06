@@ -1,13 +1,17 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import SnapKit
 
 final class MovieDetailViewController: UIViewController {
     
     // MARK: - Properties
     private let viewModel = MovieViewModel()
     private let movie: Movie
-    private weak var scrollView: UIView?
+    private let disposeBag = DisposeBag()
+    private weak var scrollView: UIScrollView?
+    private weak var heroImageView: UIView?
+    private let heroHeight: CGFloat = 450
     
     // MARK: - Init
     init(movie: Movie) {
@@ -47,37 +51,97 @@ final class MovieDetailViewController: UIViewController {
         view.subviews.forEach { $0.removeFromSuperview() }
         
         view.embed(
-            ContainerView {
-                // Background & Scroll Content
-                VerticalScrollView {
-                    VStackView(spacing: 24) {
-                        heroSection(details: safeDetails)
-                        
-                        VStackView(spacing: 24) {
-                            actionButtons
-                            storylineSection(details: safeDetails)
-                            castSection(casts: casts)
-                            similarSection(details: safeDetails)
-                        }
-                        .padding(top: 0, left: 20, bottom: 0, right: 20)
-                        
-                        // Spacer
-                        SpacerView(h: 40)
+            ZStackView {
+                ImageView(nil)
+                    .contentMode(.scaleAspectFill)
+                    .clipsToBounds(true)
+                    .onReceive(safeDetails.map { $0.backdropURL ?? $0.posterURL }) { context in
+                        context.view.setImage(from: context.value)
                     }
+                    .with { [weak self] view in
+                        self?.heroImageView = view
+                    }
+                    .customConstraints { [weak self] view in
+                        guard let self = self else { return }
+                        view.snp.makeConstraints { make in
+                            make.top.leading.trailing.equalToSuperview()
+                            make.height.equalTo(self.heroHeight)
+                        }
+                    }
+                
+                // Layer 2: Scroll Content
+                ContainerView {
+                    VerticalScrollView {
+                        VStackView(spacing: 24) {
+                            // Transparent Header Space + Content Overlay
+                            heroSectionContent(details: safeDetails)
+                            
+                            VStackView(spacing: 24) {
+                                actionButtons
+                                storylineSection(details: safeDetails)
+                                castSection(casts: casts)
+                                similarSection(details: safeDetails)
+                            }
+                            .padding(top: 0, left: 20, bottom: 0, right: 20)
+                            
+                            // Spacer
+                            SpacerView(h: 40)
+                        }
+                    }
+                    .with { [weak self] scrollView in
+                        guard let self = self else { return }
+                        self.scrollView = scrollView
+                        scrollView.contentInsetAdjustmentBehavior = .never
+                        scrollView.backgroundColor = .clear // Important for transparency
+                        
+                        // Stretchy Header Logic
+                        scrollView.rx.contentOffset
+                            .map { $0.y }
+                            .subscribe(onNext: { [weak self] yOffset in
+                                guard let self = self else { return }
+                                self.updateStretchyHeader(yOffset: yOffset)
+                            })
+                            .disposed(by: self.disposeBag) // Need disposeBag
+                    }
+                    .onReceive(viewModel.isLoadingDetails) { context in
+                        context.view.isHidden = context.value
+                    }
+                    
+                    // Overlay Navigation Bar
+                    navigationBar
+                    
+                    // Loading Indicator
+                    LoadingView()
+                        .visible(false)
+                        .onReceive(viewModel.isLoadingDetails) { context in
+                            context.view.isHidden = !context.value
+                        }
+                        .backgroundColor(.black.withAlphaComponent(0.5))
                 }
-                .with { $0.contentInsetAdjustmentBehavior = .never }
-                .hidden(bind: viewModel.isLoadingDetails)
-                
-                // Overlay Navigation Bar
-                navigationBar
-                
-                // Loading Indicator
-                LoadingView()
-                    .visible(false)
-                    .hidden(bind: viewModel.isLoadingDetails.map { !$0 })
-                    .backgroundColor(.clear)
             }
         )
+    }
+    
+    private func updateStretchyHeader(yOffset: CGFloat) {
+        guard let heroView = heroImageView else { return }
+        
+        if yOffset < 0 {
+            // Pull down: Stretch
+            heroView.snp.updateConstraints { make in
+                make.height.equalTo(self.heroHeight + abs(yOffset))
+            }
+        } else {
+            // Scroll up: Parallax or Normal Scroll
+            // To make it "sticked to top" but scroll away normally, we don't need to change constraints 
+            // if it's pinned to superview top. It will stay behind.
+            // BUT we probably want it to look like it's scrolling with the view, OR parallax.
+            // "Stay sticked to top" usually implies the top edge is pinned.
+            // The user said "stretched and stay sticked to the top".
+            // Standard behavior:
+            heroView.snp.updateConstraints { make in
+                make.height.equalTo(max(0, self.heroHeight - yOffset))
+            }
+        }
     }
     
     private var navigationBar: View {
@@ -117,18 +181,12 @@ final class MovieDetailViewController: UIViewController {
         .height(48)
     }
     
-    private func heroSection(details: Observable<MovieDetail>) -> View {
+    private func heroSectionContent(details: Observable<MovieDetail>) -> View {
         ZStackView {
-            // Layer 1: Backdrop Image
-            ImageView(nil)
-                .contentMode(.scaleAspectFill)
-                .clipsToBounds(true)
-                .height(450)
-                .onReceive(details.map { $0.backdropURL ?? $0.posterURL }) { context in
-                    context.view.setImage(from: context.value)
-                }
+            // Layer 1: Transparent Spacer to matching Hero Height
+            SpacerView(h: heroHeight)
             
-            // Layer 2: Gradient Overlay
+            // Layer 2: Gradient Overlay (Moves with content)
             LocalGradientView()
                 .position(.fill)
             
@@ -171,7 +229,7 @@ final class MovieDetailViewController: UIViewController {
             .padding(top: 0, left: 16, bottom: 20, right: 16) // Padding from edges
             .position(.bottom) // Pin container to bottom of ZStack
         }
-        .height(450)
+        .height(heroHeight)
     }
     
     private func metadata(details: Observable<MovieDetail>) -> View {
@@ -281,7 +339,9 @@ final class MovieDetailViewController: UIViewController {
             .bounces(false)
             .height(min: 120)
         }
-        .hidden(bind: casts.map { $0.isEmpty })
+        .onReceive(casts.map { $0.isEmpty }) { context in
+            context.view.isHidden = context.value
+        }
     }
     
     private func similarSection(details: Observable<MovieDetail>) -> View {

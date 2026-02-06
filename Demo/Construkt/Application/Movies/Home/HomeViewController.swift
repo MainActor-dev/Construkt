@@ -6,6 +6,9 @@
 //
 
 import UIKit
+import SnapKit
+import RxSwift
+import RxCocoa
 
 class HomeViewController: UIViewController {
     
@@ -13,11 +16,15 @@ class HomeViewController: UIViewController {
     private weak var cachedHeroContainerView: UIView?
     
     private var navBarBackgroundView: UIView?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor("#0A0A0A")
         view.embed(body)
+
+        
+
         fetchData()
     }
     
@@ -28,7 +35,7 @@ class HomeViewController: UIViewController {
     // MARK: - Layout
     
     var body: View {
-        ZStackView {
+        return ZStackView {
             CollectionView {
                 heroSection
                 genresSection
@@ -56,6 +63,7 @@ class HomeViewController: UIViewController {
             .onScroll { [weak self] scrollView in
                 self?.handleNavBarScroll(scrollView)
             }
+            
             HomeNavigationBar(
                 isLoading: viewModel.isNowPlayingLoading,
                 onBackgroundReference: { [weak self] view in
@@ -245,6 +253,38 @@ extension HomeViewController {
             // Match layout item to cell by X position in the orthogonal scroll view
             if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
                 matchedCell.heroContentView.setScrollProgress(progress)
+            }
+        }
+        
+        // Stretchy Header Logic
+        let y = offset.y
+        if y < 0 {
+             items.forEach { item in
+                 // Scale height to fill the pull-down area
+                 // Original Height = 550
+                 let originalHeight: CGFloat = 550
+                 let newHeight = originalHeight + abs(y)
+                 let scale = newHeight / originalHeight
+                 
+                 // Translate up to pin to top
+                 // Center Y needs to move up by (difference in height / 2) + y
+                 // Actually, if we scale Y, it scales from center.
+                 // We want top edge to be at `y`.
+                 
+                 let translationY = y / 2
+                 item.alpha = 1.0
+                 item.transform = CGAffineTransform(translationX: 0, y: translationY)
+                     .scaledBy(x: 1, y: scale)
+             }
+        } else {
+            // Scroll Up: Fade Effect
+            // Fade out as we scroll up
+            let fadeRange: CGFloat = 350
+            let alpha = max(0, 1 - (y / fadeRange))
+            
+            items.forEach { item in
+                item.alpha = alpha
+                item.transform = .identity
             }
         }
     }

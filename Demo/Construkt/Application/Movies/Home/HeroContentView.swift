@@ -28,6 +28,7 @@ class HeroContentView: UIView {
                     .clipsToBounds(true)
                     .skeletonable(true)
                     .reference(&backgroundImageView)
+
                 
                 // Content Gradient and Text
                 VStackView {
