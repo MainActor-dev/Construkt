@@ -17,13 +17,13 @@ public struct SpacerView: ModifiableView {
         modifiableView.setContentHuggingPriority(.defaultLow, for: .vertical)
     }
 
-    public init(_ height: CGFloat = 16) {
-        modifiableView.heightAnchor.constraint(greaterThanOrEqualToConstant: height).isActive = true
+    public init(h: CGFloat = 16) {
+        modifiableView.heightAnchor.constraint(greaterThanOrEqualToConstant: h).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 
-    public init(width: CGFloat = 8) {
-        modifiableView.widthAnchor.constraint(greaterThanOrEqualToConstant: width).isActive = true
+    public init(w: CGFloat = 8) {
+        modifiableView.widthAnchor.constraint(greaterThanOrEqualToConstant: w).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     

@@ -27,10 +27,13 @@ public class MovieViewModel {
 
     @Variable private var state = HomeData()
     @Variable private var selectedMovie: MovieDetail? = nil 
+    @Variable private var casts: LoadableState<[Cast]> = .initial 
     
     // MARK: - Observables
     private var homeData: Observable<HomeData> { $state.asObservable() }
     public var movieDetails: Observable<MovieDetail?> { $selectedMovie.asObservable() }
+    public var movieCasts: Observable<[Cast]> { $casts.asObservable().mapItems() }
+    public var isCastsLoading: Observable<Bool> { $casts.asObservable().mapLoading() }
     
     // Now Playing
     public var nowPlayingMovies: Observable<[Movie]> {
@@ -159,13 +162,30 @@ public class MovieViewModel {
                     self.state.genres = .loaded(result.genres)
                 }
             } catch {
-                await MainActor.run { self.state.genres = .loaded([]) }
+                await MainActor.run { self.state.genres = .error(error.localizedDescription) }
+            }
+        }
+    }
+
+    public func fetchMovieCasts(id: Int) {
+        self.casts = .loading
+        Task {
+            do {
+                let result = try await service.getMovieCredits(id: id)
+                await MainActor.run {
+                    self.casts = .loaded(result.cast)
+                }
+            } catch {
+                await MainActor.run {
+                    self.casts = .error(error.localizedDescription)
+                }
             }
         }
     }
     
     public func selectMovie(_ movie: Movie) {        
         Task {
+            self.fetchMovieCasts(id: movie.id)
             do {
                 let detailedMovie = try await service.getMovieDetails(id: movie.id)
                 await MainActor.run {

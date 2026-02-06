@@ -29,14 +29,19 @@ final class MovieDetailViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .share(replay: 1)
         
-        setupUI(details: details)
+        // Casts signal
+        let casts = viewModel.movieCasts
+            .observe(on: MainScheduler.instance)
+            .share(replay: 1)
+            
+        setupUI(details: details, casts: casts)
         
         // Trigger fetch
         viewModel.selectMovie(movie)
     }
     
     // MARK: - Setup UI
-    private func setupUI(details: Observable<MovieDetail?>) {
+    private func setupUI(details: Observable<MovieDetail?>, casts: Observable<[Cast]>) {
         let safeDetails = details.compactMap { $0 }
         
         view.embed(
@@ -49,7 +54,7 @@ final class MovieDetailViewController: UIViewController {
                         VStackView(spacing: 24) {
                             actionButtons
                             storylineSection(details: safeDetails)
-                            castSection(details: safeDetails)
+                            castSection(casts: casts)
                             similarSection(details: safeDetails)
                         }
                         .padding(top: 0, left: 20, bottom: 0, right: 20)
@@ -243,7 +248,7 @@ final class MovieDetailViewController: UIViewController {
         }
     }
     
-    private func castSection(details: Observable<MovieDetail>) -> View {
+    private func castSection(casts: Observable<[Cast]>) -> View {
         VStackView(spacing: 16) {
             HStackView {
                 LabelView("Cast & Crew")
@@ -257,12 +262,15 @@ final class MovieDetailViewController: UIViewController {
             
             ScrollView(
                 HStackView {}
-                    .onReceive(details.map { self.createCastViews(from: $0) }) { context in
+                    .onReceive(casts.map { self.createCastViews(from: $0) }) { context in
                         context.view.reset(to: context.value)
                     }
                     .spacing(16)
+                    .alignment(.top)
             )
             .showHorizontalIndicator(false)
+            .bounces(false)
+            .height(min: 120)
         }
     }
     
@@ -279,36 +287,41 @@ final class MovieDetailViewController: UIViewController {
     
     // MARK: - View Creators
     
-    private func createCastViews(from details: MovieDetail) -> [View] {
-        guard let castList = details.credits?.cast.prefix(10) else { return [] }
-        return castList.map { createCastView($0) }
+    private func createCastViews(from casts: [Cast]) -> [View] {
+        guard !casts.isEmpty else { return [] }
+        return casts.prefix(10).map { createCastView($0) }
     }
     
     private func createCastView(_ cast: Cast) -> View {
-        VStackView(spacing: 8) {
-            ImageView(nil)
+        VStackView {
+            ImageView(url: cast.profileURL)
                 .backgroundColor(.darkGray)
                 .cornerRadius(30)
-                .size(width: 60, height: 60)
+                .width(60)
+                .height(60)
                 .clipsToBounds(true)
-                .with { view in
-                    view.setImage(from: cast.profileURL)
+                .contentMode(.scaleAspectFill)
+               
+            ZStackView {
+                VStackView(spacing: 4) {
+                    LabelView(cast.name)
+                        .font(UIFont.systemFont(ofSize: 12, weight: .medium))
+                        .color(.white)
+                        .numberOfLines(2)
+                        .alignment(.center)
+                    
+                    LabelView(cast.character)
+                        .font(UIFont.systemFont(ofSize: 10))
+                        .color(.gray)
+                        .numberOfLines(1)
+                        .alignment(.center)
                 }
-            
-            LabelView(cast.name)
-                .font(UIFont.systemFont(ofSize: 12, weight: .medium))
-                .color(.white)
-                .numberOfLines(2)
                 .alignment(.center)
-                .with { $0.widthAnchor.constraint(equalToConstant: 70).isActive = true }
-            
-            LabelView(cast.character)
-                .font(UIFont.systemFont(ofSize: 10))
-                .color(.gray)
-                .numberOfLines(1)
-                .alignment(.center)
-                .with { $0.widthAnchor.constraint(equalToConstant: 70).isActive = true }
+            }
         }
+        .width(max: 100, priority: .required)
+        .alignment(.center)
+        .padding(h: 2, v: 4)
     }
     
     private func createSimilarViews(from details: MovieDetail) -> [View] {

@@ -5,6 +5,7 @@ public enum MoviesEndpoint: Endpoint {
     case getTopRated(page: Int)
     case getNowPlaying(page: Int)
     case getMovieDetails(id: Int)
+    case getMovieCredits(id: Int)
     case getGenres
     
     public var path: String {
@@ -17,6 +18,8 @@ public enum MoviesEndpoint: Endpoint {
             return "/movie/now_playing"
         case .getMovieDetails(let id):
             return "/movie/\(id)"
+        case .getMovieCredits(let id):
+            return "/movie/\(id)/credits"
         case .getGenres:
             return "/genre/movie/list"
         }
@@ -34,6 +37,8 @@ public enum MoviesEndpoint: Endpoint {
             return ["page": String(page)]
         case .getMovieDetails:
             return ["append_to_response": "credits,similar"]
+        case .getMovieCredits:
+            return nil
         case .getGenres:
             return nil
         }
