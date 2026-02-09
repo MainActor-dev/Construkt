@@ -16,12 +16,9 @@ class MovieListViewController: UIViewController {
     init(viewModel: MovieListViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        hidesBottomBarWhenPushed = true
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { nil }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,78 +28,111 @@ class MovieListViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = UIColor("#0A0A0A")
         
-        // Custom Navigation Bar adjustments if needed,
-        // but assuming we are pushed on a Standard nav stack or using the builder.
-        // The design shows a back button and title "Popular Movies" and a sort icon.
-        // We will use standard navigation bar for simplicity or the builder approach if `view.embed` handles it.
-        
-        navigationItem.title = viewModel.title
-        navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-        
-        view.embed(
-            ZStackView {
-                CollectionView {
-                    // Section 1: Filters
-                    Section(
-                        id: MovieListSection.filter,
-                        items: viewModel.filterItemsObservable
-                    ) { item in
-                        Cell(item, id: "filter-\(item.id)") { item in
-                            FilterCell(title: item.title, isSelected: item.isSelected)
-                        }
-                        .onSelect { [weak self] _ in
-                            self?.viewModel.selectGenre(item.genre)
-                        }
-                    }
-                    .layout { _ in
-                        return .layout(
-                            group: .horizontally(
-                                width: .estimated(80),
-                                height: .absolute(36)
-                            ),
-                            spacing: 8,
-                            insets: .init(v: 16, h: 16),
-                            scrolling: .continuous
-                        )
-                    }
-                    
-                    // Section 2: Movies Grid
-                    Section(
-                        id:  MovieListSection.grid,
-                        items: viewModel.moviesObservable,
-                        header: nil
-                    ) { movie in
-                        Cell(movie, id: "movie-\(movie.id)") { movie in
-                            MovieGridCell(movie: movie)
-                        }
-                        .onSelect { [weak self] movie in
-                            self?.showDetail(for: movie)
-                        }
-                    }
-                    .layout { _ in
-                        let itemSize = NSCollectionLayoutSize(
-                            widthDimension: .fractionalWidth(0.5),
-                            heightDimension: .fractionalHeight(1.0)
-                        )
-                        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                        item.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
-                        
-                        let groupSize = NSCollectionLayoutSize(
-                            widthDimension: .fractionalWidth(1.0),
-                            heightDimension: .fractionalWidth(0.75) // Aspect ratio for poster
-                        )
-                        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                        
-                        return NSCollectionLayoutSection(group: group)
-                    }
+        // Define CollectionView
+        let moviesList: View = CollectionView {
+            // Section 1: Filters
+            Section(
+                id: MovieListSection.filter,
+                items: viewModel.filterItemsObservable
+            ) { item in
+                Cell(item, id: "filter-\(item.id)") { item in
+                    FilterCell(title: item.title, isSelected: item.isSelected)
                 }
-                .backgroundColor(UIColor("#0A0A0A"))
-                .with {
-                    $0.collectionView.contentInsetAdjustmentBehavior = .always
+                .onSelect { [weak self] _ in
+                    self?.viewModel.selectGenre(item.genre)
                 }
             }
+            .layout { _ in
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .estimated(80),
+                    heightDimension: .absolute(36)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .estimated(80),
+                    heightDimension: .absolute(36)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.interGroupSpacing = 8
+                section.contentInsets = NSDirectionalEdgeInsets(top: 100, leading: 16, bottom: 16, trailing: 16)
+                
+                return section
+            }
             
+            // Section 2: Movies Grid
+            Section(
+                id:  MovieListSection.grid,
+                items: viewModel.moviesObservable,
+                header: nil
+            ) { movie in
+                Cell(movie, id: "movie-\(movie.id)") { movie in
+                    MovieGridCell(movie: movie)
+                }
+                .onSelect { [weak self] movie in
+                    self?.showDetail(for: movie)
+                }
+            }
+            .layout { _ in
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(0.5),
+                    heightDimension: .fractionalHeight(1.0)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                item.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+                
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .fractionalWidth(0.75) // Aspect ratio for poster
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                
+                return NSCollectionLayoutSection(group: group)
+            }
+        }
+        .backgroundColor(UIColor("#0A0A0A"))
+        .with {
+            $0.collectionView.contentInsetAdjustmentBehavior = .never
+            $0.collectionView.contentInset.top = 20
+        }
+        
+        // Define Custom Navigation Bar
+        let navBar: View = CustomNavigationBar(
+            leading: [
+                HStackView {
+                    ImageView(systemName: "arrow.left")
+                        .tintColor(.white)
+                        .size(width: 24, height: 24)
+                        .contentMode(.scaleAspectFit)
+                }
+                .padding(insets: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)) // Increase hit area
+                .onTapGesture { [weak self] _ in
+                    self?.navigationController?.popViewController(animated: true)
+                }
+            ] as [View],
+            customTitle: LabelView(viewModel.title)
+                .font(.systemFont(ofSize: 18, weight: .semibold))
+                .color(.white),
+            trailing: [
+                ImageView(systemName: "arrow.up.arrow.down")
+                    .tintColor(.gray)
+                    .size(width: 20, height: 20)
+                    .contentMode(.scaleAspectFit)
+            ] as [View]
+        )
+        .position(.top)
+        .height(48)
+        .backgroundColor(UIColor("#0A0A0A"))
+        
+        // Embed in Container
+        view.embed(
+            ContainerView {
+                moviesList
+                navBar
+            }
         )
     }
     
