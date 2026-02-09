@@ -8,10 +8,10 @@ final class MovieDetailViewController: UIViewController {
     // MARK: - Properties
     private let viewModel = MovieViewModel()
     private let movie: Movie
-    private let disposeBag = DisposeBag()
+    private let heroHeight: CGFloat = 450
+    
     private weak var scrollView: UIScrollView?
     private weak var heroImageView: UIView?
-    private let heroHeight: CGFloat = 450
     
     // MARK: - Init
     init(movie: Movie) {
@@ -19,29 +19,30 @@ final class MovieDetailViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { nil }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(hex: "#0A0A0A")
-        
-        // Output signal
+        view.backgroundColor = UIColor("#0A0A0A")
+        observe()
+        fetchDetail()
+    }
+    
+    private func fetchDetail() {
+        viewModel.selectMovie(movie)
+    }
+    
+    private func observe() {
         let details = viewModel.movieDetails
             .observe(on: MainScheduler.instance)
             .share(replay: 1)
         
-        // Casts signal
         let casts = viewModel.movieCasts
             .observe(on: MainScheduler.instance)
             .share(replay: 1)
         
         setupUI(details: details, casts: casts)
-        
-        // Trigger fetch
-        viewModel.selectMovie(movie)
     }
     
     // MARK: - Setup UI
@@ -57,6 +58,9 @@ final class MovieDetailViewController: UIViewController {
                     .clipsToBounds(true)
                     .onReceive(safeDetails.map { $0.backdropURL ?? $0.posterURL }) { context in
                         context.view.setImage(from: context.value)
+                    }
+                    .onReceive(viewModel.isLoadingDetails){ context in
+                        context.view.isHidden = context.value
                     }
                     .with { [weak self] view in
                         self?.heroImageView = view
@@ -88,24 +92,18 @@ final class MovieDetailViewController: UIViewController {
                             SpacerView(h: 40)
                         }
                     }
-                    .with { [weak self] scrollView in
-                        guard let self = self else { return }
-                        self.scrollView = scrollView
+                    .onDidScroll { [weak self] context in
+                        let yOffset = context.view.contentOffset.y
+                        self?.updateStretchyHeader(yOffset: yOffset)
+                    }
+                    .with { scrollView in
                         scrollView.contentInsetAdjustmentBehavior = .never
-                        scrollView.backgroundColor = .clear // Important for transparency
-                        
-                        // Stretchy Header Logic
-                        scrollView.rx.contentOffset
-                            .map { $0.y }
-                            .subscribe(onNext: { [weak self] yOffset in
-                                guard let self = self else { return }
-                                self.updateStretchyHeader(yOffset: yOffset)
-                            })
-                            .disposed(by: self.disposeBag) // Need disposeBag
+                        scrollView.backgroundColor = .clear
                     }
                     .onReceive(viewModel.isLoadingDetails) { context in
                         context.view.isHidden = context.value
                     }
+                    .reference(&scrollView)
                     
                     // Overlay Navigation Bar
                     navigationBar
@@ -126,18 +124,10 @@ final class MovieDetailViewController: UIViewController {
         guard let heroView = heroImageView else { return }
         
         if yOffset < 0 {
-            // Pull down: Stretch
             heroView.snp.updateConstraints { make in
                 make.height.equalTo(self.heroHeight + abs(yOffset))
             }
         } else {
-            // Scroll up: Parallax or Normal Scroll
-            // To make it "sticked to top" but scroll away normally, we don't need to change constraints 
-            // if it's pinned to superview top. It will stay behind.
-            // BUT we probably want it to look like it's scrolling with the view, OR parallax.
-            // "Stay sticked to top" usually implies the top edge is pinned.
-            // The user said "stretched and stay sticked to the top".
-            // Standard behavior:
             heroView.snp.updateConstraints { make in
                 make.height.equalTo(max(0, self.heroHeight - yOffset))
             }
@@ -288,7 +278,7 @@ final class MovieDetailViewController: UIViewController {
                     $0.imageEdgeInsets = UIEdgeInsets(top: 0, left: -8, bottom: 0, right: 8)
                 }
             ButtonView("Download")
-                .backgroundColor(UIColor(hex: "#1A1A1A"), for: .normal)
+                .backgroundColor(UIColor("#1A1A1A"), for: .normal)
                 .color(.white, for: .normal)
                 .font(UIFont.systemFont(ofSize: 16, weight: .medium))
                 .cornerRadius(24)
@@ -430,36 +420,6 @@ final class MovieDetailViewController: UIViewController {
     }
 }
 
-// MARK: - Extensions
-// Assuming LabelView, etc are from Builder
-
-extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
-        }
-    }
-}
-
-extension UIColor {
-    convenience init(hex: String, alpha: CGFloat = 1.0) {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-        
-        var rgb: UInt64 = 0
-        
-        Scanner(string: hexSanitized).scanHexInt64(&rgb)
-        
-        let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
-        let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
-        let blue = CGFloat(rgb & 0x0000FF) / 255.0
-        
-        self.init(red: red, green: green, blue: blue, alpha: alpha)
-    }
-}
-
-// MARK: - Local Custom Components
-
 struct LocalGradientView: ModifiableView {
     
     var modifiableView = GradientOverlayView()
@@ -475,7 +435,7 @@ class GradientOverlayView: UIView {
     init() {
         super.init(frame: .zero)
         guard let layer = self.layer as? CAGradientLayer else { return }
-        layer.colors = [UIColor.clear.cgColor, UIColor(hex: "#0A0A0A").cgColor]
+        layer.colors = [UIColor.clear.cgColor, UIColor("#0A0A0A").cgColor]
         layer.startPoint = CGPoint(x: 0.5, y: 0.0)
         layer.endPoint = CGPoint(x: 0.5, y: 1.0)
     }
