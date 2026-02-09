@@ -6,11 +6,11 @@ struct LoadingView: ViewBuilder {
             VStackView(spacing: 16) {
                 With(UIActivityIndicatorView(style: .large)) {
                     $0.startAnimating()
-                    $0.color = .gray
+                    $0.color = .white
                 }
                 LabelView("Loading...")
                     .font(.systemFont(ofSize: 14))
-                    .color(.secondaryLabel)
+                    .color(.white)
                     .alignment(.center)
             }
             .alignment(.center)

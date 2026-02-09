@@ -12,6 +12,8 @@ final class MovieDetailViewController: UIViewController {
     
     private weak var scrollView: UIScrollView?
     private weak var heroImageView: UIView?
+    private weak var navBarBackgroundView: UIView?
+    private weak var navBarTitleLabel: UIView?
     
     // MARK: - Init
     init(movie: Movie) {
@@ -95,6 +97,7 @@ final class MovieDetailViewController: UIViewController {
                     .onDidScroll { [weak self] context in
                         let yOffset = context.view.contentOffset.y
                         self?.updateStretchyHeader(yOffset: yOffset)
+                        self?.handleNavBarScroll(yOffset: yOffset)
                     }
                     .with { scrollView in
                         scrollView.contentInsetAdjustmentBehavior = .never
@@ -134,11 +137,29 @@ final class MovieDetailViewController: UIViewController {
         }
     }
     
+    private func handleNavBarScroll(yOffset: CGFloat) {
+        // Fade in background between 0 and 100pt
+        let bgAlpha = min(1.0, max(0.0, yOffset / 100.0))
+        navBarBackgroundView?.alpha = bgAlpha
+        
+        // Fade in title between 300 and 350pt (when hero title disappears)
+        let titleStart: CGFloat = 300
+        let titleEnd: CGFloat = 350
+        let titleAlpha = min(1.0, max(0.0, (yOffset - titleStart) / (titleEnd - titleStart)))
+        navBarTitleLabel?.alpha = titleAlpha
+    }
+    
     private var navigationBar: View {
         ZStackView {
             GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
                 .height(100)
                 .alpha(0) // Start transparent
+                .with { [weak self] view in
+                    self?.navBarBackgroundView = view
+                }
+            
+            // Title (Centered)
+            
             
             CustomNavigationBar(
                 leading: [
@@ -148,7 +169,15 @@ final class MovieDetailViewController: UIViewController {
                         .backgroundColor(UIColor.black.withAlphaComponent(0.3), for: .normal)
                         .cornerRadius(20)
                         .size(width: 40, height: 40)
-                        .onTap { [weak self] _ in self?.navigationController?.popViewController(animated: true) }
+                        .onTap { [weak self] _ in self?.navigationController?.popViewController(animated: true) },
+                    LabelView(movie.title)
+                        .font(.systemFont(ofSize: 17, weight: .semibold))
+                        .color(.white)
+                        .alignment(.center)
+                        .alpha(0)
+                        .with { [weak self] view in
+                            self?.navBarTitleLabel = view
+                        }
                 ],
                 trailing: [
                     ButtonView()
