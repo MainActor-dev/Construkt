@@ -9,6 +9,8 @@ public struct Movie: Decodable, Identifiable, Equatable {
     public let backdropPath: String?
     public let voteAverage: Double
     
+    public let genreIds: [Int]?
+    
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -17,6 +19,7 @@ public struct Movie: Decodable, Identifiable, Equatable {
         case posterPath = "poster_path"
         case backdropPath = "backdrop_path"
         case voteAverage = "vote_average"
+        case genreIds = "genre_ids"
     }
     
     public var posterURL: URL? {
@@ -37,7 +40,8 @@ public struct Movie: Decodable, Identifiable, Equatable {
             releaseDate: "2024-01-01",
             posterPath: nil,
             backdropPath: nil,
-            voteAverage: 0.0
+            voteAverage: 0.0,
+            genreIds: []
         )
     }
 }

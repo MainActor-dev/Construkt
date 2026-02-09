@@ -98,6 +98,10 @@ public class MovieViewModel {
         return homeData.map { !$0.isAnyLoading && $0.isEmpty }
     }
     
+    public var currentGenres: [Genre] {
+        state.genres.value ?? []
+    }
+    
     // MARK: - Dependencies
     private let service: MovieServiceProtocol
     

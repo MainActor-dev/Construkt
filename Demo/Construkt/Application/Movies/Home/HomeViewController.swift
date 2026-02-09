@@ -128,8 +128,8 @@ class HomeViewController: UIViewController {
             items: viewModel.popularSectionMovies,
             header: {
                 Header {
-                    StandardHeader(title: "Popular Now", actionTitle: "See All") {
-                        print("See All Tapped")
+                    StandardHeader(title: "Popular Now", actionTitle: "See All") { [weak self] in
+                        self?.showMovieList(for: .popular)
                     }
                 }
             }
@@ -159,8 +159,8 @@ class HomeViewController: UIViewController {
             items: viewModel.upcomingMovies,
             header: {
                 Header {
-                    StandardHeader(title: "Upcoming", actionTitle: "See All") {
-                        print("See All Tapped")
+                    StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
+                        self?.showMovieList(for: .upcoming)
                     }
                 }
             }
@@ -216,6 +216,24 @@ extension HomeViewController {
     private func showDetail(for movie: Movie) {
         let detailVC = MovieDetailViewController(movie: movie)
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    private func showMovieList(for section: HomeSection) {
+        let title: String
+        switch section {
+        case .popular: title = "Popular Movies"
+        case .upcoming: title = "Upcoming Movies"
+        case .topRated: title = "Top Rated Movies"
+        default: title = "Movies"
+        }
+        
+        let viewModel = MovieListViewModel(
+            title: title,
+            sectionType: section,
+            genres: self.viewModel.currentGenres
+        )
+        let vc = MovieListViewController(viewModel: viewModel)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 

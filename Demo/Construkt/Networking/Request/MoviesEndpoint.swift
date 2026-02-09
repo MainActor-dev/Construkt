@@ -7,6 +7,7 @@ public enum MoviesEndpoint: Endpoint {
     case getMovieDetails(id: Int)
     case getMovieCredits(id: Int)
     case getGenres
+    case discover(page: Int, genreId: Int?)
     
     public var path: String {
         switch self {
@@ -22,6 +23,8 @@ public enum MoviesEndpoint: Endpoint {
             return "/movie/\(id)/credits"
         case .getGenres:
             return "/genre/movie/list"
+        case .discover:
+            return "/discover/movie"
         }
     }
     
@@ -41,6 +44,12 @@ public enum MoviesEndpoint: Endpoint {
             return nil
         case .getGenres:
             return nil
+        case .discover(let page, let genreId):
+            var params = ["page": String(page), "sort_by": "popularity.desc"]
+            if let genreId = genreId {
+                params["with_genres"] = String(genreId)
+            }
+            return params
         }
     }
 }

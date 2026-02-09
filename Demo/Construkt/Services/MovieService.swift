@@ -7,6 +7,7 @@ public protocol MovieServiceProtocol {
     func getMovieDetails(id: Int) async throws -> MovieDetail
     func getMovieCredits(id: Int) async throws -> CreditsResponse
     func getGenres() async throws -> GenreResponse
+    func discoverMovies(page: Int, genreId: Int?) async throws -> MovieResponse
 }
 
 public class MovieService: MovieServiceProtocol {
@@ -41,5 +42,9 @@ public class MovieService: MovieServiceProtocol {
     
     public func getGenres() async throws -> GenreResponse {
         return try await client.request(MoviesEndpoint.getGenres)
+    }
+    
+    public func discoverMovies(page: Int, genreId: Int?) async throws -> MovieResponse {
+        return try await client.request(MoviesEndpoint.discover(page: page, genreId: genreId))
     }
 }
