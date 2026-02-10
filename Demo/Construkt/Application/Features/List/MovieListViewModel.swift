@@ -10,7 +10,7 @@ public class MovieListViewModel {
     @Variable public private(set) var isLoading: Bool = false
     @Variable public private(set) var error: String? = nil
     
-    public struct FilterItem: Identifiable, Equatable {
+    public struct FilterItem: Identifiable, Equatable, Hashable {
         public let id: Int
         public let title: String
         public let isSelected: Bool
@@ -66,7 +66,7 @@ public class MovieListViewModel {
     public func selectGenre(_ genre: Genre?) {
         guard selectedGenre != genre else { return }
         selectedGenre = genre
-        // fetchMovies(reset: true)
+        fetchMovies(reset: true)
     }
     
     public func loadMore() {

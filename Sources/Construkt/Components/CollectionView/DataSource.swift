@@ -29,70 +29,74 @@ public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionContro
 public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
 
 public extension CollectionDiffableDataSource {
-    func updateSections(
-        _ sections: [SectionController],
-        beforeItem: CellController? = nil,
-        completion: (() -> Void)? = nil,
-        animated: Bool = false
-    ) {
-        var snapshot = snapshot()
-        
-        defer {
-            applySnapshot(snapshot, completion: completion)
-        }
-                
-        let displayedSections = snapshot.sectionIdentifiers
-        let newSections = sections.filter { !displayedSections.contains($0) }
-        newSections.forEach { newSection in
-            snapshot.appendSections([newSection])
-            snapshot.appendItems(newSection.cells, toSection: newSection)
-        }
-        
-        print("[BEKA] displayed sections", displayedSections.map { $0.identifier.uniqueId })
-        print("[BEKA] new sections", sections.map { $0.identifier.uniqueId })
-
-        let existingSections = displayedSections.filter { sections.contains($0) }
-        
-        print("[BEKA] existing sections", existingSections.map { $0.identifier.uniqueId })
-
-        zip(existingSections, sections).forEach { old, new in
-            guard old.identifier.uniqueId == new.identifier.uniqueId else { return  }
-            
-            if new.identifier.uniqueId == "grid" {
-                print("[BEKA] new items", new.cells.map { $0.id })
-                print("[BEKA] old items", old.cells.map { $0.id })
-            }
-            let newItems = new.cells
-            let oldItems = snapshot.itemIdentifiers(inSection: old)
-            var filtered = newItems.filter { !oldItems.contains($0) }
-            
-            /// Delete items if needed
-            let toBeDeletedItems = oldItems.filter { !newItems.contains($0) }
-            snapshot.deleteItems(toBeDeletedItems)
-            
-            if let beforeItem = beforeItem {
-                if snapshot.itemIdentifiers.contains(beforeItem) {
-                    snapshot.insertItems(filtered, beforeItem: beforeItem)
-                } else {
-                    filtered.removeAll(where: { $0 == beforeItem })
-                    snapshot.appendItems(filtered, toSection: old)
-                    snapshot.appendItems([beforeItem], toSection: old)
-                }
-            } else {
-                snapshot.appendItems(filtered, toSection: new)
-            }
-        }
-    }
-    
     func display(_ sections: [SectionController], completion: (() -> Void)? = nil) {
-        var snapshot = CollectionSnapshot()
+        let currentSnapshot = snapshot()
+        let isFirstLoad = currentSnapshot.numberOfSections == 0
+        
+        // Build new snapshot
+        var newSnapshot = CollectionSnapshot()
         sections.forEach { section in
             if !section.cells.isEmpty {
-                snapshot.appendSections([section])
-                snapshot.appendItems(section.cells, toSection: section)
+                newSnapshot.appendSections([section])
+                newSnapshot.appendItems(section.cells, toSection: section)
             }
         }
-        applySnapshotUsingReloadData(snapshot, completion: completion)
+        
+        if isFirstLoad {
+            // First load: use reloadData for instant display (no animation needed)
+            applySnapshotUsingReloadData(newSnapshot, completion: completion)
+        } else {
+            // Build content map from current snapshot before applying structural changes
+            let oldItemMap = buildContentMap(from: currentSnapshot)
+            let oldIds = Set(currentSnapshot.itemIdentifiers.map { $0.id })
+            
+            // Apply structural diff (inserts/deletes/moves) without animation
+            apply(newSnapshot, animatingDifferences: false) { [weak self] in
+                guard let self = self else {
+                    completion?()
+                    return
+                }
+                
+                // Find items that need reconfiguration:
+                // - nil contentHash: can't verify content unchanged → reconfigure
+                // - different contentHash: content confirmed changed → reconfigure
+                // - same non-nil contentHash: content confirmed unchanged → skip
+                let itemsToReconfigure = newSnapshot.itemIdentifiers.filter { item in
+                    // Only reconfigure items that existed before (new items already handled by apply)
+                    guard oldIds.contains(item.id) else { return false }
+                    
+                    guard let newHash = item.contentHash else {
+                        // No contentHash — can't verify unchanged, must reconfigure
+                        return true
+                    }
+                    guard let oldHash = oldItemMap[item.id] else {
+                        // Item existed but had no hash before — reconfigure
+                        return true
+                    }
+                    // Both have hashes — only reconfigure if different
+                    return oldHash != newHash
+                }
+                
+                if !itemsToReconfigure.isEmpty {
+                    var reconfigSnapshot = self.snapshot()
+                    // Filter to only items that actually exist in the current snapshot
+                    // (guards against race conditions from overlapping display() calls)
+                    let currentIds = Set(reconfigSnapshot.itemIdentifiers.map { $0.id })
+                    let safeItems = itemsToReconfigure.filter { currentIds.contains($0.id) }
+                    
+                    if !safeItems.isEmpty {
+                        // Use reloadItems (not reconfigureItems) because each CellController
+                        // creates a new CellRegistration per emission — reconfigureItems
+                        // requires the same registration, which we can't guarantee.
+                        reconfigSnapshot.reloadItems(safeItems)
+                        // Enable animations to preserve orthogonal scroll positions
+                        self.apply(reconfigSnapshot, animatingDifferences: false)
+                    }
+                }
+                
+                completion?()
+            }
+        }
     }
     
     func appendItems(
@@ -105,13 +109,13 @@ public extension CollectionDiffableDataSource {
         
         var snapshot = snapshot()
         snapshot.appendItems(items, toSection: section)
-        applySnapshot(snapshot, animated: animated)
+        apply(snapshot, animatingDifferences: animated)
     }
     
     func deleteItems(_ items: [CellController]) {
         var snapshot = snapshot()
         snapshot.deleteItems(items)
-        applySnapshot(snapshot, animated: true)
+        apply(snapshot, animatingDifferences: true)
     }
     
     func section(at index: Int) -> SectionController? {
@@ -122,15 +126,18 @@ public extension CollectionDiffableDataSource {
         return snapshot().sectionIdentifiers[safe: index]?.identifier.uniqueId
     }
     
-    private func applySnapshot(
-        _  snapshot: CollectionSnapshot,
-        animated: Bool = false,
-        completion: (() -> Void)? = nil
-    ) {
-        if #available(iOS 15.0, *) {
-            applySnapshotUsingReloadData(snapshot, completion: completion)
-        } else {
-            apply(snapshot, animatingDifferences: animated)
+    // MARK: - Private Helpers
+    
+    /// Builds a lookup of [CellController.id → contentHash] from the current snapshot
+    private func buildContentMap(
+        from snapshot: CollectionSnapshot
+    ) -> [AnyHashable: AnyHashable] {
+        var map: [AnyHashable: AnyHashable] = [:]
+        for item in snapshot.itemIdentifiers {
+            if let hash = item.contentHash {
+                map[item.id] = hash
+            }
         }
+        return map
     }
 }

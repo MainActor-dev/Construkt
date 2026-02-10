@@ -33,6 +33,7 @@ public enum CellControllerState: Equatable {
 public struct CellController: Hashable {
     
     public let id: AnyHashable
+    public let contentHash: AnyHashable?
     private let makeCell: (UICollectionView, IndexPath) -> UICollectionViewCell
     private let onSelect: (() -> Void)?
     private let onPrefetch: (() -> Void)?
@@ -42,11 +43,13 @@ public struct CellController: Hashable {
         id: AnyHashable = UUID(),
         model: Model,
         registration: UICollectionView.CellRegistration<Cell, Model>,
+        contentHash: AnyHashable? = nil,
         didSelect: ((Model) -> Void)? = nil,
         prefetch: ((Model) -> Void)? = nil,
         cancelPrefetch: ((Model) -> Void)? = nil
     ) {
         self.id = id
+        self.contentHash = contentHash
         self.makeCell = { collectionView, indexPath in
             collectionView.dequeueConfiguredReusableCell(
                 using: registration,
