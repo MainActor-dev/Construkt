@@ -8,19 +8,19 @@
 import UIKit
 
 extension ModifiableView {
-
+    
     @discardableResult
     public func contentCompressionResistancePriority(_ priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.setContentCompressionResistancePriority(priority, for: axis) }
     }
-
+    
     @discardableResult
     public func contentHuggingPriority(_ priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
             $0.setContentHuggingPriority(priority, for: axis)
         }
     }
-
+    
     @discardableResult
     public func frame(height: CGFloat? = nil, width: CGFloat? = nil) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -40,17 +40,22 @@ extension ModifiableView {
             }
         }
     }
-
+    
     @discardableResult
     public func height(_ height: CGFloat) -> ViewModifier<Base> {
         self.height(height, priority: UILayoutPriority(999))
     }
-
+    
+    @discardableResult
+    public func size(width: CGFloat, height: CGFloat) -> ViewModifier<Base> {
+        self.width(width).height(height)
+    }
+    
     @discardableResult
     public func height(_ height: CGFloat, priority: Float) -> ViewModifier<Base> {
         self.height(height, priority: UILayoutPriority(priority))
     }
-
+    
     @discardableResult
     public func height(_ height: CGFloat, priority: UILayoutPriority) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -61,7 +66,7 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
     @discardableResult
     public func height(min height: CGFloat, priority: UILayoutPriority = UILayoutPriority(rawValue: 999)) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -72,7 +77,7 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
     @discardableResult
     public func height(max height: CGFloat, priority: UILayoutPriority = UILayoutPriority(rawValue: 999)) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -83,17 +88,17 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
     @discardableResult
     public func width(_ width: CGFloat) -> ViewModifier<Base> {
         self.width(width, priority: UILayoutPriority(999))
     }
-
+    
     @discardableResult
     public func width(_ width: CGFloat, priority: Float) -> ViewModifier<Base> {
         self.width(width, priority: UILayoutPriority(priority))
     }
-
+    
     @discardableResult
     public func width(_ width: CGFloat, priority: UILayoutPriority) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -104,7 +109,7 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
     @discardableResult
     public func width(min width: CGFloat, priority: UILayoutPriority = UILayoutPriority(rawValue: 999)) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -115,7 +120,7 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
     @discardableResult
     public func width(max width: CGFloat, priority: UILayoutPriority = UILayoutPriority(rawValue: 999)) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -126,11 +131,11 @@ extension ModifiableView {
                 .activate()
         }
     }
-
+    
 }
 
 extension UIView {
-
+    
     public enum EmbedPosition {
         case fill
         case top
@@ -147,29 +152,29 @@ extension UIView {
         case bottomCenter
         case bottomRight
     }
-
+    
     public func embed(_ view: View, padding: UIEdgeInsets? = nil, safeArea: Bool = false) {
         addConstrainedSubview(view(), position: .fill, padding: padding ?? .zero, safeArea: safeArea)
     }
-
+    
     public func embed(_ views: [View], padding: UIEdgeInsets? = nil, safeArea: Bool = false) {
         views.forEach { self.addConstrainedSubview($0(), position: .fill, padding: padding ?? .zero, safeArea: safeArea) }
     }
-
+    
     public func addConstrainedSubview(_ view: UIView, position: EmbedPosition, padding: UIEdgeInsets, safeArea: Bool = false) {
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
         addConstraints(view, position: position, padding: padding, safeArea: safeArea)
     }
-
+    
     public func insertConstrainedSubview(_ view: UIView, at index: Int, position: EmbedPosition, padding: UIEdgeInsets, safeArea: Bool = false) {
         view.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(view, at: index)
         addConstraints(view, position: position, padding: padding, safeArea: safeArea)
     }
-
+    
     // all embedding and inserts flow here...
-
+    
     private func addConstraints(_ view: UIView, position: EmbedPosition, padding: UIEdgeInsets, safeArea: Bool) {
         // check for builder overrides
         let attributes = view.optionalBuilderAttributes()
@@ -183,10 +188,10 @@ extension UIView {
             addHorizontalConstraints(view, position: position, padding: padding, safeArea: safeArea)
         }
     }
-
+    
     private func addVerticalConstraints(_ view: UIView, position: EmbedPosition, padding: UIEdgeInsets, safeArea: Bool) {
         let guides: UIViewAnchoring = safeArea ? safeAreaLayoutGuide : self
-
+        
         if [EmbedPosition.center, .centerLeft, .centerRight].contains(position) {
             view.centerYAnchor.constraint(equalTo: guides.centerYAnchor)
                 .identifier("centerY")
@@ -203,7 +208,7 @@ extension UIView {
                     .identifier("top")
                     .activate()
             }
-
+            
             // bottom
             if [EmbedPosition.fill, .bottom, .left, .right, .bottomLeft, .bottomCenter, .bottomRight].contains(position) {
                 view.bottomAnchor.constraint(equalTo: guides.bottomAnchor, constant: -padding.bottom)
@@ -217,10 +222,10 @@ extension UIView {
             }
         }
     }
-
+    
     private func addHorizontalConstraints(_ view: UIView, position: EmbedPosition, padding: UIEdgeInsets, safeArea: Bool = false) {
         let guides: UIViewAnchoring = safeArea ? safeAreaLayoutGuide : self
-
+        
         if [EmbedPosition.center, .topCenter, .bottomCenter].contains(position) {
             view.centerXAnchor.constraint(equalTo: guides.centerXAnchor)
                 .identifier("centerX")
@@ -237,7 +242,7 @@ extension UIView {
                     .identifier("left")
                     .activate()
             }
-
+            
             // right
             if [EmbedPosition.fill, .right, .top, .bottom, .topRight, .centerRight, .bottomRight].contains(position) {
                 view.rightAnchor.constraint(equalTo: guides.rightAnchor, constant: -padding.right)
@@ -251,7 +256,7 @@ extension UIView {
             }
         }
     }
-
+    
 }
 
 private protocol UIViewAnchoring {

@@ -65,8 +65,6 @@ extension View {
     }
 }
 
-
-
 // Allows view builder modifications to be made to a given UIView type
 public protocol ModifiableView: View {
     associatedtype Base: UIView
@@ -78,24 +76,45 @@ extension ModifiableView {
     public func asBaseView() -> Base {
         modifiableView
     }
+    
     public func build() -> UIView {
         modifiableView
     }
+    
     @discardableResult
     public func reference<V:UIView>(_ view: inout V?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view = $0 as? V }
     }
+    
     @discardableResult
     public func with(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
+    
     @discardableResult
     public func perform(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
+    
+    @discardableResult
+    public func visible(_ isVisible: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { $0.isHidden = !isVisible }
+    }
+    
+    @discardableResult
+    public func skeletonable(
+        _ isSkeletonAble: Bool,
+        bgColor: UIColor = UIColor(white: 0.90, alpha: 1.0)
+    ) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) {
+            $0.isSkeletonable = isSkeletonAble
+            $0.skeletonConfig = .init(
+                background: bgColor,
+                pausesOnBackground: false
+            )
+        }
+    }
 }
-
-
 
 // Generic return type for building/chaining view modifiers
 public struct ViewModifier<Base:UIView>: ModifiableView {
