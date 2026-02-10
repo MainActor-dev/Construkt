@@ -1,5 +1,21 @@
 import UIKit
 
+struct AdsCell: ViewBuilder {
+    let text: String
+    
+    var body: View {
+        CenteredView {
+            LabelView(text)
+                .font(.systemFont(ofSize: 16, weight: .bold))
+                .alignment(.center)
+                .color(.white)
+        }
+        .border(color: .white.withAlphaComponent(0.3), lineWidth: 1)
+        .cornerRadius(12)
+        .clipsToBounds(true)
+    }
+}
+
 struct TopRatedCell: ViewBuilder {
     let index: Int
     let movie: Movie

@@ -36,31 +36,25 @@ class MovieListViewController: UIViewController {
                 items: viewModel.filterItemsObservable
             ) { item in
                 Cell(item, id: "filter-\(item.id)") { item in
-                    FilterCell(title: item.title, isSelected: item.isSelected)
+                    GenresCell(
+                        genre: Genre(id: item.id, name: item.title),
+                        isSelected: item.isSelected
+                    )
                 }
                 .onSelect { [weak self] _ in
                     self?.viewModel.selectGenre(item.genre)
                 }
             }
             .layout { _ in
-                let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .estimated(80),
-                    heightDimension: .absolute(36)
+                return .layout(
+                    group: .horizontally(
+                        width: .estimated(100),
+                        height: .absolute(40)
+                    ),
+                    spacing: 12,
+                    insets: .init(v: 16, h: 16),
+                    scrolling: .continuous
                 )
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                
-                let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .estimated(80),
-                    heightDimension: .absolute(36)
-                )
-                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                
-                let section = NSCollectionLayoutSection(group: group)
-                section.orthogonalScrollingBehavior = .continuous
-                section.interGroupSpacing = 8
-                section.contentInsets = NSDirectionalEdgeInsets(top: 100, leading: 16, bottom: 16, trailing: 16)
-                
-                return section
             }
             
             // Section 2: Movies Grid
@@ -95,8 +89,7 @@ class MovieListViewController: UIViewController {
         }
         .backgroundColor(UIColor("#0A0A0A"))
         .with {
-            $0.collectionView.contentInsetAdjustmentBehavior = .never
-            $0.collectionView.contentInset.top = 20
+            $0.collectionView.contentInset.top = 40
         }
         
         // Define Custom Navigation Bar

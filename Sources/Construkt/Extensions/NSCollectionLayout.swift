@@ -44,11 +44,18 @@ extension NSCollectionLayoutItem {
 
 extension NSCollectionLayoutGroup {
     static func vertically(
-        estimatedHeight: CGFloat,
+        width: NSCollectionLayoutDimension,
+        height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem.entireWidth(withHeight: .estimated(estimatedHeight))
-        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: .estimated(estimatedHeight))
+        let item = NSCollectionLayoutItem(layoutSize: .init(
+            widthDimension: width,
+            heightDimension: height
+        ))
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: width,
+            heightDimension: height
+        )
         let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
         group.contentInsets = insets
         return group

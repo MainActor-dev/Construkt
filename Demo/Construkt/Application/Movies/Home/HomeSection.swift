@@ -52,7 +52,7 @@ enum HomeSection: String, SectionControllerIdentifier {
             )
         case .topRated:
             return .layout(
-                group: .vertically(height: .absolute(100)),
+                group: .vertically(width: .fractionalWidth(1.0), height: .estimated(50)),
                 spacing: 12,
                 insets: .init(v: 16, h: 16),
                 supplementaryItems: [.header(height: .absolute(40))]

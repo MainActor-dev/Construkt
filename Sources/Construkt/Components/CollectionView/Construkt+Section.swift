@@ -242,14 +242,22 @@ public struct Section: SectionObservable {
     public init<B: RxBinding, Element>(
         id: SectionControllerIdentifier,
         items binding: B,
-        header: (() -> Header)? = nil,
-        footer: (() -> Footer)? = nil,
+        header: Header? = nil,
+        footer: Footer? = nil,
         @CellResultBuilder content: @escaping (Element) -> [CellController]
     ) where B.T == [Element] {
         self.observable = binding.asObservable()
             .map { items in
                 let cells = items.flatMap { content($0) }
-                return [SectionController(identifier: id, cells: cells, header: header?().controller, footer: footer?().controller, layoutProvider: nil)]
+                return [
+                    SectionController(
+                        identifier: id,
+                        cells: cells,
+                        header: header?.controller,
+                        footer: footer?.controller,
+                        layoutProvider: nil
+                    )
+                ]
             }
     }
 

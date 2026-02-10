@@ -100,10 +100,8 @@ class HomeViewController: UIViewController {
         Section(
             id: HomeSection.categories,
             items: viewModel.genres,
-            header: {
-                Header {
-                    StandardHeader(title: "Genres", actionTitle: nil)
-                }
+            header: Header {
+                StandardHeader(title: "Genres", actionTitle: nil)
             }
         ) { genre in
             Cell(genre, id: "genre-\(genre.id)") { genre in
@@ -126,11 +124,9 @@ class HomeViewController: UIViewController {
         Section(
             id: HomeSection.popular,
             items: viewModel.popularSectionMovies,
-            header: {
-                Header {
-                    StandardHeader(title: "Popular Now", actionTitle: "See All") { [weak self] in
-                        self?.showMovieList(for: .popular)
-                    }
+            header: Header {
+                StandardHeader(title: "Popular Now", actionTitle: "See All") { [weak self] in
+                    self?.showMovieList(for: .popular)
                 }
             }
         ) { movie in
@@ -157,11 +153,9 @@ class HomeViewController: UIViewController {
         Section(
             id: HomeSection.upcoming,
             items: viewModel.upcomingMovies,
-            header: {
-                Header {
-                    StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
-                        self?.showMovieList(for: .upcoming)
-                    }
+            header: Header {
+                StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
+                    self?.showMovieList(for: .upcoming)
                 }
             }
         ) { movie in
@@ -188,12 +182,13 @@ class HomeViewController: UIViewController {
         Section(
             id: HomeSection.topRated,
             items: viewModel.topRatedMovies.map { Array($0.enumerated()) },
-            header: {
-                Header {
-                    StandardHeader(title: "Top Rated", actionTitle: nil)
-                }
+            header: Header {
+                StandardHeader(title: "Top Rated", actionTitle: nil)
             }
         ) { (index, movie) in
+            if index == 5 {
+                Cell("This is an ad") { text in AdsCell(text: text) }
+            }
             Cell(movie, id: "top-\(movie.id)") { movie in
                 TopRatedCell(index: index + 1, movie: movie)
             }
