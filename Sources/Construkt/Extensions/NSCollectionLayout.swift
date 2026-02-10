@@ -43,6 +43,7 @@ extension NSCollectionLayoutItem {
 }
 
 extension NSCollectionLayoutGroup {
+    // MARK: - Vertical Scroll
     static func vertically(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
@@ -62,7 +63,7 @@ extension NSCollectionLayoutGroup {
     }
     
     static func vertically(
-        height: NSCollectionLayoutDimension,
+        entireWidthWithHeight height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
         let item = NSCollectionLayoutItem.withEntireSize()
@@ -72,6 +73,7 @@ extension NSCollectionLayoutGroup {
         return group
     }
     
+    // MARK: - Horizontal Scroll
     static func horizontally(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
@@ -91,17 +93,11 @@ extension NSCollectionLayoutGroup {
     }
     
     static func horizontally(
-        height: NSCollectionLayoutDimension,
+        entireWidthWithHeight height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem(layoutSize: .init(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: height
-        ))
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: height
-        )
+        let item = NSCollectionLayoutItem.entireWidth(withHeight: height)
+        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: height)
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         group.contentInsets = insets
         return group

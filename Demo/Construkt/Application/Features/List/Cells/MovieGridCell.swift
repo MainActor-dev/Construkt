@@ -20,29 +20,33 @@ struct MovieGridCell: ViewBuilder {
                 .clipsToBounds(true)
                 .skeletonable(true)
             
-            ratingBadge
+           ratingBadge
         }
-        .height(180) 
+        .height(290)
     }
     
     private var ratingBadge: View {
-        ContainerView {
+        ZStackView {
             HStackView(spacing: 4) {
                 ImageView(systemName: "star.fill")
                     .tintColor(.systemYellow)
                     .contentMode(.scaleAspectFit)
-                    .size(width: 10, height: 10)
+                    .size(width: 12, height: 12)
                 
                 LabelView(String(format: "%.1f", movie.voteAverage))
                     .font(.systemFont(ofSize: 10, weight: .bold))
                     .color(.white)
             }
             .padding(top: 4, left: 6, bottom: 4, right: 6)
+            .alignment(.center)
         }
-        .backgroundColor(UIColor.black.withAlphaComponent(0.7))
-        .cornerRadius(4)
-        .defaultPosition(.topRight)
-        .padding(insets: UIEdgeInsets(top: 8, left: 0, bottom: 0, right: 8))
+        .backgroundColor(.black.withAlphaComponent(0.5))
+        .margins(h: 6, v: 6)
+        .position(.topRight)
+        .width(max: 50)
+        .height(30)
+        .cornerRadius(8)
+        .skeletonable(true, bgColor: UIColor("#EEEEEE"))
     }
     
     private var titleLabel: View {

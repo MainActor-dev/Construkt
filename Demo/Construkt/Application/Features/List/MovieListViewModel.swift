@@ -34,9 +34,7 @@ public class MovieListViewModel {
             return [allItem] + items
         }
     }
-    
-    public var selectedGenreObservable: Observable<Genre?> { $selectedGenre.asObservable() }
-    
+        
     // MARK: - Properties
     public let title: String
     public let genres: [Genre] // Available filters
@@ -68,7 +66,7 @@ public class MovieListViewModel {
     public func selectGenre(_ genre: Genre?) {
         guard selectedGenre != genre else { return }
         selectedGenre = genre
-        fetchMovies(reset: true)
+        // fetchMovies(reset: true)
     }
     
     public func loadMore() {

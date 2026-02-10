@@ -1,6 +1,7 @@
 import UIKit
 
 struct GenresCell: ViewBuilder {
+    let id: Int
     let genre: Genre
     var isSelected: Bool = false
     

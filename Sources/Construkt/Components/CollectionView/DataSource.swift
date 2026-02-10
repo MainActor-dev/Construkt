@@ -48,11 +48,20 @@ public extension CollectionDiffableDataSource {
             snapshot.appendItems(newSection.cells, toSection: newSection)
         }
         
+        print("[BEKA] displayed sections", displayedSections.map { $0.identifier.uniqueId })
+        print("[BEKA] new sections", sections.map { $0.identifier.uniqueId })
+
         let existingSections = displayedSections.filter { sections.contains($0) }
         
+        print("[BEKA] existing sections", existingSections.map { $0.identifier.uniqueId })
+
         zip(existingSections, sections).forEach { old, new in
             guard old.identifier.uniqueId == new.identifier.uniqueId else { return  }
             
+            if new.identifier.uniqueId == "grid" {
+                print("[BEKA] new items", new.cells.map { $0.id })
+                print("[BEKA] old items", old.cells.map { $0.id })
+            }
             let newItems = new.cells
             let oldItems = snapshot.itemIdentifiers(inSection: old)
             var filtered = newItems.filter { !oldItems.contains($0) }

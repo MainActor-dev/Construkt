@@ -102,10 +102,16 @@ extension ModifiableView {
     }
     
     @discardableResult
-    public func skeletonable(_ isSkeletonAble: Bool) -> ViewModifier<Base> {
+    public func skeletonable(
+        _ isSkeletonAble: Bool,
+        bgColor: UIColor = UIColor(white: 0.90, alpha: 1.0)
+    ) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
             $0.isSkeletonable = isSkeletonAble
-            $0.skeletonConfig = .init(pausesOnBackground: false)
+            $0.skeletonConfig = .init(
+                background: bgColor,
+                pausesOnBackground: false
+            )
         }
     }
 }

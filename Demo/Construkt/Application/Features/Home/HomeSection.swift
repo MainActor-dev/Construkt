@@ -13,7 +13,7 @@ enum HomeSection: String, SectionControllerIdentifier {
         switch self {
         case .hero:
             return .layout(
-                group: .horizontally(height: .absolute(550)),
+                group: .horizontally(entireWidthWithHeight: .absolute(550)),
                 insets: .init(top: 0, leading: 0, bottom: 16, trailing: 0),
                 scrolling: .groupPagingCentered
             )

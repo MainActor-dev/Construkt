@@ -19,28 +19,6 @@ struct LoadingView: ViewBuilder {
     }
 }
 
-struct ErrorView: ViewBuilder {
-    let message: String
-    
-    var body: View {
-        CenteredView {
-            VStackView(spacing: 8) {
-                LabelView("Something went wrong")
-                    .font(.boldSystemFont(ofSize: 18))
-                    .alignment(.center)
-                LabelView(message)
-                    .font(.systemFont(ofSize: 14))
-                    .color(.secondaryLabel)
-                    .numberOfLines(0)
-                    .alignment(.center)
-            }
-            .padding(32)
-            .alignment(.center)
-        }
-        .backgroundColor(.systemBackground)
-    }
-}
-
 struct EmptyView: ViewBuilder {
     let title: String
     let subtitle: String

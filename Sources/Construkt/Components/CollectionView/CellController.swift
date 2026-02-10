@@ -32,7 +32,7 @@ public enum CellControllerState: Equatable {
 
 public struct CellController: Hashable {
     
-    private let id: AnyHashable
+    public let id: AnyHashable
     private let makeCell: (UICollectionView, IndexPath) -> UICollectionViewCell
     private let onSelect: (() -> Void)?
     private let onPrefetch: (() -> Void)?

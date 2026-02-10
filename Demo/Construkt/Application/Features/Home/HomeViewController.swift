@@ -22,9 +22,6 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor("#0A0A0A")
         view.embed(body)
-
-        
-
         fetchData()
     }
     
@@ -105,7 +102,7 @@ class HomeViewController: UIViewController {
             }
         ) { genre in
             Cell(genre, id: "genre-\(genre.id)") { genre in
-                GenresCell(genre: genre)
+                GenresCell(id: genre.id, genre: genre)
             }
         }
         .skeleton(
@@ -113,7 +110,7 @@ class HomeViewController: UIViewController {
             when: viewModel.isLoadingGenres,
             includeSupplementary: true
         ) {
-            GenresCell(genre: .placeholder)
+            GenresCell(id: -2, genre: .placeholder)
         }
         .layout { _ in
             return HomeSection.categories.layout
@@ -225,7 +222,7 @@ extension HomeViewController {
         let viewModel = MovieListViewModel(
             title: title,
             sectionType: section,
-            genres: self.viewModel.currentGenres
+            genres: viewModel.currentGenres
         )
         let vc = MovieListViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
