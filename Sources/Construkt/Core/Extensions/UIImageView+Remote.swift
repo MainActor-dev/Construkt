@@ -1,7 +1,6 @@
 import UIKit
 
 // Simple Image Cache to avoid re-downloading
-// Simple Image Cache to avoid re-downloading
 fileprivate let imageCache: NSCache<NSString, UIImage> = {
     let cache = NSCache<NSString, UIImage>()
     cache.countLimit = 100 // Limit to 100 images
@@ -17,14 +16,16 @@ public class ImageCache {
 }
 
 // Associated object key for storing the current URL
-private var currentURLKey: UInt8 = 0
+private var currentTaskKey: UInt8 = 0
 
 public extension UIImageView {
     func setImage(from url: URL?, placeholder: UIImage? = nil) {
-        self.image = placeholder
+        // Cancel prior task
+        if let existingTask = objc_getAssociatedObject(self, &currentTaskKey) as? Task<Void, Never> {
+            existingTask.cancel()
+        }
         
-        // Cancel previous task? Ideally yes, but for now let's just tag the view with the URL.
-        objc_setAssociatedObject(self, &currentURLKey, url?.absoluteString, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        self.image = placeholder
         
         guard let url = url else { return }
         
@@ -37,24 +38,25 @@ public extension UIImageView {
         }
         
         // Download
-        Task { [weak self] in
+        let task = Task { [weak self] in
             do {
                 let (data, _) = try await URLSession.shared.data(from: url)
+                
+                // Check for cancellation
+                try Task.checkCancellation()
+                
                 if let image = UIImage(data: data) {
                     imageCache.setObject(image, forKey: urlString)
                     
                     await MainActor.run { [weak self] in
-                        guard let self = self else { return }
-                        // Verify if the URL is still the same (handle reuse)
-                        let currentUrlString = objc_getAssociatedObject(self, &currentURLKey) as? String
-                        if currentUrlString == url.absoluteString {
-                            self.image = image
-                        }
+                        self?.image = image
                     }
                 }
             } catch {
-                print("Failed to load image: \(url)")
+                // Cancellation or error
             }
         }
+        
+        objc_setAssociatedObject(self, &currentTaskKey, task, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 }

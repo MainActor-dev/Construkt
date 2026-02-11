@@ -31,6 +31,10 @@ final class MovieDetailViewController: UIViewController {
         fetchDetail()
     }
     
+    deinit {
+        ImageCache.clear()
+    }
+    
     private func fetchDetail() {
         viewModel.selectMovie(movie)
     }
