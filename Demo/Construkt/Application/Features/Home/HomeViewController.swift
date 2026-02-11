@@ -77,9 +77,9 @@ class HomeViewController: UIViewController {
             Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
                 cell.configure(with: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { [weak self] _ in
             let layout = HomeSection.hero.layout
@@ -130,9 +130,9 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "popular-\(movie.id)") { movie in
                 PosterCell(movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { _ in
             return HomeSection.popular.layout
@@ -159,9 +159,9 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "upcoming-\(movie.id)") { movie in
                 UpcomingCell(movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { _ in
             return HomeSection.upcoming.layout
@@ -189,9 +189,12 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "top-\(movie.id)") { movie in
                 TopRatedCell(index: index + 1, movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
+        }
+        .onSelect(on: self) { (me, ad: String) in
+            print("Ad Selected: \(ad)")
         }
         .layout { _ in
             return HomeSection.topRated.layout

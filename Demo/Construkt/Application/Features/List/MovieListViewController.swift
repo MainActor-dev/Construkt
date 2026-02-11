@@ -25,13 +25,17 @@ class MovieListViewController: UIViewController {
         setupUI()
     }
     
+    deinit {
+        print("MovieListViewController deinit")
+    }
+    
     private func setupUI() {
         view.backgroundColor = UIColor("#0A0A0A")
         view.embed(
             ContainerView {
                 CollectionView {
-                    filterSection
-                    gridSection
+                     filterSection
+                     gridSection
                 }
                 .backgroundColor(UIColor("#0A0A0A"))
                 .with {
@@ -78,10 +82,10 @@ class MovieListViewController: UIViewController {
                     isSelected: item.isSelected
                 )
             }
-            .onSelect { [weak self] _ in
-                self?.viewModel.selectGenre(item.genre)
-                self?.scrollToFilter(item)
-            }
+        }
+        .onSelect(on: self) { (self, item: MovieListViewModel.FilterItem) in
+            self.viewModel.selectGenre(item.genre)
+            self.scrollToFilter(item)
         }
         .layout { _ in
             return .layout(
@@ -105,9 +109,9 @@ class MovieListViewController: UIViewController {
             Cell(movie, id: "movie-\(movie.id)") { movie in
                 MovieGridCell(movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (self, movie: Movie) in
+            self.showDetail(for: movie)
         }
         .skeleton(count: 8, when: viewModel.$isLoading) {
             MovieGridCell(movie: .placeholder)

@@ -23,8 +23,6 @@
 //  THE SOFTWARE.
 
 import UIKit
-import RxSwift
-import RxCocoa
 
 private typealias CollectionDelegate = UICollectionViewDelegate & UICollectionViewDataSourcePrefetching
 
@@ -32,37 +30,18 @@ public final class CellControllerAdapter: NSObject, CollectionDelegate {
 
     private weak var dataSource: CollectionDiffableDataSource?
     
-    private let debouncedTapSubject = PublishSubject<IndexPath>()
-    private var debounceInterval: TimeInterval = 0.5
-    private var disposeBag = DisposeBag()
-    
     public init(dataSource: CollectionDiffableDataSource) {
         self.dataSource = dataSource
         super.init()
-        setupRxBindings()
     }
-    
-    private func setupRxBindings() {
-        debouncedTapSubject
-            .asObservable()
-            .debounce(
-                .milliseconds(Int(debounceInterval * 1000)),
-                scheduler: MainScheduler.instance
-            )
-            .subscribe(onNext: { [weak self] indexPath in
-                guard let self = self else { return }
-                item(at: indexPath)?.didSelect()
-            })
-            .disposed(by: disposeBag)
-    }
-
+   
     private func item(at indexPath: IndexPath) -> CellController? {
         dataSource?.itemIdentifier(for: indexPath)
     }
 
     // MARK: Selection
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        debouncedTapSubject.onNext(indexPath)
+        item(at: indexPath)?.didSelect()
     }
 
     // MARK: Prefetch
@@ -72,6 +51,10 @@ public final class CellControllerAdapter: NSObject, CollectionDelegate {
 
     public func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
         indexPaths.compactMap(item).forEach { $0.cancelPrefetch() }
+    }
+    
+    deinit {
+        print("CellControllerAdapter deinit")
     }
 }
 

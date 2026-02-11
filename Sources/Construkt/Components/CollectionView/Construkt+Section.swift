@@ -263,6 +263,57 @@ public struct Section: SectionObservable {
             }
     }
 
+    // MARK: - Actions Modifier
+    
+    public func onSelect<T>(_ handler: @escaping (T) -> Void) -> Section {
+        let improved: Observable<[SectionController]> = observable.map { sections in
+            sections.map { section in
+                let newCells = section.cells.map { cell in
+                    guard let model = cell.model as? T else { return cell }
+                    
+                    return cell.withSelection {
+                        handler(model)
+                    }
+                }
+                 
+                return SectionController(
+                    identifier: section.identifier,
+                    cells: newCells,
+                    header: section.header,
+                    footer: section.footer,
+                    layoutProvider: section.layoutProvider
+                )
+            }
+        }
+        return Section(observable: improved)
+    }
+    
+    public func onSelect<T, Target: AnyObject>(on target: Target, _ handler: @escaping (Target, T) -> Void) -> Section {
+        let improved: Observable<[SectionController]> = observable
+            .map { [weak target] sections in
+                guard let target = target else { return sections }
+            
+                return sections.map { section in
+                    let newCells = section.cells.map { cell in
+                        guard let model = cell.model as? T else { return cell }
+                        return cell.withSelection { [weak target] in
+                            guard let target = target else { return }
+                            handler(target, model)
+                        }
+                    }
+                     
+                    return SectionController(
+                        identifier: section.identifier,
+                        cells: newCells,
+                        header: section.header,
+                        footer: section.footer,
+                        layoutProvider: section.layoutProvider
+                    )
+                }
+        }
+        return Section(observable: improved)
+    }
+
     /// Builder Initializer with Header/Footer support
     public init(
         id: SectionControllerIdentifier,

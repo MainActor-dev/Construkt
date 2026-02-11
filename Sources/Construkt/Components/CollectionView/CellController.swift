@@ -33,6 +33,7 @@ public enum CellControllerState: Equatable {
 public struct CellController: Hashable {
     
     public let id: AnyHashable
+    public let model: Any
     public let contentHash: AnyHashable?
     private let makeCell: (UICollectionView, IndexPath) -> UICollectionViewCell
     private let onSelect: (() -> Void)?
@@ -49,6 +50,7 @@ public struct CellController: Hashable {
         cancelPrefetch: ((Model) -> Void)? = nil
     ) {
         self.id = id
+        self.model = model
         self.contentHash = contentHash
         self.makeCell = { collectionView, indexPath in
             collectionView.dequeueConfiguredReusableCell(
@@ -67,34 +69,74 @@ public struct CellController: Hashable {
             handler in { handler(model) }
         }
     }
-
+    
     /// Convenience initializer for creating a dummy controller for lookup by ID.
     /// This controller will trap if used for display.
     public init(id: AnyHashable) {
         self.id = id
+        self.model = ()
         self.contentHash = nil
         self.makeCell = { _, _ in fatalError("CellController initialized with 'init(id:)' is for lookup only and cannot be used for display.") }
         self.onSelect = nil
         self.onPrefetch = nil
         self.onCancelPrefetch = nil
     }
+    
+    // Internal helper for usage by onSelect modifier
+    internal init(
+        id: AnyHashable,
+        model: Any,
+        contentHash: AnyHashable?,
+        makeCell: @escaping (UICollectionView, IndexPath) -> UICollectionViewCell,
+        onSelect: (() -> Void)?,
+        onPrefetch: (() -> Void)?,
+        onCancelPrefetch: (() -> Void)?
+    ) {
+        self.id = id
+        self.model = model
+        self.contentHash = contentHash
+        self.makeCell = makeCell
+        self.onSelect = onSelect
+        self.onPrefetch = onPrefetch
+        self.onCancelPrefetch = onCancelPrefetch
+    }
+    
+    public func withSelection(_ handler: @escaping () -> Void) -> CellController {
+        // Chain with existing execution if needed, or just replace?
+        // Usually modifiers replace or append. Let's append to existing to be safe.
+        let current = self.onSelect
+        let newHandler: () -> Void = {
+            current?()
+            handler()
+        }
+        
+        return CellController(
+            id: id,
+            model: model,
+            contentHash: contentHash,
+            makeCell: makeCell,
+            onSelect: newHandler,
+            onPrefetch: onPrefetch,
+            onCancelPrefetch: onCancelPrefetch
+        )
+    }
 
     public static func == (lhs: CellController, rhs: CellController) -> Bool {
         lhs.id == rhs.id
     }
-
+    
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-
+    
     public func cell(in collectionView: UICollectionView, at indexPath: IndexPath) -> UICollectionViewCell {
         makeCell(collectionView, indexPath)
     }
-
+    
     public func didSelect() {
         onSelect?()
     }
-
+    
     public func prefetch() {
         onPrefetch?()
     }
