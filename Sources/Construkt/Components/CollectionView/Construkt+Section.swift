@@ -55,6 +55,7 @@ public struct Header: SectionComponent {
             elementKind: UICollectionView.elementKindSectionHeader,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
+            view.setAnimatedSkeletonView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }
@@ -80,6 +81,7 @@ public struct Footer: SectionComponent {
             elementKind: UICollectionView.elementKindSectionFooter,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
+            view.setAnimatedSkeletonView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }

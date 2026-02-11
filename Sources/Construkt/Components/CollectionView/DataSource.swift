@@ -30,73 +30,65 @@ public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSour
 
 public extension CollectionDiffableDataSource {
     func display(_ sections: [SectionController], completion: (() -> Void)? = nil) {
-        let currentSnapshot = snapshot()
-        let isFirstLoad = currentSnapshot.numberOfSections == 0
-        
-        // Build new snapshot
         var newSnapshot = CollectionSnapshot()
-        sections.forEach { section in
+        
+        // 1. Build the new structure
+        for section in sections {
             if !section.cells.isEmpty {
                 newSnapshot.appendSections([section])
                 newSnapshot.appendItems(section.cells, toSection: section)
             }
         }
         
-        if isFirstLoad {
-            // First load: use reloadData for instant display (no animation needed)
-            applySnapshotUsingReloadData(newSnapshot, completion: completion)
-        } else {
-            // Build content map from current snapshot before applying structural changes
+        // 2. Calculate reloads *before* applying
+        let currentSnapshot = snapshot()
+        let isFirstLoad = currentSnapshot.numberOfSections == 0
+        
+        if !isFirstLoad {
             let oldItemMap = buildContentMap(from: currentSnapshot)
-            let oldIds = Set(currentSnapshot.itemIdentifiers.map { $0.id })
             
-            // Apply structural diff (inserts/deletes/moves) without animation
-            apply(newSnapshot, animatingDifferences: false) { [weak self] in
-                guard let self = self else {
-                    completion?()
-                    return
+            // 2a. Find items that need reloading
+            let itemsToReload = newSnapshot.itemIdentifiers.filter { newItem in
+                guard let oldHash = oldItemMap[newItem.id] else { return false }
+                guard let newHash = newItem.contentHash else { return true }
+                return newHash != oldHash
+            }
+            
+            // 2b. Find sections that need reloading (header/footer changes)
+            // We can't rely on SectionController equality since it only checks uniqueId.
+            // We need to manually check if the supplementaries changed.
+            let oldSectionMap = Dictionary(uniqueKeysWithValues: currentSnapshot.sectionIdentifiers.map { ($0.identifier.uniqueId, $0) })
+            
+            let sectionsToReload = newSnapshot.sectionIdentifiers.filter { newSection in
+                guard let oldSection = oldSectionMap[newSection.identifier.uniqueId] else { return false }
+                
+                // Check if header changed ID
+                if let newHeader = newSection.header, let oldHeader = oldSection.header {
+                    if newHeader.id != oldHeader.id { return true }
+                } else if (newSection.header == nil) != (oldSection.header == nil) {
+                    return true
                 }
                 
-                // Find items that need reconfiguration:
-                // - nil contentHash: can't verify content unchanged → reconfigure
-                // - different contentHash: content confirmed changed → reconfigure
-                // - same non-nil contentHash: content confirmed unchanged → skip
-                let itemsToReconfigure = newSnapshot.itemIdentifiers.filter { item in
-                    // Only reconfigure items that existed before (new items already handled by apply)
-                    guard oldIds.contains(item.id) else { return false }
-                    
-                    guard let newHash = item.contentHash else {
-                        // No contentHash — can't verify unchanged, must reconfigure
-                        return true
-                    }
-                    guard let oldHash = oldItemMap[item.id] else {
-                        // Item existed but had no hash before — reconfigure
-                        return true
-                    }
-                    // Both have hashes — only reconfigure if different
-                    return oldHash != newHash
+                // Check if footer changed ID
+                if let newFooter = newSection.footer, let oldFooter = oldSection.footer {
+                    if newFooter.id != oldFooter.id { return true }
+                } else if (newSection.footer == nil) != (oldSection.footer == nil) {
+                    return true
                 }
-                
-                if !itemsToReconfigure.isEmpty {
-                    var reconfigSnapshot = self.snapshot()
-                    // Filter to only items that actually exist in the current snapshot
-                    // (guards against race conditions from overlapping display() calls)
-                    let currentIds = Set(reconfigSnapshot.itemIdentifiers.map { $0.id })
-                    let safeItems = itemsToReconfigure.filter { currentIds.contains($0.id) }
-                    
-                    if !safeItems.isEmpty {
-                        // Use reloadItems (not reconfigureItems) because each CellController
-                        // creates a new CellRegistration per emission — reconfigureItems
-                        // requires the same registration, which we can't guarantee.
-                        reconfigSnapshot.reloadItems(safeItems)
-                        // Enable animations to preserve orthogonal scroll positions
-                        self.apply(reconfigSnapshot, animatingDifferences: false)
-                    }
-                }
-                
-                completion?()
+
+                return false
+            }
+            
+            if !itemsToReload.isEmpty {
+                newSnapshot.reloadItems(itemsToReload)
+            }
+            if !sectionsToReload.isEmpty {
+                newSnapshot.reloadSections(sectionsToReload)
             }
         }
+        
+        // 3. Apply once
+        apply(newSnapshot, animatingDifferences: !isFirstLoad, completion: completion)
     }
     
     func appendItems(
