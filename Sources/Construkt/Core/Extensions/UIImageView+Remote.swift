@@ -3,8 +3,8 @@ import UIKit
 // Simple Image Cache to avoid re-downloading
 fileprivate let imageCache: NSCache<NSString, UIImage> = {
     let cache = NSCache<NSString, UIImage>()
-    cache.countLimit = 100 // Limit to 100 images
-    cache.totalCostLimit = 1024 * 1024 * 100 // 100 MB limit
+    cache.countLimit = 200 // Limit to 200 images
+    cache.totalCostLimit = 1024 * 1024 * 200 // 200 MB limit
     return cache
 }()
 

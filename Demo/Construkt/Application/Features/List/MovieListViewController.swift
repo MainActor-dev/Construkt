@@ -108,7 +108,17 @@ class MovieListViewController: UIViewController {
     private var gridSection: Section {
         Section(
             id:  MovieListSection.grid,
-            items: viewModel.moviesObservable.map { Array($0.enumerated()) }
+            items: viewModel.moviesObservable.map { Array($0.enumerated()) },
+            footer: Footer { [viewModel] in
+                CenteredView {
+                    ZStackView {
+                        ActivityIndicator(style: .large)
+                            .color(.white)
+                            .animating(viewModel.$paginationState.asObservable().map { $0.isPaginating })
+                    }
+                    .padding(12)
+                }
+            }
         ) { index, movie in
             Cell(movie, id: "movie-\(movie.id)-\(index)") { movie in
                 MovieGridCell(movie: movie)
