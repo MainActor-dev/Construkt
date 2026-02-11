@@ -88,7 +88,7 @@ public extension CollectionDiffableDataSource {
         }
         
         // 3. Apply once
-        apply(newSnapshot, animatingDifferences: !isFirstLoad, completion: completion)
+        apply(newSnapshot, animatingDifferences: false, completion: completion)
     }
     
     func appendItems(

@@ -47,7 +47,7 @@ public struct CollectionView: ModifiableView {
 
 public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
-    private(set) lazy var collectionView: UICollectionView = {
+    public private(set) lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         cv.backgroundColor = .clear
         cv.clipsToBounds = false

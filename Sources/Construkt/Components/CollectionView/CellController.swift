@@ -68,6 +68,17 @@ public struct CellController: Hashable {
         }
     }
 
+    /// Convenience initializer for creating a dummy controller for lookup by ID.
+    /// This controller will trap if used for display.
+    public init(id: AnyHashable) {
+        self.id = id
+        self.contentHash = nil
+        self.makeCell = { _, _ in fatalError("CellController initialized with 'init(id:)' is for lookup only and cannot be used for display.") }
+        self.onSelect = nil
+        self.onPrefetch = nil
+        self.onCancelPrefetch = nil
+    }
+
     public static func == (lhs: CellController, rhs: CellController) -> Bool {
         lhs.id == rhs.id
     }

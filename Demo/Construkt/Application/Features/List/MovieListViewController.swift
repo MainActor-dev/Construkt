@@ -71,7 +71,7 @@ class MovieListViewController: UIViewController {
             id: MovieListSection.filter,
             items: viewModel.filterItemsObservable
         ) { item in
-            Cell(item, id: "filter-\(item.id)") { item in
+            Cell(item, id: item.id) { item in
                 GenresCell(
                     id: item.id,
                     genre: Genre(id: item.id, name: item.title),
@@ -80,6 +80,7 @@ class MovieListViewController: UIViewController {
             }
             .onSelect { [weak self] _ in
                 self?.viewModel.selectGenre(item.genre)
+                self?.scrollToFilter(item)
             }
         }
         .layout { _ in
@@ -132,5 +133,29 @@ class MovieListViewController: UIViewController {
     private func showDetail(for movie: Movie) {
         let detailVC = MovieDetailViewController(movie: movie)
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    private func scrollToFilter(_ item: MovieListViewModel.FilterItem) {
+        // Access the public (via cast or our previous change) dataSource
+        guard let wrapper = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
+        
+        // We need to access the data source.
+        // Since `CollectionViewWrapperView` keeps it private, we either expose it or use a trick.
+        // Wait, `dataSource` property in wrapper is private.
+        // However, `collectionView.dataSource` returns the diffable data source object (type-erased as UICollectionViewDataSource).
+        // We can cast it.
+        
+        guard let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource else { return }
+        
+        // Use raw ID as requested
+        let searchKey = CellController(id: item.id)
+        
+        if let indexPath = dataSource.indexPath(for: searchKey) {
+            wrapper.collectionView.scrollToItem(
+                at: indexPath,
+                at: .centeredHorizontally,
+                animated: true
+            )
+        }
     }
 }
