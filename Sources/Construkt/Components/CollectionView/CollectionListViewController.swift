@@ -115,26 +115,5 @@ extension CollectionListViewController {
         registerDecorationView?(layout)
         collectionView.setCollectionViewLayout(layout, animated: false)
     }
-    
-    
-//    func registerPagination(
-//        _ scrollView: UIScrollView,
-//        model: ListPaginationModel?,
-//        handler: ((Int) -> Void)?
-//    ) {
-//        guard scrollView.isDragging else { return }
-//        
-//        let offsetY = scrollView.contentOffset.y
-//        let scrollHeight = scrollView.contentSize.height - scrollView.frame.height
-//        let finalOffsetY = offsetY < 0 ? 0 : offsetY
-//        let finalHeight = scrollHeight < 0 ? 0 : scrollHeight
-//        
-//        guard let model = model,
-//              let nextPage = model.nextPage
-//        else { return }
-//        
-//        if (finalOffsetY > finalHeight) && !model.isLastPage && !model.isPaginating {
-//            DispatchQueue.main.async { handler?(nextPage) }
-//        }
-//    }
 }
+

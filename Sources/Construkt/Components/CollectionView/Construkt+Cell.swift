@@ -113,21 +113,52 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
     
     public func asCells() -> [CellController] {
         if let model = model {
+            let wrapper = CellConfigurationWrapper(model: model, configure: configure)
+            let registration = RegistrationCache.register(cell: C.self, model: Model.self)
+            
              return [
                 CellController(
                     id: id,
-                    model: model,
-                    registration: CellRegistration<C, Model> { cell, _, item in
-                        configure(cell, item)
-                    },
+                    model: wrapper,
+                    registration: registration,
                     contentHash: (model as? AnyHashable),
-                    didSelect: onSelect
+                    didSelect: { wrapper in
+                        onSelect?(wrapper.model)
+                    }
                 )
              ]
         } else if let count = skeletonCount {
             return Skeleton<C>.create(count: count, identifier: "skeleton_\(id)")
         }
         return []
+    }
+}
+
+// MARK: - Registration Caching
+
+struct CellConfigurationWrapper<C: UICollectionViewCell, M>: CellContentWrapper {
+    let model: M
+    let configure: (C, M) -> Void
+    
+    var originalModel: Any { model }
+}
+
+class RegistrationCache {
+    static var cache = [String: Any]()
+    
+    static func register<C: UICollectionViewCell, M>(cell: C.Type, model: M.Type) -> UICollectionView.CellRegistration<C, CellConfigurationWrapper<C, M>> {
+        let key = "\(String(describing: C.self))_\(String(describing: M.self))"
+        
+        if let existing = cache[key] as? UICollectionView.CellRegistration<C, CellConfigurationWrapper<C, M>> {
+            return existing
+        }
+        
+        let registration = UICollectionView.CellRegistration<C, CellConfigurationWrapper<C, M>> { cell, _, wrapper in
+            wrapper.configure(cell, wrapper.model)
+        }
+        
+        cache[key] = registration
+        return registration
     }
 }
 

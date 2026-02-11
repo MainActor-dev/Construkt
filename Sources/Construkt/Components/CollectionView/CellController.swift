@@ -24,6 +24,10 @@
 
 import UIKit
 
+public protocol CellContentWrapper {
+    var originalModel: Any { get }
+}
+
 public enum CellControllerState: Equatable {
     public typealias TotalSkeleton = Int
     case loading(TotalSkeleton)

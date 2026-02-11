@@ -145,7 +145,7 @@ extension NSCollectionLayoutBoundarySupplementaryItem {
     ) -> NSCollectionLayoutBoundarySupplementaryItem {
         let header = NSCollectionLayoutBoundarySupplementaryItem(
             layoutSize: .entireWidth(withHeight: height),
-            elementKind: UICollectionView.elementKindSectionHeader,
+            elementKind: UICollectionView.elementKindSectionFooter,
             alignment: .bottom
         )
         header.pinToVisibleBounds = isSticky

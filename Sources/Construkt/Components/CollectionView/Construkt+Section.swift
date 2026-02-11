@@ -50,8 +50,9 @@ extension Array: SectionComponent where Element == CellController {}
 public struct Header: SectionComponent {
     public let controller: SupplementaryController
     
-    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+    public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
+            id: id ?? AnyHashable(UUID()),
             elementKind: UICollectionView.elementKindSectionHeader,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
@@ -76,8 +77,9 @@ public struct Header: SectionComponent {
 public struct Footer: SectionComponent {
     public let controller: SupplementaryController
     
-    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+    public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
+            id: id ?? AnyHashable(UUID()),
             elementKind: UICollectionView.elementKindSectionFooter,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
@@ -269,7 +271,13 @@ public struct Section: SectionObservable {
         let improved: Observable<[SectionController]> = observable.map { sections in
             sections.map { section in
                 let newCells = section.cells.map { cell in
-                    guard let model = cell.model as? T else { return cell }
+                    var modelToUse = cell.model
+                    
+                    if let wrapper = modelToUse as? CellContentWrapper {
+                        modelToUse = wrapper.originalModel
+                    }
+                    
+                    guard let model = modelToUse as? T else { return cell }
                     
                     return cell.withSelection {
                         handler(model)
@@ -295,7 +303,13 @@ public struct Section: SectionObservable {
             
                 return sections.map { section in
                     let newCells = section.cells.map { cell in
-                        guard let model = cell.model as? T else { return cell }
+                        var modelToUse = cell.model
+                        
+                        if let wrapper = modelToUse as? CellContentWrapper {
+                            modelToUse = wrapper.originalModel
+                        }
+                        
+                        guard let model = modelToUse as? T else { return cell }
                         return cell.withSelection { [weak target] in
                             guard let target = target else { return }
                             handler(target, model)

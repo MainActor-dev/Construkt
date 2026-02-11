@@ -35,7 +35,7 @@ class HomeViewController: UIViewController {
         return ZStackView {
             CollectionView {
                 heroSection
-                genresSection
+                // genresSection
                 popularSection
                 upcomingSection
                 topRatedSection

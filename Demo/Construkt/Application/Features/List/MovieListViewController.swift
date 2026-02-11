@@ -27,6 +27,7 @@ class MovieListViewController: UIViewController {
     
     deinit {
         print("MovieListViewController deinit")
+        ImageCache.clear()
     }
     
     private func setupUI() {
@@ -37,10 +38,14 @@ class MovieListViewController: UIViewController {
                      filterSection
                      gridSection
                 }
+                .pagination(model: viewModel.$paginationState) { [weak self] _ in
+                    self?.viewModel.loadMore()
+                }
                 .backgroundColor(UIColor("#0A0A0A"))
                 .with {
                     $0.collectionView.contentInset.top = 40
                 }
+               
                 CustomNavigationBar(
                     leading: [
                         HStackView {
@@ -103,10 +108,9 @@ class MovieListViewController: UIViewController {
     private var gridSection: Section {
         Section(
             id:  MovieListSection.grid,
-            items: viewModel.moviesObservable,
-            header: nil
-        ) { movie in
-            Cell(movie, id: "movie-\(movie.id)") { movie in
+            items: viewModel.moviesObservable.map { Array($0.enumerated()) }
+        ) { index, movie in
+            Cell(movie, id: "movie-\(movie.id)-\(index)") { movie in
                 MovieGridCell(movie: movie)
             }
         }
@@ -129,8 +133,9 @@ class MovieListViewController: UIViewController {
                 heightDimension: .fractionalWidth(0.75) // Aspect ratio for poster
             )
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            
-            return NSCollectionLayoutSection(group: group)
+            let section = NSCollectionLayoutSection(group: group)
+            section.boundarySupplementaryItems = [.footer(height: .absolute(40))]
+            return section
         }
     }
     
