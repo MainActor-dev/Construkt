@@ -120,6 +120,7 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
                     registration: CellRegistration<C, Model> { cell, _, item in
                         configure(cell, item)
                     },
+                    contentHash: (model as? AnyHashable),
                     didSelect: onSelect
                 )
              ]

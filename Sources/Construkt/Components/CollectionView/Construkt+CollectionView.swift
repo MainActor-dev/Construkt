@@ -94,6 +94,12 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         return CellControllerAdapter(dataSource: dataSource)
     }()
     
+    /// Cached section map for O(1) layout provider lookups
+    private var currentSectionMap: [String: SectionController] = [:]
+    
+    /// Tracks whether the compositional layout has been set up
+    private var hasInitializedLayout = false
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
@@ -116,42 +122,49 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     }
     
     func update(sections: [SectionController]) {
-        dataSource.display(sections)
+        // Update the cached section map before applying data
+        currentSectionMap = Dictionary(
+            uniqueKeysWithValues: sections.map { ($0.identifier.uniqueId, $0) }
+        )
         
-        // Create lookup dictionary for O(1) access
-        let sectionMap = Dictionary(uniqueKeysWithValues: sections.map { ($0.identifier.uniqueId, $0) })
-        
-        let layout = UICollectionViewCompositionalLayout { [weak self] index, _ in
-            guard let self = self,
-                  let sect = self.dataSource.sectionIdentifier(at: index) else { return nil }
-            
-            // O(1) Lookup
-            if let sectionController = sectionMap[sect],
-               let layout = sectionController.layoutProvider?(sect) {
+        if !hasInitializedLayout {
+            // Create layout once — the provider closure reads from currentSectionMap
+            let layout = UICollectionViewCompositionalLayout { [weak self] index, _ in
+                guard let self = self,
+                      let sect = self.dataSource.sectionIdentifier(at: index) else { return nil }
                 
-                // Hide empty sections logic
-                if self.dataSource.snapshot().numberOfItems(inSection: sectionController) == 0 {
-                   layout.contentInsets = .zero
-                   layout.decorationItems = []
-                   layout.boundarySupplementaryItems = []
-                } else {
-                    // Filter hidden or missing headers/footers
-                    layout.boundarySupplementaryItems = layout.boundarySupplementaryItems.filter { item in
-                        if item.elementKind == UICollectionView.elementKindSectionHeader {
-                            return sectionController.header != nil && !(sectionController.header?.isHidden ?? false)
-                        } else if item.elementKind == UICollectionView.elementKindSectionFooter {
-                            return sectionController.footer != nil && !(sectionController.footer?.isHidden ?? false)
+                // O(1) Lookup
+                if let sectionController = self.currentSectionMap[sect],
+                   let layout = sectionController.layoutProvider?(sect) {
+                    
+                    // Hide empty sections logic
+                    if self.dataSource.snapshot().numberOfItems(inSection: sectionController) == 0 {
+                       layout.contentInsets = .zero
+                       layout.decorationItems = []
+                       layout.boundarySupplementaryItems = []
+                    } else {
+                        // Filter hidden or missing headers/footers
+                        layout.boundarySupplementaryItems = layout.boundarySupplementaryItems.filter { item in
+                            if item.elementKind == UICollectionView.elementKindSectionHeader {
+                                return sectionController.header != nil && !(sectionController.header?.isHidden ?? false)
+                            } else if item.elementKind == UICollectionView.elementKindSectionFooter {
+                                return sectionController.footer != nil && !(sectionController.footer?.isHidden ?? false)
+                            }
+                            return true
                         }
-                        return true
                     }
+                    
+                    return layout
                 }
-                
-                return layout
+                return nil
             }
-            return nil
+            
+            collectionView.setCollectionViewLayout(layout, animated: false)
+            hasInitializedLayout = true
         }
         
-        collectionView.setCollectionViewLayout(layout, animated: false)
+        // Apply data changes (smart incremental diffing)
+        dataSource.display(sections)
     }
     
     

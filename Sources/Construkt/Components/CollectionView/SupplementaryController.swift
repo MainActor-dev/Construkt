@@ -26,15 +26,18 @@
 import UIKit
 
 public struct SupplementaryController {
+    public var id: AnyHashable
     let elementKind: String
     var dequeue: (UICollectionView, IndexPath) -> UICollectionReusableView
     var isHidden: Bool = false
     
     public init<ViewType: UICollectionReusableView>(
+        id: AnyHashable = UUID(),
         elementKind: String,
         viewType: ViewType.Type,
         configure: @escaping (ViewType) -> Void
     ) {
+        self.id = id
         self.elementKind = elementKind
         let registration = UICollectionView.SupplementaryRegistration<ViewType>(elementKind: elementKind) { view, _, _ in
             configure(view)
@@ -46,6 +49,8 @@ public struct SupplementaryController {
     
     internal func asSkeleton() -> SupplementaryController {
         var copy = self
+        // Ensure skeleton has a different ID to force section reload
+        copy.id = UUID()
         let originalDequeue = self.dequeue
         copy.dequeue = { collectionView, indexPath in
             let view = originalDequeue(collectionView, indexPath)

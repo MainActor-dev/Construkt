@@ -29,70 +29,66 @@ public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionContro
 public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
 
 public extension CollectionDiffableDataSource {
-    func updateSections(
-        _ sections: [SectionController],
-        beforeItem: CellController? = nil,
-        completion: (() -> Void)? = nil,
-        animated: Bool = false
-    ) {
-        var snapshot = snapshot()
-        
-        defer {
-            applySnapshot(snapshot, completion: completion)
-        }
-                
-        let displayedSections = snapshot.sectionIdentifiers
-        let newSections = sections.filter { !displayedSections.contains($0) }
-        newSections.forEach { newSection in
-            snapshot.appendSections([newSection])
-            snapshot.appendItems(newSection.cells, toSection: newSection)
-        }
-        
-        print("[BEKA] displayed sections", displayedSections.map { $0.identifier.uniqueId })
-        print("[BEKA] new sections", sections.map { $0.identifier.uniqueId })
-
-        let existingSections = displayedSections.filter { sections.contains($0) }
-        
-        print("[BEKA] existing sections", existingSections.map { $0.identifier.uniqueId })
-
-        zip(existingSections, sections).forEach { old, new in
-            guard old.identifier.uniqueId == new.identifier.uniqueId else { return  }
-            
-            if new.identifier.uniqueId == "grid" {
-                print("[BEKA] new items", new.cells.map { $0.id })
-                print("[BEKA] old items", old.cells.map { $0.id })
-            }
-            let newItems = new.cells
-            let oldItems = snapshot.itemIdentifiers(inSection: old)
-            var filtered = newItems.filter { !oldItems.contains($0) }
-            
-            /// Delete items if needed
-            let toBeDeletedItems = oldItems.filter { !newItems.contains($0) }
-            snapshot.deleteItems(toBeDeletedItems)
-            
-            if let beforeItem = beforeItem {
-                if snapshot.itemIdentifiers.contains(beforeItem) {
-                    snapshot.insertItems(filtered, beforeItem: beforeItem)
-                } else {
-                    filtered.removeAll(where: { $0 == beforeItem })
-                    snapshot.appendItems(filtered, toSection: old)
-                    snapshot.appendItems([beforeItem], toSection: old)
-                }
-            } else {
-                snapshot.appendItems(filtered, toSection: new)
-            }
-        }
-    }
-    
     func display(_ sections: [SectionController], completion: (() -> Void)? = nil) {
-        var snapshot = CollectionSnapshot()
-        sections.forEach { section in
+        var newSnapshot = CollectionSnapshot()
+        
+        // 1. Build the new structure
+        for section in sections {
             if !section.cells.isEmpty {
-                snapshot.appendSections([section])
-                snapshot.appendItems(section.cells, toSection: section)
+                newSnapshot.appendSections([section])
+                newSnapshot.appendItems(section.cells, toSection: section)
             }
         }
-        applySnapshotUsingReloadData(snapshot, completion: completion)
+        
+        // 2. Calculate reloads *before* applying
+        let currentSnapshot = snapshot()
+        let isFirstLoad = currentSnapshot.numberOfSections == 0
+        
+        if !isFirstLoad {
+            let oldItemMap = buildContentMap(from: currentSnapshot)
+            
+            // 2a. Find items that need reloading
+            let itemsToReload = newSnapshot.itemIdentifiers.filter { newItem in
+                guard let oldHash = oldItemMap[newItem.id] else { return false }
+                guard let newHash = newItem.contentHash else { return true }
+                return newHash != oldHash
+            }
+            
+            // 2b. Find sections that need reloading (header/footer changes)
+            // We can't rely on SectionController equality since it only checks uniqueId.
+            // We need to manually check if the supplementaries changed.
+            let oldSectionMap = Dictionary(uniqueKeysWithValues: currentSnapshot.sectionIdentifiers.map { ($0.identifier.uniqueId, $0) })
+            
+            let sectionsToReload = newSnapshot.sectionIdentifiers.filter { newSection in
+                guard let oldSection = oldSectionMap[newSection.identifier.uniqueId] else { return false }
+                
+                // Check if header changed ID
+                if let newHeader = newSection.header, let oldHeader = oldSection.header {
+                    if newHeader.id != oldHeader.id { return true }
+                } else if (newSection.header == nil) != (oldSection.header == nil) {
+                    return true
+                }
+                
+                // Check if footer changed ID
+                if let newFooter = newSection.footer, let oldFooter = oldSection.footer {
+                    if newFooter.id != oldFooter.id { return true }
+                } else if (newSection.footer == nil) != (oldSection.footer == nil) {
+                    return true
+                }
+
+                return false
+            }
+            
+            if !itemsToReload.isEmpty {
+                newSnapshot.reloadItems(itemsToReload)
+            }
+            if !sectionsToReload.isEmpty {
+                newSnapshot.reloadSections(sectionsToReload)
+            }
+        }
+        
+        // 3. Apply once
+        apply(newSnapshot, animatingDifferences: !isFirstLoad, completion: completion)
     }
     
     func appendItems(
@@ -105,13 +101,13 @@ public extension CollectionDiffableDataSource {
         
         var snapshot = snapshot()
         snapshot.appendItems(items, toSection: section)
-        applySnapshot(snapshot, animated: animated)
+        apply(snapshot, animatingDifferences: animated)
     }
     
     func deleteItems(_ items: [CellController]) {
         var snapshot = snapshot()
         snapshot.deleteItems(items)
-        applySnapshot(snapshot, animated: true)
+        apply(snapshot, animatingDifferences: true)
     }
     
     func section(at index: Int) -> SectionController? {
@@ -122,15 +118,18 @@ public extension CollectionDiffableDataSource {
         return snapshot().sectionIdentifiers[safe: index]?.identifier.uniqueId
     }
     
-    private func applySnapshot(
-        _  snapshot: CollectionSnapshot,
-        animated: Bool = false,
-        completion: (() -> Void)? = nil
-    ) {
-        if #available(iOS 15.0, *) {
-            applySnapshotUsingReloadData(snapshot, completion: completion)
-        } else {
-            apply(snapshot, animatingDifferences: animated)
+    // MARK: - Private Helpers
+    
+    /// Builds a lookup of [CellController.id → contentHash] from the current snapshot
+    private func buildContentMap(
+        from snapshot: CollectionSnapshot
+    ) -> [AnyHashable: AnyHashable] {
+        var map: [AnyHashable: AnyHashable] = [:]
+        for item in snapshot.itemIdentifiers {
+            if let hash = item.contentHash {
+                map[item.id] = hash
+            }
         }
+        return map
     }
 }
