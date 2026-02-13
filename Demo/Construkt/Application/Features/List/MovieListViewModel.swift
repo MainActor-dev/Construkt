@@ -38,6 +38,7 @@ public class MovieListViewModel {
     // MARK: - Properties
     public let title: String
     public let genres: [Genre] // Available filters
+    
     private let sectionType: HomeSection
     private let service: MovieServiceProtocol
     
@@ -49,11 +50,13 @@ public class MovieListViewModel {
         title: String,
         sectionType: HomeSection,
         genres: [Genre],
+        selectedGenre: Genre?,
         service: MovieServiceProtocol = MovieService()
     ) {
         self.title = title
         self.sectionType = sectionType
         self.genres = genres
+        self.selectedGenre = selectedGenre
         self.service = service
         
         // Initial Fetch

@@ -35,7 +35,7 @@ class HomeViewController: UIViewController {
         return ZStackView {
             CollectionView {
                 heroSection
-                // genresSection
+                genresSection
                 popularSection
                 upcomingSection
                 topRatedSection
@@ -104,6 +104,9 @@ class HomeViewController: UIViewController {
             Cell(genre, id: "genre-\(genre.id)") { genre in
                 GenresCell(id: genre.id, genre: genre)
             }
+        }
+        .onSelect(on: self) { (self, genre: Genre) in
+            self.showMovieList(for: .categories, selectedGenre: genre)
         }
         .skeleton(
             count: 6,
@@ -213,9 +216,18 @@ extension HomeViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
-    private func showMovieList(for section: HomeSection) {
+    private func showMovieList(
+        for section: HomeSection,
+        selectedGenre: Genre? = nil
+    ) {
         let title: String
         switch section {
+        case .categories:
+            if let selectedGenre {
+                title = selectedGenre.name
+            } else {
+                title = "Genre"
+            }
         case .popular: title = "Popular Movies"
         case .upcoming: title = "Upcoming Movies"
         case .topRated: title = "Top Rated Movies"
@@ -225,7 +237,8 @@ extension HomeViewController {
         let viewModel = MovieListViewModel(
             title: title,
             sectionType: section,
-            genres: viewModel.currentGenres
+            genres: viewModel.currentGenres,
+            selectedGenre: selectedGenre
         )
         let vc = MovieListViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)

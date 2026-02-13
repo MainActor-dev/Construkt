@@ -12,6 +12,8 @@ enum MovieListSection: String, SectionControllerIdentifier {
 class MovieListViewController: UIViewController {
     
     private let viewModel: MovieListViewModel
+    private let disposeBag = DisposeBag()
+    private var filterCollectionViewWrapper: CollectionViewWrapperView?
     
     init(viewModel: MovieListViewModel) {
         self.viewModel = viewModel
@@ -23,6 +25,7 @@ class MovieListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        observe()
     }
     
     deinit {
@@ -30,47 +33,45 @@ class MovieListViewController: UIViewController {
         ImageCache.clear()
     }
     
+    private func observe() {
+        viewModel.$selectedGenre
+            .observe(on: MainScheduler.asyncInstance)
+            .compactMap { $0 }
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak self] item in
+                self?.scrollToFilter(item.id)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setupUI() {
         view.backgroundColor = UIColor("#0A0A0A")
         view.embed(
-            ContainerView {
-                CollectionView {
-                     filterSection
-                     gridSection
+            ZStackView {
+                VStackView {
+                    CollectionView {
+                        filterSection
+                    }
+                    .reference(&filterCollectionViewWrapper)
+                    .backgroundColor(UIColor("#0A0A0A"))
+                    .height(56)
+                    .zIndex(100)
+
+                    CollectionView {
+                         gridSection
+                    }
+                    .pagination(model: viewModel.$paginationState) { [weak self] _ in
+                        self?.viewModel.loadMore()
+                    }
+                    .onRefresh(viewModel.$isLoading) { [weak self] in
+                        self?.viewModel.refresh()
+                    }
                 }
-                .pagination(model: viewModel.$paginationState) { [weak self] _ in
-                    self?.viewModel.loadMore()
-                }
-                .backgroundColor(UIColor("#0A0A0A"))
-                .with {
-                    $0.collectionView.contentInset.top = 40
-                }
-               
-                CustomNavigationBar(
-                    leading: [
-                        HStackView {
-                            ImageView(systemName: "arrow.left")
-                                .tintColor(.white)
-                                .size(width: 24, height: 24)
-                                .contentMode(.scaleAspectFit)
-                        }
-                            .onTapGesture { [weak self] _ in
-                                self?.navigationController?.popViewController(animated: true)
-                            }
-                    ],
-                    customTitle: LabelView(viewModel.title)
-                        .font(.systemFont(ofSize: 18, weight: .semibold))
-                        .color(.white),
-                    trailing: [
-                        ImageView(systemName: "arrow.up.arrow.down")
-                            .tintColor(.gray)
-                            .size(width: 20, height: 20)
-                            .contentMode(.scaleAspectFit)
-                    ]
-                )
-                .position(.top)
-                .height(48)
-                .backgroundColor(UIColor("#0A0A0A"))
+                .padding(top: 40)
+                
+                MovieListNavBar(title: viewModel.title, onTapBack: { [weak self] in
+                    self?.navigationController?.popViewController(animated: true)
+                })
             }
         )
     }
@@ -90,7 +91,6 @@ class MovieListViewController: UIViewController {
         }
         .onSelect(on: self) { (self, item: MovieListViewModel.FilterItem) in
             self.viewModel.selectGenre(item.genre)
-            self.scrollToFilter(item)
         }
         .layout { _ in
             return .layout(
@@ -99,7 +99,7 @@ class MovieListViewController: UIViewController {
                     height: .absolute(40)
                 ),
                 spacing: 12,
-                insets: .init(v: 16, h: 16),
+                insets: .init(v: 8, h: 16),
                 scrolling: .continuous
             )
         }
@@ -154,12 +154,19 @@ class MovieListViewController: UIViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
-    private func scrollToFilter(_ item: MovieListViewModel.FilterItem) {
-        guard let wrapper = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
-        guard let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource else { return }
+    private func scrollToFilter(_ id: Int) {
+        guard let wrapper = filterCollectionViewWrapper,
+              let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource else { return }
         
-        let searchKey = CellController(id: item.id)
+        // Retry scroll if data isn't ready yet
+        if dataSource.snapshot().numberOfItems == 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.scrollToFilter(id)
+            }
+            return
+        }
         
+        let searchKey = CellController(id: id)
         if let indexPath = dataSource.indexPath(for: searchKey) {
             wrapper.collectionView.scrollToItem(
                 at: indexPath,

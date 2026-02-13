@@ -323,6 +323,17 @@ public extension CollectionView {
 
 public extension ModifiableView where Base: CollectionViewWrapperView {
     @discardableResult
+    func contentInset(
+        top: CGFloat = 0,
+        left: CGFloat = 0,
+        bottom: CGFloat = 0,
+        right: CGFloat = 0
+    ) -> ViewModifier<Base> {
+        modifiableView.collectionView.contentInset = .init(top: top, left: left, bottom: bottom, right: right)
+        return ViewModifier(modifiableView)
+    }
+    
+    @discardableResult
     func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
         modifiableView.setupRefreshControl(action: action)
         

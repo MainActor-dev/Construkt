@@ -31,10 +31,6 @@ final class MovieDetailViewController: UIViewController {
         fetchDetail()
     }
     
-    deinit {
-        ImageCache.clear()
-    }
-    
     private func fetchDetail() {
         viewModel.selectMovie(movie)
     }
@@ -65,7 +61,7 @@ final class MovieDetailViewController: UIViewController {
                     .onReceive(safeDetails.map { $0.backdropURL ?? $0.posterURL }) { context in
                         context.view.setImage(from: context.value)
                     }
-                    .onReceive(viewModel.isLoadingDetails){ context in
+                    .onReceive(viewModel.isLoadingDetails) { context in
                         context.view.isHidden = context.value
                     }
                     .with { [weak self] view in

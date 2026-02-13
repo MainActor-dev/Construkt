@@ -132,6 +132,10 @@ extension ModifiableView {
         }
     }
     
+    @discardableResult
+    public func zIndex(_ position: CGFloat) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { $0.layer.zPosition = position }
+    }
 }
 
 extension UIView {
