@@ -245,10 +245,11 @@ extension HomeViewController {
         let heroCells: [HeroCollectionCell]
         
         // Cache the container view to avoid expensive recursive searches
-        if let container = cachedHeroContainerView {
+        // Also validate that the cached container is still effectively in the hierarchy (e.g. has a window)
+        if let container = cachedHeroContainerView, container.window != nil {
             heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
         } else {
-            // Initial search
+            // Initial search or cache invalidation
             heroCells = findAllHeroCells(in: collectionView)
             if let firstCell = heroCells.first {
                 cachedHeroContainerView = firstCell.superview

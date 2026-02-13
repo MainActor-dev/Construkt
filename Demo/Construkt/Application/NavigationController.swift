@@ -1,4 +1,3 @@
-
 import UIKit
 
 class NavigationController: UINavigationController, UIGestureRecognizerDelegate {
@@ -11,7 +10,6 @@ class NavigationController: UINavigationController, UIGestureRecognizerDelegate 
         interactivePopGestureRecognizer?.delegate = self
     }
     
-    // UIGestureRecognizerDelegate
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         // Only allow swipe back if there is more than one view controller on the stack
         return viewControllers.count > 1

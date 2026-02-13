@@ -298,7 +298,7 @@ public extension CollectionView {
         let stateObservable = binding.asObservable()
         
         scrollViewObservable
-            .throttle(.milliseconds(100), scheduler: MainScheduler.instance)
+            .throttle(.milliseconds(250), scheduler: MainScheduler.instance)
             .withLatestFrom(stateObservable) { ($0, $1) }
             .subscribe(onNext: { (scrollView, model) in
                 guard scrollView.isDragging else { return }

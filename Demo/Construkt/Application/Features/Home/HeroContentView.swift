@@ -105,6 +105,9 @@ class HeroContentView: UIView {
         
         titleLabel?.text = movie.title
         ratingLabel?.text = String(format: "%.1f", movie.voteAverage)
+        
+        // Reset state for reuse
+        setScrollProgress(0)
     }
     
     // MARK: - Animation
@@ -119,9 +122,5 @@ class HeroContentView: UIView {
         
         container.transform = transform
         container.alpha = alpha
-    }
-    
-    func setContentHidden(_ hidden: Bool, animated: Bool) {
-        setScrollProgress(hidden ? 1.0 : 0.0)
     }
 }
