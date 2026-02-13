@@ -56,6 +56,7 @@ class MovieListViewController: UIViewController {
                     .backgroundColor(UIColor("#0A0A0A"))
                     .height(56)
                     .zIndex(100)
+                    .clipsToBounds(true)
 
                     CollectionView {
                          gridSection
