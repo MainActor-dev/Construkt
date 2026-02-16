@@ -113,7 +113,12 @@ final class MovieDetailViewController: UIViewController {
                     .reference(&scrollView)
                     
                     // Overlay Navigation Bar
-                    navigationBar
+                    MovieDetailNavBar(
+                        title: movie.title,
+                        onBack: { [weak self] in self?.navigationController?.popViewController(animated: true) },
+                        backgroundViewCapture: { [weak self] view in self?.navBarBackgroundView = view },
+                        titleLabelCapture: { [weak self] view in self?.navBarTitleLabel = view }
+                    )
                     
                     // Loading Indicator
                     LoadingView()
@@ -151,57 +156,6 @@ final class MovieDetailViewController: UIViewController {
         let titleEnd: CGFloat = 350
         let titleAlpha = min(1.0, max(0.0, (yOffset - titleStart) / (titleEnd - titleStart)))
         navBarTitleLabel?.alpha = titleAlpha
-    }
-    
-    private var navigationBar: View {
-        ZStackView {
-            GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
-                .height(100)
-                .alpha(0) // Start transparent
-                .with { [weak self] view in
-                    self?.navBarBackgroundView = view
-                }
-            
-            // Title (Centered)
-            
-            
-            CustomNavigationBar(
-                leading: [
-                    ButtonView()
-                        .with { $0.setImage(UIImage(systemName: "arrow.left"), for: .normal) }
-                        .tintColor(.white)
-                        .backgroundColor(UIColor.black.withAlphaComponent(0.3), for: .normal)
-                        .cornerRadius(20)
-                        .size(width: 40, height: 40)
-                        .onTap { [weak self] _ in self?.navigationController?.popViewController(animated: true) },
-                    LabelView(movie.title)
-                        .font(.systemFont(ofSize: 17, weight: .semibold))
-                        .color(.white)
-                        .alignment(.center)
-                        .alpha(0)
-                        .with { [weak self] view in
-                            self?.navBarTitleLabel = view
-                        }
-                ],
-                trailing: [
-                    ButtonView()
-                        .with { $0.setImage(UIImage(systemName: "heart"), for: .normal) }
-                        .tintColor(.white)
-                        .backgroundColor(UIColor.black.withAlphaComponent(0.3), for: .normal)
-                        .cornerRadius(20)
-                        .size(width: 40, height: 40),
-                    
-                    ButtonView()
-                        .with { $0.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal) }
-                        .tintColor(.white)
-                        .backgroundColor(UIColor.black.withAlphaComponent(0.3), for: .normal)
-                        .cornerRadius(20)
-                        .size(width: 40, height: 40)
-                ]
-            )
-        }
-        .position(.top)
-        .height(48)
     }
     
     private func heroSectionContent(details: Observable<MovieDetail>) -> View {
