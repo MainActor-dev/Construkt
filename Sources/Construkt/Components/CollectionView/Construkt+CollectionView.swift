@@ -47,7 +47,7 @@ public struct CollectionView: ModifiableView {
 
 public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
-    private(set) lazy var collectionView: UICollectionView = {
+    public private(set) lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
         cv.backgroundColor = .clear
         cv.clipsToBounds = false
@@ -284,9 +284,55 @@ public extension CollectionView {
             
         return self
     }
+    
+    func pagination<B: RxBinding>(
+        model binding: B,
+        threshold: CGFloat = 100,
+        handler: @escaping (Int) -> Void
+    ) -> CollectionView where B.T == ListPaginationModel {
+        
+        let scrollViewObservable =  modifiableView.rx.methodInvoked(#selector(CollectionViewWrapperView.scrollViewDidScroll(_:)))
+            .map { $0.first as? UIScrollView }
+            .compactMap { $0 }
+        
+        let stateObservable = binding.asObservable()
+        
+        scrollViewObservable
+            .throttle(.milliseconds(250), scheduler: MainScheduler.instance)
+            .withLatestFrom(stateObservable) { ($0, $1) }
+            .subscribe(onNext: { (scrollView, model) in
+                guard scrollView.isDragging else { return }
+                
+                let offsetY = scrollView.contentOffset.y
+                let contentHeight = scrollView.contentSize.height
+                let frameHeight = scrollView.frame.height
+                
+                let triggerDistance = contentHeight - frameHeight - threshold
+                
+                if offsetY > triggerDistance {
+                    if !model.isPaginating && !model.isLastPage {
+                        handler(model.nextPage)
+                    }
+                }
+            })
+            .disposed(by: modifiableView.rxDisposeBag)
+        
+        return self
+    }
 }
 
 public extension ModifiableView where Base: CollectionViewWrapperView {
+    @discardableResult
+    func contentInset(
+        top: CGFloat = 0,
+        left: CGFloat = 0,
+        bottom: CGFloat = 0,
+        right: CGFloat = 0
+    ) -> ViewModifier<Base> {
+        modifiableView.collectionView.contentInset = .init(top: top, left: left, bottom: bottom, right: right)
+        return ViewModifier(modifiableView)
+    }
+    
     @discardableResult
     func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
         modifiableView.setupRefreshControl(action: action)

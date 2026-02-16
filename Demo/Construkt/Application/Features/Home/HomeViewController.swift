@@ -77,9 +77,9 @@ class HomeViewController: UIViewController {
             Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
                 cell.configure(with: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { [weak self] _ in
             let layout = HomeSection.hero.layout
@@ -104,6 +104,9 @@ class HomeViewController: UIViewController {
             Cell(genre, id: "genre-\(genre.id)") { genre in
                 GenresCell(id: genre.id, genre: genre)
             }
+        }
+        .onSelect(on: self) { (self, genre: Genre) in
+            self.showMovieList(for: .categories, selectedGenre: genre)
         }
         .skeleton(
             count: 6,
@@ -130,9 +133,9 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "popular-\(movie.id)") { movie in
                 PosterCell(movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { _ in
             return HomeSection.popular.layout
@@ -159,9 +162,9 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "upcoming-\(movie.id)") { movie in
                 UpcomingCell(movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
         }
         .layout { _ in
             return HomeSection.upcoming.layout
@@ -189,9 +192,12 @@ class HomeViewController: UIViewController {
             Cell(movie, id: "top-\(movie.id)") { movie in
                 TopRatedCell(index: index + 1, movie: movie)
             }
-            .onSelect { [weak self] movie in
-                self?.showDetail(for: movie)
-            }
+        }
+        .onSelect(on: self) { (me, movie: Movie) in
+            me.showDetail(for: movie)
+        }
+        .onSelect(on: self) { (me, ad: String) in
+            print("Ad Selected: \(ad)")
         }
         .layout { _ in
             return HomeSection.topRated.layout
@@ -210,9 +216,18 @@ extension HomeViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
-    private func showMovieList(for section: HomeSection) {
+    private func showMovieList(
+        for section: HomeSection,
+        selectedGenre: Genre? = nil
+    ) {
         let title: String
         switch section {
+        case .categories:
+            if let selectedGenre {
+                title = selectedGenre.name
+            } else {
+                title = "Genre"
+            }
         case .popular: title = "Popular Movies"
         case .upcoming: title = "Upcoming Movies"
         case .topRated: title = "Top Rated Movies"
@@ -222,7 +237,8 @@ extension HomeViewController {
         let viewModel = MovieListViewModel(
             title: title,
             sectionType: section,
-            genres: viewModel.currentGenres
+            genres: viewModel.currentGenres,
+            selectedGenre: selectedGenre
         )
         let vc = MovieListViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
@@ -242,10 +258,11 @@ extension HomeViewController {
         let heroCells: [HeroCollectionCell]
         
         // Cache the container view to avoid expensive recursive searches
-        if let container = cachedHeroContainerView {
+        // Also validate that the cached container is still effectively in the hierarchy (e.g. has a window)
+        if let container = cachedHeroContainerView, container.window != nil {
             heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
         } else {
-            // Initial search
+            // Initial search or cache invalidation
             heroCells = findAllHeroCells(in: collectionView)
             if let firstCell = heroCells.first {
                 cachedHeroContainerView = firstCell.superview

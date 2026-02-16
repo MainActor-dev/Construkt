@@ -39,14 +39,36 @@ public struct SupplementaryController {
     ) {
         self.id = id
         self.elementKind = elementKind
-        let registration = UICollectionView.SupplementaryRegistration<ViewType>(elementKind: elementKind) { view, _, _ in
-            configure(view)
-        }
+        
+        let registration = SupplementaryRegistrationCache.register(viewType: ViewType.self, elementKind: elementKind)
+        
         self.dequeue = { collectionView, indexPath in
-             return collectionView.dequeueConfiguredReusableSupplementary(using: registration, for: indexPath)
+            let view = collectionView.dequeueConfiguredReusableSupplementary(using: registration, for: indexPath)
+            configure(view)
+            return view
         }
     }
+}
+
+class SupplementaryRegistrationCache {
+    static var cache = [String: Any]()
     
+    static func register<ViewType: UICollectionReusableView>(viewType: ViewType.Type, elementKind: String) -> UICollectionView.SupplementaryRegistration<ViewType> {
+        let key = "\(String(describing: ViewType.self))_\(elementKind)"
+        
+        if let existing = cache[key] as? UICollectionView.SupplementaryRegistration<ViewType> {
+            return existing
+        }
+        
+        // Dummy registration with no-op handler
+        let registration = UICollectionView.SupplementaryRegistration<ViewType>(elementKind: elementKind) { _, _, _ in }
+        
+        cache[key] = registration
+        return registration
+    }
+}
+    
+extension SupplementaryController {
     internal func asSkeleton() -> SupplementaryController {
         var copy = self
         // Ensure skeleton has a different ID to force section reload

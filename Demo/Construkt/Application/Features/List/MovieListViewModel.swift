@@ -38,24 +38,25 @@ public class MovieListViewModel {
     // MARK: - Properties
     public let title: String
     public let genres: [Genre] // Available filters
+    
     private let sectionType: HomeSection
     private let service: MovieServiceProtocol
-    private var currentPage: Int = 1
-    private var totalPages: Int = 1
-    private var isFetching: Bool = false
+    
+    // Pagination State
+    @Variable public private(set) var paginationState = ListPaginationModel()
     
     // MARK: - Init
     init(
         title: String,
         sectionType: HomeSection,
         genres: [Genre],
+        selectedGenre: Genre?,
         service: MovieServiceProtocol = MovieService()
     ) {
         self.title = title
         self.sectionType = sectionType
-        // Prepend "All" to genres if not present? 
-        // Actually UI can handle "All" as a separate case or nil selectedGenre.
         self.genres = genres
+        self.selectedGenre = selectedGenre
         self.service = service
         
         // Initial Fetch
@@ -70,7 +71,7 @@ public class MovieListViewModel {
     }
     
     public func loadMore() {
-        guard !isFetching, currentPage < totalPages else { return }
+        guard !paginationState.isPaginating, !paginationState.isLastPage else { return }
         fetchMovies(reset: false)
     }
     
@@ -81,31 +82,30 @@ public class MovieListViewModel {
     // MARK: - Private
     private func fetchMovies(reset: Bool) {
         if reset {
-            currentPage = 1
             movies = []
             isLoading = true
+            paginationState = ListPaginationModel(currentPage: 1, isPaginating: false, isLastPage: false)
+        } else {
+             paginationState = ListPaginationModel(
+                currentPage: paginationState.currentPage,
+                isPaginating: true,
+                isLastPage: paginationState.isLastPage
+             )
         }
-        
-        isFetching = true
         
         Task {
             do {
+                let currentPage = paginationState.currentPage
                 let response: MovieResponse
                 
                 if let genre = selectedGenre {
-                    // If genre is selected, use discover endpoint (defaults to popularity desc)
-                    // Note: This overrides sectionType specific logic for now, effectively verifying "Popular" + Genre.
                     response = try await service.discoverMovies(page: currentPage, genreId: genre.id)
                 } else {
-                    // "All" selected -> Use section specific endpoint
                     switch sectionType {
                     case .popular:
                         response = try await service.getPopularMovies(page: currentPage)
                     case .upcoming:
-                        // Upcoming usually maps to "Popular" with page 2 in HomeViewModel for demo, 
-                        // but ideally should use getNowPlaying or specific upcoming endpoint if available.
-                        // For now we reuse what HomeViewModel did or use getPopularMovies as fallback.
-                         response = try await service.getNowPlayingMovies(page: currentPage) // Approximation
+                         response = try await service.getNowPlayingMovies(page: currentPage)
                     case .topRated:
                         response = try await service.getTopRatedMovies(page: currentPage)
                     case .hero, .categories:
@@ -119,16 +119,30 @@ public class MovieListViewModel {
                     } else {
                         self.movies.append(contentsOf: response.results)
                     }
-                    self.totalPages = response.totalPages
-                    self.currentPage += 1
+                    
+                    let newPage = currentPage + 1
+                    let isLastPage = newPage > response.totalPages
+                    
+                    self.paginationState = ListPaginationModel(
+                        currentPage: newPage,
+                        isPaginating: false,
+                        isLastPage: isLastPage
+                    )
+                    
                     self.isLoading = false
-                    self.isFetching = false
                 }
             } catch {
                 await MainActor.run {
                     self.error = error.localizedDescription
+                    
+                    // Reset pagination state on error (allow retry)
+                    self.paginationState = ListPaginationModel(
+                        currentPage: self.paginationState.currentPage,
+                        isPaginating: false,
+                        isLastPage: self.paginationState.isLastPage
+                    )
+                    
                     self.isLoading = false
-                    self.isFetching = false
                 }
             }
         }

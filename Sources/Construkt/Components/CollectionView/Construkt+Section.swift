@@ -50,8 +50,9 @@ extension Array: SectionComponent where Element == CellController {}
 public struct Header: SectionComponent {
     public let controller: SupplementaryController
     
-    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+    public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
+            id: id ?? AnyHashable(UUID()),
             elementKind: UICollectionView.elementKindSectionHeader,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
@@ -76,8 +77,9 @@ public struct Header: SectionComponent {
 public struct Footer: SectionComponent {
     public let controller: SupplementaryController
     
-    public init(@ViewResultBuilder content: @escaping () -> ViewConvertable) {
+    public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
+            id: id ?? AnyHashable(UUID()),
             elementKind: UICollectionView.elementKindSectionFooter,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
@@ -261,6 +263,69 @@ public struct Section: SectionObservable {
                     )
                 ]
             }
+    }
+
+    // MARK: - Actions Modifier
+    
+    public func onSelect<T>(_ handler: @escaping (T) -> Void) -> Section {
+        let improved: Observable<[SectionController]> = observable.map { sections in
+            sections.map { section in
+                let newCells = section.cells.map { cell in
+                    var modelToUse = cell.model
+                    
+                    if let wrapper = modelToUse as? CellContentWrapper {
+                        modelToUse = wrapper.originalModel
+                    }
+                    
+                    guard let model = modelToUse as? T else { return cell }
+                    
+                    return cell.withSelection {
+                        handler(model)
+                    }
+                }
+                 
+                return SectionController(
+                    identifier: section.identifier,
+                    cells: newCells,
+                    header: section.header,
+                    footer: section.footer,
+                    layoutProvider: section.layoutProvider
+                )
+            }
+        }
+        return Section(observable: improved)
+    }
+    
+    public func onSelect<T, Target: AnyObject>(on target: Target, _ handler: @escaping (Target, T) -> Void) -> Section {
+        let improved: Observable<[SectionController]> = observable
+            .map { [weak target] sections in
+                guard let target = target else { return sections }
+            
+                return sections.map { section in
+                    let newCells = section.cells.map { cell in
+                        var modelToUse = cell.model
+                        
+                        if let wrapper = modelToUse as? CellContentWrapper {
+                            modelToUse = wrapper.originalModel
+                        }
+                        
+                        guard let model = modelToUse as? T else { return cell }
+                        return cell.withSelection { [weak target] in
+                            guard let target = target else { return }
+                            handler(target, model)
+                        }
+                    }
+                     
+                    return SectionController(
+                        identifier: section.identifier,
+                        cells: newCells,
+                        header: section.header,
+                        footer: section.footer,
+                        layoutProvider: section.layoutProvider
+                    )
+                }
+        }
+        return Section(observable: improved)
     }
 
     /// Builder Initializer with Header/Footer support

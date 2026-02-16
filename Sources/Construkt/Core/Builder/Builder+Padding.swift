@@ -26,7 +26,12 @@ extension ModifiableView where Base: ViewBuilderPaddable {
     }
     
     @discardableResult
-    public func padding(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) -> ViewModifier<Base> {
+    public func padding(
+        top: CGFloat = 0,
+        left: CGFloat = 0,
+        bottom: CGFloat = 0,
+        right: CGFloat = 0
+    ) -> ViewModifier<Base> {
         padding(insets: UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
     }
     

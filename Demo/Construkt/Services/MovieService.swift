@@ -15,7 +15,7 @@ public class MovieService: MovieServiceProtocol {
     
     public init(client: NetworkClient = .init(
         configuration: NetworkConfiguration(baseURL: TMDBConfiguration.baseURL),
-        interceptors: [TMDBRequestInterceptor()])
+        interceptors: [TMDBRequestInterceptor(), LoggerInterceptor()])
     ) {
         self.client = client
     }
