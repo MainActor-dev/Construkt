@@ -84,13 +84,20 @@ final class MovieDetailViewController: UIViewController {
                     VerticalScrollView {
                         VStackView(spacing: 24) {
                             // Transparent Header Space + Content Overlay
-                            heroSectionContent(details: safeDetails)
+                            MovieDetailHero(details: safeDetails, height: self.heroHeight)
                             
                             VStackView(spacing: 24) {
                                 actionButtons
-                                storylineSection(details: safeDetails)
-                                castSection(casts: casts)
-                                similarSection(details: safeDetails)
+                                MovieStoryline(details: safeDetails)
+                                MovieCast(casts: casts) { cast in
+                                    print("Tapped on cast: \(cast.name)")
+                                }
+                                MovieSimilar(details: safeDetails) { [weak self] movie in
+                                    if let scrollView = self?.scrollView as? UIScrollView {
+                                        scrollView.setContentOffset(.zero, animated: true)
+                                    }
+                                    self?.viewModel.selectMovie(movie)
+                                }
                             }
                             .padding(top: 0, left: 20, bottom: 0, right: 20)
                             
@@ -158,94 +165,9 @@ final class MovieDetailViewController: UIViewController {
         navBarTitleLabel?.alpha = titleAlpha
     }
     
-    private func heroSectionContent(details: Observable<MovieDetail>) -> View {
-        ZStackView {
-            // Layer 1: Transparent Spacer to matching Hero Height
-            SpacerView(h: heroHeight)
-            
-            // Layer 2: Gradient Overlay (Moves with content)
-            LocalGradientView()
-                .position(.fill)
-            
-            // Layer 3: Play Button (Centered in Hero)
-            ImageView(UIImage(systemName: "play.circle.fill"))
-                .tintColor(.white)
-                .size(width: 64, height: 64)
-                .position(.center)
-            
-            // Layer 4: Content Overlay (Pinned Bottom, Centered)
-            ZStackView {
-                VStackView(spacing: 8) {
-                    SpacerView()
-                    // Title
-                    LabelView(details.map { $0.title })
-                        .font(UIFont.systemFont(ofSize: 32, weight: .bold))
-                        .color(.white)
-                        .numberOfLines(2)
-                        .alignment(.center)
-                    
-                    // Metadata Row
-                    metadata(details: details)
-                    
-                    // Rating Row
-                    HStackView(spacing: 4) {
-                        ImageView(UIImage(systemName: "star.fill")).tintColor(.systemYellow).size(width: 14, height: 14)
-                        LabelView(details.map { "\(String(format: "%.1f", $0.voteAverage)) (2.4k)" })
-                            .font(UIFont.systemFont(ofSize: 14))
-                            .color(.lightGray)
-                    }
-                    .alignment(.center)
-                }
-                .alignment(.center)
-            }
-            .padding(top: 0, left: 16, bottom: 20, right: 16)
-            .position(.bottom)
-        }
-        .height(heroHeight)
-    }
+
     
-    private func metadata(details: Observable<MovieDetail>) -> View {
-        ZStackView {
-            HStackView(spacing: 6) {
-                ZStackView {
-                    LabelView(details.map { $0.releaseDate?.prefix(4).description ?? "2024" })
-                        .font(UIFont.systemFont(ofSize: 14))
-                        .color(.lightGray)
-                }
-                LabelView("•")
-                    .color(.darkGray)
-                    .font(.systemFont(ofSize: 10))
-                    .alignment(.center)
-                ZStackView {
-                    LabelView(details.map { $0.genreText })
-                        .font(UIFont.systemFont(ofSize: 14))
-                        .color(.lightGray)
-                }
-                LabelView("•")
-                    .color(.darkGray)
-                    .font(.systemFont(ofSize: 10))
-                    .alignment(.center)
-                ZStackView {
-                    LabelView(details.map { $0.durationText })
-                        .font(UIFont.systemFont(ofSize: 14))
-                        .color(.lightGray)
-                }
-                LabelView("•")
-                    .color(.darkGray)
-                    .font(.systemFont(ofSize: 10))
-                    .alignment(.center)
-                ZStackView {
-                    LabelView("4K")
-                        .font(UIFont.systemFont(ofSize: 10))
-                        .color(.lightGray)
-                        .padding(top: 2, left: 4, bottom: 2, right: 4)
-                }
-                .border(color: .lightGray, lineWidth: 1)
-                .cornerRadius(4)
-            }
-        }
-    }
-    
+
     private var actionButtons: View {
         HStackView(spacing: 16) {
             ButtonView("Watch Now")
@@ -274,132 +196,11 @@ final class MovieDetailViewController: UIViewController {
         .distribution(.fillEqually)
     }
     
-    private func storylineSection(details: Observable<MovieDetail>) -> View {
-        VStackView(spacing: 12) {
-            LabelView("Storyline")
-                .font(UIFont.systemFont(ofSize: 18, weight: .bold))
-                .color(.white)
-            
-            LabelView(details.map { $0.overview })
-                .font(UIFont.systemFont(ofSize: 14))
-                .color(.lightGray)
-                .numberOfLines(0)
-        }
-    }
+
     
-    private func castSection(casts: Observable<[Cast]>) -> View {
-        VStackView(spacing: 16) {
-            HStackView {
-                LabelView("Cast & Crew")
-                    .font(UIFont.systemFont(ofSize: 18, weight: .bold))
-                    .color(.white)
-                SpacerView()
-                LabelView("View all")
-                    .font(UIFont.systemFont(ofSize: 14))
-                    .color(.gray)
-            }
-            
-            ScrollView(
-                HStackView {}
-                    .onReceive(casts.map { [weak self] in self?.createCastViews(from: $0) ?? [] }) { context in
-                        context.view.reset(to: context.value)
-                    }
-                    .spacing(16)
-                    .alignment(.top)
-            )
-            .showHorizontalIndicator(false)
-            .bounces(false)
-            .height(min: 120)
-        }
-        .onReceive(casts.map { $0.isEmpty }) { context in
-            context.view.isHidden = context.value
-        }
-    }
+
     
-    private func similarSection(details: Observable<MovieDetail>) -> View {
-        VStackView(spacing: 16) {
-            LabelView("More Like This")
-                .font(UIFont.systemFont(ofSize: 18, weight: .bold))
-                .color(.white)
-            
-            ScrollView(
-                HStackView {}
-                    .onReceive(details.map { [weak self] in self?.createSimilarViews(from: $0) ?? [] }) { context in
-                        context.view.reset(to: context.value)
-                    }
-                    .spacing(16)
-                    .alignment(.top)
-            )
-            .showHorizontalIndicator(false)
-            .height(180)
-        }
-    }
-    
-    // MARK: - View Creators
-    
-    private func createCastViews(from casts: [Cast]) -> [View] {
-        guard !casts.isEmpty else { return [] }
-        return casts.prefix(10).map { createCastView($0) }
-    }
-    
-    private func createCastView(_ cast: Cast) -> View {
-        VStackView {
-            ImageView(url: cast.profileURL)
-                .backgroundColor(.darkGray)
-                .cornerRadius(30)
-                .width(60)
-                .height(60)
-                .clipsToBounds(true)
-                .contentMode(.scaleAspectFill)
-            
-            ZStackView {
-                VStackView(spacing: 4) {
-                    LabelView(cast.name)
-                        .font(UIFont.systemFont(ofSize: 12, weight: .medium))
-                        .color(.white)
-                        .numberOfLines(2)
-                        .alignment(.center)
-                    
-                    LabelView(cast.character)
-                        .font(UIFont.systemFont(ofSize: 10))
-                        .color(.gray)
-                        .numberOfLines(1)
-                        .alignment(.center)
-                }
-                .alignment(.center)
-            }
-        }
-        .width(max: 100, priority: .required)
-        .alignment(.center)
-        .padding(h: 2, v: 4)
-        .onTapGesture { _ in
-            print("Tapped on cast: \(cast.name)")
-        }
-    }
-    
-    private func createSimilarViews(from details: MovieDetail) -> [View] {
-        guard let similarMovies = details.similar?.results.prefix(9) else { return [] }
-        return similarMovies.map { createMoviePoster($0) }
-    }
-    
-    private func createMoviePoster(_ movie: Movie) -> View {
-        ImageView(nil)
-            .backgroundColor(.darkGray)
-            .cornerRadius(8)
-            .contentMode(.scaleAspectFill)
-            .clipsToBounds(true)
-            .width(120)
-            .height(180)
-            .with { view in
-                view.setImage(from: movie.posterURL)
-            }
-            .onTapGesture { [weak self] _ in
-                if let scrollView = self?.scrollView as? UIScrollView {
-                    scrollView.setContentOffset(.zero, animated: true)
-                }
-                self?.viewModel.selectMovie(movie)
-            }
-    }
+
 }
 
 struct LocalGradientView: ModifiableView {
