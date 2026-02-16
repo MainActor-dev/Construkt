@@ -165,9 +165,6 @@ final class MovieDetailViewController: UIViewController {
         navBarTitleLabel?.alpha = titleAlpha
     }
     
-
-    
-
     private var actionButtons: View {
         HStackView(spacing: 16) {
             ButtonView("Watch Now")
@@ -194,36 +191,5 @@ final class MovieDetailViewController: UIViewController {
                 }
         }
         .distribution(.fillEqually)
-    }
-    
-
-    
-
-    
-
-}
-
-struct LocalGradientView: ModifiableView {
-    
-    var modifiableView = GradientOverlayView()
-    
-    init() {}
-}
-
-class GradientOverlayView: UIView {
-    override class var layerClass: AnyClass {
-        return CAGradientLayer.self
-    }
-    
-    init() {
-        super.init(frame: .zero)
-        guard let layer = self.layer as? CAGradientLayer else { return }
-        layer.colors = [UIColor.clear.cgColor, UIColor("#0A0A0A").cgColor]
-        layer.startPoint = CGPoint(x: 0.5, y: 0.0)
-        layer.endPoint = CGPoint(x: 0.5, y: 1.0)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

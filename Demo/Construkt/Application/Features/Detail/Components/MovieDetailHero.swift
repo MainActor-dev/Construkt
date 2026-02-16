@@ -14,7 +14,7 @@ struct MovieDetailHero: ViewBuilder {
             SpacerView(h: height)
             
             // Layer 2: Gradient Overlay (Moves with content)
-            LocalGradientView()
+            GradientView(colors: [.clear, UIColor("#0A0A0A")])
                 .position(.fill)
             
             // Layer 3: Play Button (Centered in Hero)
