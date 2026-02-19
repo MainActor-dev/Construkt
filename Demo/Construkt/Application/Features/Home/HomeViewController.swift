@@ -13,7 +13,7 @@ import RxCocoa
 class HomeViewController: UIViewController {
     
     private let viewModel = MovieViewModel()
-    private weak var cachedHeroContainerView: UIView?
+    private weak var cachedCollectionView: UICollectionView?
     
     private var navBarBackgroundView: UIView?
 
@@ -32,7 +32,7 @@ class HomeViewController: UIViewController {
     // MARK: - Layout
     
     var body: View {
-        return ZStackView {
+        ZStackView {
             CollectionView {
                 heroSection
                 genresSection
@@ -74,8 +74,10 @@ class HomeViewController: UIViewController {
     
     private var heroSection: Section {
         Section(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
-            Cell<HeroCollectionCell, Movie>(movie, id: "hero-\(movie.id)") { cell, movie in
-                cell.configure(with: movie)
+            Cell(movie, id: "hero-\(movie.id)") { movie in
+                Modified(HeroContentView()) { view in
+                    view.configure(with: movie)
+                }
             }
         }
         .onSelect(on: self) { (me, movie: Movie) in
@@ -248,26 +250,29 @@ extension HomeViewController {
 // MARK: - Helpers
 
 extension HomeViewController {
-    private func handleHeroScroll(items: [NSCollectionLayoutVisibleItem], offset: CGPoint, env: NSCollectionLayoutEnvironment) {
+    private func handleHeroScroll(
+        items: [NSCollectionLayoutVisibleItem],
+        offset: CGPoint,
+        env: NSCollectionLayoutEnvironment
+    ) {
         let containerWidth = env.container.contentSize.width
         let visibleRectCenter = offset.x + containerWidth / 2.0
         
         // We need to find the actual cells to update them
-        guard let collectionView = view.firstSubview(ofType: CollectionViewWrapperView.self) else { return }
+        let collectionView: UICollectionView
         
-        let heroCells: [HeroCollectionCell]
-        
-        // Cache the container view to avoid expensive recursive searches
-        // Also validate that the cached container is still effectively in the hierarchy (e.g. has a window)
-        if let container = cachedHeroContainerView, container.window != nil {
-            heroCells = container.subviews.compactMap { $0 as? HeroCollectionCell }
+        if let cached = cachedCollectionView {
+            collectionView = cached
+        } else if let wrapper = view.firstSubview(ofType: CollectionViewWrapperView.self),
+                  let found = wrapper.subviews.first(where: { $0 is UICollectionView }) as? UICollectionView {
+            collectionView = found
+            cachedCollectionView = found
         } else {
-            // Initial search or cache invalidation
-            heroCells = findAllHeroCells(in: collectionView)
-            if let firstCell = heroCells.first {
-                cachedHeroContainerView = firstCell.superview
-            }
+            return
         }
+        
+        // Use visible cells to find hero views (much more efficient and robust)
+        let heroViews = collectionView.visibleCells.flatMap { findAllHeroViews(in: $0) }
         
         // Map visible items to their progress
         for item in items {
@@ -277,9 +282,10 @@ extension HomeViewController {
             // Normalize distance: 0 at center, 1 at edge
             let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
             
-            // Match layout item to cell by X position in the orthogonal scroll view
-            if let matchedCell = heroCells.first(where: { abs($0.center.x - item.center.x) < 2.0 }) {
-                matchedCell.heroContentView.setScrollProgress(progress)
+            // Match layout item to cell by indexPath (more robust than coordinate matching)
+            if let cell = collectionView.cellForItem(at: item.indexPath),
+               let heroView = findAllHeroViews(in: cell).first {
+                heroView.setScrollProgress(progress)
             }
         }
         
@@ -287,16 +293,9 @@ extension HomeViewController {
         let y = offset.y
         if y < 0 {
              items.forEach { item in
-                 // Scale height to fill the pull-down area
-                 // Original Height = 550
                  let originalHeight: CGFloat = 550
                  let newHeight = originalHeight + abs(y)
                  let scale = newHeight / originalHeight
-                 
-                 // Translate up to pin to top
-                 // Center Y needs to move up by (difference in height / 2) + y
-                 // Actually, if we scale Y, it scales from center.
-                 // We want top edge to be at `y`.
                  
                  let translationY = y / 2
                  item.alpha = 1.0
@@ -305,7 +304,6 @@ extension HomeViewController {
              }
         } else {
             // Scroll Up: Fade Effect
-            // Fade out as we scroll up
             let fadeRange: CGFloat = 350
             let alpha = max(0, 1 - (y / fadeRange))
             
@@ -316,11 +314,11 @@ extension HomeViewController {
         }
     }
     
-    private func findAllHeroCells(in view: UIView) -> [HeroCollectionCell] {
-        var cells: [HeroCollectionCell] = []
-        if let cell = view as? HeroCollectionCell { cells.append(cell) }
-        for subview in view.subviews { cells.append(contentsOf: findAllHeroCells(in: subview)) }
-        return cells
+    private func findAllHeroViews(in view: UIView) -> [HeroContentView] {
+        var views: [HeroContentView] = []
+        if let heroView = view as? HeroContentView { views.append(heroView) }
+        for subview in view.subviews { views.append(contentsOf: findAllHeroViews(in: subview)) }
+        return views
     }
     
     private func handleNavBarScroll(_ scrollView: UIScrollView) {
