@@ -73,9 +73,7 @@ public class SearchViewController: UIViewController {
                             return section
                         }
                     }
-                    .onReceive(viewModel.moviesObservable) { context in
-                        context.view.isHidden = context.value.isEmpty
-                    }
+                    .backgroundColor(.clear)
                 }
                 .backgroundColor(UIColor("#0A0A0A"))
             }
@@ -101,7 +99,9 @@ public class SearchViewController: UIViewController {
         }
         .padding(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
         .cornerRadius(12)
+        .backgroundColor(UIColor("#0A0A0A"))
         .padding(insets: .init(top: 16, left: 16, bottom: 0, right: 16))
+        .zIndex(100)
     }
 }
 
