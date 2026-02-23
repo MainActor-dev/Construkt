@@ -1,14 +1,34 @@
 //
-//  Builder.swift
-//  ViewBuilder
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 11/8/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
 
 
-// ViewResultBuilder allows SwiftUI-like definitions of UIView trees
+/// A result builder that enables a declarative, SwiftUI-like syntax for constructing `UIView` hierarchies.
+/// It converts combinations of `ViewConvertable` expressions into a flat array of abstract `View` components.
 @resultBuilder public struct ViewResultBuilder {
     public static func buildBlock() -> [View] {
         []
@@ -32,7 +52,10 @@ import UIKit
 
 
 
-// Arrays of views are the building blocks of ViewResultBuilder
+/// A protocol representing a type that can be converted into an array of abstract `View` objects.
+///
+/// This is the fundamental building block for the `ViewResultBuilder`, allowing elements like single views,
+/// arrays of views, and dynamic builders to coexist cleanly in the DSL.
 public protocol ViewConvertable {
     func asViews() -> [View]
 }
@@ -49,7 +72,9 @@ extension Array where Element == ViewConvertable {
 
 
 
-// Fundamental view object that knows how to build a UIView from a given view or view definition
+/// An abstract representation of a UI component that knows how to build a tangible `UIView`.
+///
+/// Types conforming to this protocol can be used inside `ViewResultBuilder` blocks to assemble UI hierarchically.
 public protocol View: ViewConvertable {
     func build() -> UIView
     func callAsFunction() -> UIView
@@ -65,7 +90,10 @@ extension View {
     }
 }
 
-// Allows view builder modifications to be made to a given UIView type
+/// A specialized `View` that exposes an underlying `UIView` of a specific type (`Base`) for modification.
+///
+/// Conform to this protocol when you want to use the standard chainable `ViewModifier` methods
+/// (like `.hidden()`, `.backgroundColor()`, etc.) on a custom object wrapping a `UIView`.
 public protocol ModifiableView: View {
     associatedtype Base: UIView
     var modifiableView: Base { get }
@@ -73,34 +101,59 @@ public protocol ModifiableView: View {
 
 // Standard "builder" modifiers for all view types
 extension ModifiableView {
+    
+    /// Returns the underlying base `UIView` instance.
     public func asBaseView() -> Base {
         modifiableView
     }
     
+    /// Returns the underlying base `UIView` instance, fulfilling the `View` protocol.
     public func build() -> UIView {
         modifiableView
     }
     
+    /// Captures a reference to the underlying `UIView`, allowing it to be stored in a variable.
+    ///
+    /// - Parameter view: An `inout` reference to store the view.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func reference<V:UIView>(_ view: inout V?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view = $0 as? V }
     }
     
+    /// Performs a generic modification closure on the underlying `UIView`.
+    ///
+    /// - Parameter modifier: A closure containing the modification logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func with(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
     
+    /// Performs a generic modification closure on the underlying `UIView`. Alias for `with`.
+    ///
+    /// - Parameter modifier: A closure containing the modification logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func perform(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
     
+    /// Toggles the visibility (`isHidden`) state of the underlying `UIView`.
+    ///
+    /// - Parameter isVisible: A boolean determining if the view should be visible.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func visible(_ isVisible: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.isHidden = !isVisible }
     }
     
+    /// Configures the view to support `SkeletonView` loading states.
+    ///
+    /// - Parameters:
+    ///   - isSkeletonAble: A boolean enabling skeleton animations on this view.
+    ///   - bgColor: The background color used during the skeleton state.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func skeletonable(
         _ isSkeletonAble: Bool,
@@ -116,19 +169,31 @@ extension ModifiableView {
     }
 }
 
-// Generic return type for building/chaining view modifiers
+/// A generic wrapper type used to chain sequential modifications to a `UIView`.
+///
+/// Each builder method (e.g. `.backgroundColor(:)`) returns a `ViewModifier` retaining the original underlying `UIView`.
 public struct ViewModifier<Base:UIView>: ModifiableView {
+    
+    /// The underlying view being modified.
     public let modifiableView: Base
+    
+    /// Initializes with an existing base view.
     public init(_ view: Base) {
         self.modifiableView = view
     }
+    
+    /// Initializes by building an abstract `View` into its tangible `UIView` form.
     public init(_ view: View) where Base == UIView {
         self.modifiableView = view()
     }
+    
+    /// Initializes with an existing base view and immediately applies a custom modifier closure to it.
     public init(_ view: Base, modifier: (_ view: Base) -> Void) {
         self.modifiableView = view
         modifier(view)
     }
+    
+    /// Initializes with an existing base view and modifies a specific property via its `ReferenceWritableKeyPath`.
     public init<Value>(_ view: Base, keyPath: ReferenceWritableKeyPath<Base, Value>, value: Value) {
         self.modifiableView = view
         self.modifiableView[keyPath: keyPath] = value
@@ -137,7 +202,12 @@ public struct ViewModifier<Base:UIView>: ModifiableView {
 
 
 
-// Helper function to simplify custom view builder initialization
+/// A convenience utility for instantiating and configuring a `UIView` subclass in a single expression.
+///
+/// - Parameters:
+///   - instance: The view instance to modify.
+///   - modify: A closure exposing the instance for inline configuration.
+/// - Returns: The configured `UIView` instance.
 public func Modified<T:UIView>( _ instance: T, modify: ((_ instance: T) -> Void)? = nil) -> T {
     // common modifications
     instance.translatesAutoresizingMaskIntoConstraints = false
@@ -148,8 +218,13 @@ public func Modified<T:UIView>( _ instance: T, modify: ((_ instance: T) -> Void)
 
 
 
-// ViewBuilder allows for user-defined custom view configurations
+/// A protocol that enables building custom composite views declaratively.
+///
+/// Conforming objects implement the `body` property using the `ViewResultBuilder` syntax
+/// to combine existing primitive views into higher-level, reusable components.
 public protocol ViewBuilder: ModifiableView {
+    
+    /// The declarative body of the composite view component.
     var body: View { get }
 }
 
@@ -166,6 +241,10 @@ extension ViewBuilder {
 
 
 
+/// A central configuration store for default styling properties across Construkt builders.
+///
+/// By providing ambient constants here, components like `Button` and `Label` can inherit standard
+/// application aesthetics without declaring style modifiers explicitly on every instance.
 public struct ViewBuilderEnvironment {
     static public var defaultButtonFont: UIFont?
     static public var defaultButtonColor: UIColor?

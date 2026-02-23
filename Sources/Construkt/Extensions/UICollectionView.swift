@@ -26,6 +26,7 @@
 import UIKit
 
 public extension UICollectionView {
+    /// Registers a cell type dynamically using its class name as the reuse identifier.
     func registerCell<Cell: UICollectionViewCell>(_ cell: Cell.Type) {
         let identifier = String(describing: cell)
         register(cell, forCellWithReuseIdentifier: identifier)
@@ -41,6 +42,7 @@ public extension UICollectionView {
         register(reusableView, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: identifier)
     }
     
+    /// Dequeues a generic, forcefully unwrapped cell for the specified index path using its class name.
     func dequeueReusableCell<Cell: UICollectionViewCell>(at indexPath: IndexPath) -> Cell {
         let identifier = String(describing: Cell.self)
         return dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath) as! Cell

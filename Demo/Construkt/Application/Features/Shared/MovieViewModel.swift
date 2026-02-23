@@ -1,6 +1,4 @@
 import Foundation
-import RxSwift
-import RxCocoa
 
 public class MovieViewModel {
     
@@ -30,21 +28,17 @@ public class MovieViewModel {
     @Variable private var casts: LoadableState<[Cast]> = .initial
     @Variable private var isDetailsLoading: Bool = false
     
-    // MARK: - Observables
-    private var homeData: Observable<HomeData> { $state.asObservable() }
-    public var movieDetails: Observable<MovieDetail?> { $selectedMovie.asObservable() }
-    public var movieCasts: Observable<[Cast]> { $casts.asObservable().mapItems() }
-    public var isCastsLoading: Observable<Bool> { $casts.asObservable().mapLoading() }
-    public var isLoadingDetails: Observable<Bool> { $isDetailsLoading.asObservable() }
+    // MARK: - Bindings
+    public var movieDetails: AnyViewBinding<MovieDetail?> { $selectedMovie.map { $0 } }
+    public var movieCasts: AnyViewBinding<[Cast]> { $casts.mapItems() }
+    public var isCastsLoading: AnyViewBinding<Bool> { $casts.mapLoading() }
+    public var isLoadingDetails: AnyViewBinding<Bool> { $isDetailsLoading.map { $0 } }
     
-    // ... (existing code)
-
     public func selectMovie(_ movie: Movie) {        
         self.isDetailsLoading = true
         Task {
             self.fetchMovieCasts(id: movie.id)
             do {
-                // Simulate loading latency
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 let detailedMovie = try await service.getMovieDetails(id: movie.id)
                 await MainActor.run {
@@ -61,41 +55,41 @@ public class MovieViewModel {
     }
     
     // Now Playing
-    public var nowPlayingMovies: Observable<[Movie]> {
-        homeData.map { $0.nowPlaying }.mapItems()
+    public var nowPlayingMovies: AnyViewBinding<[Movie]> {
+        $state.map { $0.nowPlaying }.mapItems()
     }
-    public var isNowPlayingLoading: Observable<Bool> {
-        homeData.map { $0.nowPlaying }.mapLoading()
+    public var isNowPlayingLoading: AnyViewBinding<Bool> {
+        $state.map { $0.nowPlaying }.mapLoading()
     }
     
     // Popular
-    public var popularSectionMovies: Observable<[Movie]> {
-        homeData.map { $0.popular }.mapItems()
+    public var popularSectionMovies: AnyViewBinding<[Movie]> {
+        $state.map { $0.popular }.mapItems()
     }
-    public var isPopularSectionLoading: Observable<Bool> {
-        homeData.map { $0.popular }.mapLoading()
+    public var isPopularSectionLoading: AnyViewBinding<Bool> {
+        $state.map { $0.popular }.mapLoading()
     }
     
     // Upcoming
-    public var upcomingMovies: Observable<[Movie]> {
-        homeData.map { $0.upcoming }.mapItems()
+    public var upcomingMovies: AnyViewBinding<[Movie]> {
+        $state.map { $0.upcoming }.mapItems()
     }
-    public var isUpcomingLoading: Observable<Bool> {
-        homeData.map { $0.upcoming }.mapLoading()
+    public var isUpcomingLoading: AnyViewBinding<Bool> {
+        $state.map { $0.upcoming }.mapLoading()
     }
     
     // Top-Rated
-    public var topRatedMovies: Observable<[Movie]> {
-        homeData.map { $0.topRated }.mapItems()
+    public var topRatedMovies: AnyViewBinding<[Movie]> {
+        $state.map { $0.topRated }.mapItems()
     }
-    public var isTopRatedLoading: Observable<Bool> { homeData.map { $0.topRated }.mapLoading() }
+    public var isTopRatedLoading: AnyViewBinding<Bool> { $state.map { $0.topRated }.mapLoading() }
     
     // Genres
-    public var genres: Observable<[Genre]> { homeData.map { $0.genres }.mapItems() }
-    public var isLoadingGenres: Observable<Bool> { homeData.map { $0.genres }.mapLoading() }
+    public var genres: AnyViewBinding<[Genre]> { $state.map { $0.genres }.mapItems() }
+    public var isLoadingGenres: AnyViewBinding<Bool> { $state.map { $0.genres }.mapLoading() }
     
-    public var isEmptyObservable: Observable<Bool> {
-        return homeData.map { !$0.isAnyLoading && $0.isEmpty }
+    public var isEmptyObservable: AnyViewBinding<Bool> {
+        return $state.map { !$0.isAnyLoading && $0.isEmpty }
     }
     
     public var currentGenres: [Genre] {
@@ -118,11 +112,8 @@ public class MovieViewModel {
         state.topRated = .loading
         state.genres = .loading
         
-        // Fetch concurrently and update incrementally
         Task {
-            // Simulate loading latency for demo purposes
              try? await Task.sleep(nanoseconds: 1_000_000_000)
-            
            fetchNowPlaying()
            fetchPopular()
            fetchUpcoming()

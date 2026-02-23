@@ -1,14 +1,32 @@
 //
-//  Builder+View.swift
-//  ViewBuilder
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 11/8/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
-import RxSwift
 
-// Allows UIView to use basic view modifiers and integrate with view builders
+/// Allows `UIView` objects to serve as primitives in the declarative builder syntax.
 extension UIView: ModifiableView {
     
     public var modifiableView: UIView {
@@ -34,24 +52,28 @@ extension ModifiableView {
 
 }
 
-// Standard UIView modifiers for all view types
+/// Standard `UIView` core visual and behavioral modifiers applicable to all view types.
 extension ModifiableView {
         
+    /// Sets an accessibility identifier for UI testing.
     @discardableResult
     public func accessibilityIdentifier<T:RawRepresentable>(_ accessibilityIdentifier: T) -> ViewModifier<Base> where T.RawValue == String {
         ViewModifier(modifiableView) { $0.accessibilityIdentifier = accessibilityIdentifier.rawValue }
     }
     
+    /// Sets the view's alpha transparency.
     @discardableResult
     public func alpha(_ alpha: CGFloat) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.alpha, value: alpha)
     }
 
+    /// Sets the view's background color.
     @discardableResult
     public func backgroundColor(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.backgroundColor, value: color)
     }
 
+    /// Applies a standard layer border with a specified color and width.
     @discardableResult
     public func border(color: UIColor, lineWidth: CGFloat = 0.5) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -60,16 +82,19 @@ extension ModifiableView {
         }
     }
 
+    /// Determines whether subviews are confined to the bounds of the view.
     @discardableResult
     public func clipsToBounds(_ clips: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.clipsToBounds, value: clips)
     }
 
+    /// Sets the content mode for rendering visual bounds and aspects.
     @discardableResult
     public func contentMode(_ contentMode: UIView.ContentMode) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.contentMode, value: contentMode)
     }
 
+    /// Applies a corner radius to the view's layer, automatically clipping content.
     @discardableResult
     public func cornerRadius(_ radius: CGFloat) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -78,14 +103,28 @@ extension ModifiableView {
         }
     }
 
+    /// Hides the view unconditionally. Can be used with conditionally compiled builder nodes.
     @discardableResult
     public func hidden(_ hidden: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.isHidden, value: hidden)
     }
     
+    /// Sets the view's accessibility identifier.
     @discardableResult
     public func identifier<T:RawRepresentable>(_ identifier: T) -> ViewModifier<Base> where T.RawValue == String {
         ViewModifier(modifiableView) { $0.accessibilityIdentifier = identifier.rawValue }
+    }
+    
+    /// Enables or disables drawing the layer's pixels strictly opaque for optimization.
+    @discardableResult
+    public func isOpaque(_ opaque: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.isOpaque, value: opaque)
+    }
+    
+    /// Determines whether the view actively registers tap and dragging gesture interactions.
+    @discardableResult
+    public func isUserInteractionEnabled(_ enabled: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.isUserInteractionEnabled, value: enabled)
     }
 
     @discardableResult
@@ -96,20 +135,22 @@ extension ModifiableView {
         }
     }
     
+    /// Attaches a custom drop shadow targeting the underlying layer.
     @discardableResult
-    public func shadow(color: UIColor, radius: CGFloat, opacity: Float = 0.5, offset: CGSize = .zero) -> ViewModifier<Base> {
+    public func shadow(color: UIColor, radius: CGFloat, opacity: Float, offset: CGSize = .zero) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
             $0.layer.shadowColor = color.cgColor
-            $0.layer.shadowOffset = offset
             $0.layer.shadowRadius = radius
             $0.layer.shadowOpacity = opacity
-            $0.clipsToBounds = false
+            $0.layer.shadowOffset = offset
+            $0.layer.masksToBounds = false
         }
     }
 
+    /// Associates a specific integer identifier to rapidly retrieve this specific subview instance.
     @discardableResult
     public func tag<T:RawRepresentable>(_ tag: T) -> ViewModifier<Base> where T.RawValue == Int {
-        ViewModifier(modifiableView, keyPath: \.tag, value: tag.rawValue)
+        ViewModifier(modifiableView) { $0.tag = tag.rawValue }
     }
 
     @discardableResult
@@ -134,18 +175,19 @@ extension ModifiableView {
 extension ModifiableView {
     
     @discardableResult
-    public func hidden<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func hidden<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isHidden)
     }
 
     @discardableResult
-    public func userInteractionEnabled<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func userInteractionEnabled<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isUserInteractionEnabled)
     }
 
 }
 
 
+/// An internal hosting view responsible for anchoring a declaratively-defined arbitrary inner view.
 class BuilderHostView: UIView {
     
     public init(_ view: View) {

@@ -1,13 +1,33 @@
 //
-//  Builder+Label.swift
-//  ViewBuilder
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 11/8/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
 
-// Custom builder fot UILabel
+/// A builder component that wraps a `UILabel`, exposing a declarative API for configuring text,
+/// fonts, colors, and reactive bindings.
 public struct LabelView: ModifiableView {
     
     public let modifiableView = Modified(BuilderInternalUILabel()) {
@@ -26,11 +46,11 @@ public struct LabelView: ModifiableView {
         modifiableView.text = text
     }
     
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == String {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == String {
         self.text(bind: binding)
     }
 
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == String? {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == String? {
         self.text(bind: binding)
     }
 
@@ -51,29 +71,34 @@ public struct LabelView: ModifiableView {
 }
 
 
-// Custom UILabel modifiers
+/// Standard modifiers for any `UILabel` conforming to `ModifiableView`.
 extension ModifiableView where Base: UILabel {
     
+    /// Aligns the text within the label.
     @discardableResult
     public func alignment(_ alignment: NSTextAlignment) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.textAlignment, value: alignment)
     }
 
+    /// Sets the text color.
     @discardableResult
     public func color(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.textColor, value: color)
     }
     
+    /// Applies a specific `UIFont`.
     @discardableResult
     public func font(_ font: UIFont?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.font, value: font)
     }
     
+    /// Applies a dynamic type font style.
     @discardableResult
     public func font(_ style: UIFont.TextStyle) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.font, value: .preferredFont(forTextStyle: style))
     }
 
+    /// Configures the line break mode.
     @discardableResult
     public func lineBreakMode(_ mode: NSLineBreakMode) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.lineBreakMode, value: mode)
@@ -93,28 +118,30 @@ extension ModifiableView where Base: UILabel {
 extension ModifiableView where Base: UILabel {
 
     @discardableResult
-    public func color<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIColor {
+    public func color<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIColor {
         ViewModifier(modifiableView, binding: binding, keyPath: \.textColor)
     }
 
     @discardableResult
-    public func color<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIColor? {
+    public func color<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIColor? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.textColor)
     }
 
     @discardableResult
-    public func text<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == String {
-        ViewModifier(modifiableView, binding: binding) { $0.text = $1 } // binding non-optional to optional
+    public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String {
+        ViewModifier(modifiableView, binding: binding) { $0.view.text = $0.value } // binding non-optional to optional
     }
 
     @discardableResult
-    public func text<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == String? {
+    public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.text)
     }
 
 }
 
 
+/// A custom subclass of `UILabel` designed to interface smoothly with `ViewBuilder` lifecycle
+/// events and handle custom padding logic natively.
 public class BuilderInternalUILabel: UILabel, ViewBuilderEventHandling {
 
     var labelMargins: UIEdgeInsets = .zero

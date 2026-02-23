@@ -25,7 +25,11 @@
 import UIKit
 
 public typealias CellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
+
+/// A type alias for a diffable data source snapshot mapping `SectionController` sections to `CellController` items.
 public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionController, CellController>
+
+/// A type alias for a `UICollectionViewDiffableDataSource` driven by `SectionController` and `CellController`.
 public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
 
 public extension CollectionDiffableDataSource {

@@ -25,10 +25,12 @@
 import UIKit
 import ObjectiveC.runtime
 
+/// A core protocol enabling shimmer/skeleton loading states on constrained views.
 public protocol SkeletonView {
     func setAnimatedSkeletonView(_ isShowing: Bool)
 }
 
+/// An optional protocol views can adopt if they wish to monitor whether the skeleton is actively displaying.
 public protocol SkeletonDisplayableStatus {
     var isSkeletonShowing: Bool { get set }
 }

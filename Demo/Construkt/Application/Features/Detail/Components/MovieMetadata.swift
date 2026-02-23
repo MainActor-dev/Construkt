@@ -1,10 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 struct MovieMetadata: ViewBuilder {
     
-    let details: Observable<MovieDetail>
+    let details: AnyViewBinding<MovieDetail>
     
     var body: View {
         ZStackView {

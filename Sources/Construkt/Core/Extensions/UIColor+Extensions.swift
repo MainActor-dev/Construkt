@@ -9,10 +9,12 @@ import UIKit
 
 extension UIColor {
 
+    /// Returns a lighter variation of the current color by the specified percentage.
     func lighter(by percentage: CGFloat = 30.0) -> UIColor {
         return self.adjust(by: abs(percentage))
     }
 
+    /// Returns a darker variation of the current color by the specified percentage.
     func darker(by percentage: CGFloat = 30.0) -> UIColor {
         return self.adjust(by: -1 * abs(percentage))
     }

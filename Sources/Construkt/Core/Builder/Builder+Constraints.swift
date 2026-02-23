@@ -1,19 +1,51 @@
 //
-//  Builder+Constraints.swift
-//  Builder+Constraints
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 9/3/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
 
+/// Provides declarative layout bindings (e.g., width, height, priorities) mapping to AutoLayout constraints.
 extension ModifiableView {
     
+    /// Sets the compression resistance priority for the specified axis.
+    ///
+    /// - Parameters:
+    ///   - priority: The layout priority.
+    ///   - axis: The axis (`.horizontal` or `.vertical`).
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func contentCompressionResistancePriority(_ priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.setContentCompressionResistancePriority(priority, for: axis) }
     }
     
+    /// Sets the content hugging priority for the specified axis.
+    ///
+    /// - Parameters:
+    ///   - priority: The layout priority.
+    ///   - axis: The axis (`.horizontal` or `.vertical`).
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func contentHuggingPriority(_ priority: UILayoutPriority, for axis: NSLayoutConstraint.Axis) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -21,6 +53,12 @@ extension ModifiableView {
         }
     }
     
+    /// Applies exact width and height constraints to the view.
+    ///
+    /// - Parameters:
+    ///   - height: The optional explicit height.
+    ///   - width: The optional explicit width.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func frame(height: CGFloat? = nil, width: CGFloat? = nil) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -41,6 +79,10 @@ extension ModifiableView {
         }
     }
     
+    /// Constrains the height of the view exactly to the specified constant.
+    ///
+    /// - Parameter height: The height constant.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func height(_ height: CGFloat) -> ViewModifier<Base> {
         self.height(height, priority: UILayoutPriority(999))
@@ -89,16 +131,32 @@ extension ModifiableView {
         }
     }
     
+    /// Constrains the width of the view to an exact constant.
+    ///
+    /// - Parameter width: The defined width.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func width(_ width: CGFloat) -> ViewModifier<Base> {
         self.width(width, priority: UILayoutPriority(999))
     }
     
+    /// Constrains the width of the view to a constant at a specific priority (float form).
+    ///
+    /// - Parameters:
+    ///   - width: The width constant.
+    ///   - priority: The layout priority raw value.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func width(_ width: CGFloat, priority: Float) -> ViewModifier<Base> {
         self.width(width, priority: UILayoutPriority(priority))
     }
     
+    /// Constrains the width of the view to a constant at a specific constraint priority.
+    ///
+    /// - Parameters:
+    ///   - width: The defined width.
+    ///   - priority: An explicit `UILayoutPriority`.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func width(_ width: CGFloat, priority: UILayoutPriority) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -110,6 +168,12 @@ extension ModifiableView {
         }
     }
     
+    /// Restricts the view bounds horizontally enforcing a minimum width.
+    ///
+    /// - Parameters:
+    ///   - width: The minimum width constant.
+    ///   - priority: The layout priority, defaulting to 999.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func width(min width: CGFloat, priority: UILayoutPriority = UILayoutPriority(rawValue: 999)) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {

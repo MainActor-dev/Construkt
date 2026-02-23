@@ -1,12 +1,34 @@
 //
-//  Builder+TableView.swift
-//  ViewBuilder
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 7/2/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
 
+/// A declarative component generating a standard `UITableView`.
+///
+/// Typically accepts a dynamic list builder (e.g. `DynamicItemViewBuilder`) as its content source.
 public struct TableView: ModifiableView {
 
     public struct CellContext: ViewBuilderContextProvider {
@@ -29,40 +51,36 @@ public struct TableView: ModifiableView {
 
 extension ModifiableView where Base: BuilderInternalTableView {
 
+    /// Re-binds the underlying data source builder governing the table view's children dynamically.
     @discardableResult
     public func source(_ builder: AnyIndexableViewBuilder) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.set(builder) }
     }
 
+    /// Sets the style of cell separators.
     @discardableResult
     public func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.separatorStyle, value: style)
     }
 
-    /// Automatically handles smart updates for LoadableState by injecting new data into the builder.
-    /// - Parameter type: The type of the items in the list (e.g. User.self)
+    /// Provides a generic selection handler that automatically resolves the underlying data model
+    /// from the `DynamicItemViewBuilder`. This prevents leaking UIKit index paths and table views.
     @discardableResult
-    public func enableSmartUpdate<T: Equatable>(_ type: T.Type) -> ViewModifier<Base> {
+    public func onSelect<Item>(_ handler: @escaping (_ item: Item) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view in
-             view.updateHandler = { [weak view] state in
-                 guard let view = view else { return }
-                 // Smart Update Logic:
-                 // 1. Check if state is LoadableState<[T]> and is .loaded
-                 if let state = state as? LoadableState<[T]>,
-                    case .loaded(let items) = state,
-                    // 2. Check if builder is DynamicItemViewBuilder<T>
-                    let builder = view.builder as? DynamicItemViewBuilder<T> {
-                     // 3. Inject new data
-                     builder.items = items
-                     // 4. Trigger update
-                     view.set(builder)
-                 }
-             }
+            view.selectionHandler = { indexPath in
+                if let builder = view.builder as? DynamicItemViewBuilder<Item>, let item = builder.item(at: indexPath.row) {
+                    handler(item)
+                    return true
+                }
+                return false
+            }
         }
     }
+
 }
 
-open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling, UpdatableView {
+open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling {
     
     public var updateHandler: ((Any) -> Void)?
     
@@ -75,6 +93,9 @@ open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITable
     }
      
     public var builder: AnyIndexableViewBuilder!
+    
+    /// Internal selection handler intercepting delegate callbacks.
+    public var selectionHandler: ((_ indexPath: IndexPath) -> Bool)?
     
     public init() {
         super.init(frame: .zero, style: .plain)
@@ -91,10 +112,10 @@ open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITable
     public func set(_ builder: AnyIndexableViewBuilder) {
         self.builder = builder
         builder.updated?
-            .subscribe { [weak self] _ in
+            .observe(on: .main) { [weak self] _ in
                 self?.reloadData()
             }
-            .disposed(by: rxDisposeBag)
+            .store(in: cancelBag)
     }
     
     override public func didMoveToWindow() {
@@ -121,6 +142,9 @@ open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITable
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let selectionHandler = self.selectionHandler, selectionHandler(indexPath) {
+            return
+        }
         if let cell = tableView.cellForRow(at: indexPath) as? BuilderInternalTableViewCell, let selectionHandler = cell.selectionHandler {
             let context = TableView.CellContext(view: cell, tableView: self, indexPath: indexPath)
             if selectionHandler(context) {

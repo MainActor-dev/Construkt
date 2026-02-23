@@ -1,6 +1,4 @@
 import Foundation
-import RxSwift
-import RxCocoa
 
 public class MovieListViewModel {
     
@@ -17,11 +15,11 @@ public class MovieListViewModel {
         public let genre: Genre?
     }
     
-    // MARK: - Observables
-    public var moviesObservable: Observable<[Movie]> { $movies.asObservable() }
+    // MARK: - Bindings
+    public var moviesObservable: AnyViewBinding<[Movie]> { $movies.map { $0 } }
     
-    public var filterItemsObservable: Observable<[FilterItem]> {
-        $selectedGenre.asObservable().map { selected in
+    public var filterItemsObservable: AnyViewBinding<[FilterItem]> {
+        $selectedGenre.map { selected in
             let allItem = FilterItem(id: -1, title: "All", isSelected: selected == nil, genre: nil)
             let items = self.genres.map { genre in
                 FilterItem(
@@ -135,7 +133,6 @@ public class MovieListViewModel {
                 await MainActor.run {
                     self.error = error.localizedDescription
                     
-                    // Reset pagination state on error (allow retry)
                     self.paginationState = ListPaginationModel(
                         currentPage: self.paginationState.currentPage,
                         isPaginating: false,

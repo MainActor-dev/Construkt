@@ -10,9 +10,8 @@ import UIKit
 
 extension UIImage {
 
-    /**
-     Initializes and returns the image object of the specified color and size.
-     */
+    /// Initializes and returns the image object of the specified color and size.
+    /// This is often used for creating solid color backgrounds for buttons or states.
     public convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
         let rect = CGRect(origin: .zero, size: size)
         UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)

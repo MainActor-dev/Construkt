@@ -24,6 +24,8 @@
 //
 import UIKit
 
+/// A namespace for creating placeholder/skeleton variants of a `UICollectionViewCell` 
+/// tailored for loading states.
 public enum Skeleton<Cell: UICollectionViewCell> {
     public static func create(
         count: Int = 1,

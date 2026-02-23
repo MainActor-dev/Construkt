@@ -1,8 +1,27 @@
 //
-//  Builder+Extensions.swift
-//  Builder
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 11/23/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
@@ -10,10 +29,12 @@ import UIKit
 // Helpers for view conversion
 extension UIView {
 
+    /// Adds a constructed declarative `View` as a subview directly.
     public func addSubview(_ view: View) {
         addSubview(view())
     }
 
+    /// Inserts a constructed declarative `View` at an explicit z-index.
     public func insertSubview(_ view: View, at index: Int) {
         insertSubview(view(), at: index)
     }
@@ -22,16 +43,19 @@ extension UIView {
 
 extension UIView {
 
+    /// Shorthand to remove all child views from the container.
     public func empty() {
         self.subviews.forEach { $0.removeFromSuperview() }
     }
 
+    /// Immediately clears current subviews and embeds the new `View`.
     public func reset(_ view: View, padding: UIEdgeInsets? = nil, safeArea: Bool = false) {
         let existingSubviews = subviews
         addConstrainedSubview(view(), position: .fill, padding: padding ?? .zero, safeArea: safeArea)
         existingSubviews.forEach { $0.removeFromSuperview() }
     }
 
+    /// Smoothly swaps out the current child view hierarchy for the new `View`, applying a cross-fade transition.
     public func transition(to view: View, padding: UIEdgeInsets? = nil, safeArea: Bool = false, delay: Double = 0.2) {
         let newView: UIView = view()
         if subviews.isEmpty {
@@ -113,10 +137,12 @@ extension UIView {
 
 extension UIView {
 
+    /// Returns the first subview of a specific type within the view hierarchy.
     public func firstSubview<Subview:UIView>(ofType subviewType: Subview.Type) -> Subview? {
         return firstSubview(where: { type(of: $0) == subviewType.self }) as? Subview
     }
 
+    /// Returns the first subview in the view hierarchy that satisfies the given predicate.
     public func firstSubview(where predicate: (_ view: UIView) -> Bool) -> UIView? {
         for child in subviews {
             if predicate(child) {
@@ -128,10 +154,12 @@ extension UIView {
         return nil
     }
 
+    /// Returns the first superview of a specific type in the view hierarchy.
     public func firstSuperview<Subview>(ofType subviewType: Subview.Type) -> Subview? {
         return firstSuperview(where: { type(of: $0) == subviewType.self }) as? Subview
     }
 
+    /// Returns the first superview in the view hierarchy that satisfies the given predicate.
     public func firstSuperview(where predicate: (_ view: UIView) -> Bool) -> UIView? {
         if let parent = superview {
             return predicate(parent) ? parent : parent.firstSuperview(where: predicate)
@@ -139,6 +167,7 @@ extension UIView {
         return nil
     }
 
+    /// The topmost `UIView` in the current view's superview hierarchy.
     public var rootview: UIView {
         firstSuperview(where: { $0.superview == nil }) ?? self
     }

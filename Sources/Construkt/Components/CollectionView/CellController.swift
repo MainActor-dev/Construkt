@@ -34,6 +34,8 @@ public enum CellControllerState: Equatable {
     case loaded
 }
 
+/// A type-erased wrapper that encapsulates everything required to dequeue, configure, and
+/// interact with a `UICollectionViewCell` within the Construkt collection architecture.
 public struct CellController: Hashable {
     
     public let id: AnyHashable
@@ -44,6 +46,15 @@ public struct CellController: Hashable {
     private let onPrefetch: (() -> Void)?
     private let onCancelPrefetch: (() -> Void)?
 
+    /// Initializes a `CellController` mapping a specific `UICollectionViewCell` subclass to its backing `Model`.
+    /// - Parameters:
+    ///   - id: A unique identifier for diffable data source hashing.
+    ///   - model: The underlying data driving the cell.
+    ///   - registration: The `UICollectionView.CellRegistration` dictating the cell's initialization/dequeueing mechanism.
+    ///   - contentHash: An optional hash forcing cell reloads when the state changes.
+    ///   - didSelect: A closure executed when the constructed cell is tapped.
+    ///   - prefetch: A closure executed to begin prefetching data for the cell.
+    ///   - cancelPrefetch: A closure executed to halt prefetching data for the cell.
     public init<Cell: UICollectionViewCell, Model>(
         id: AnyHashable = UUID(),
         model: Model,

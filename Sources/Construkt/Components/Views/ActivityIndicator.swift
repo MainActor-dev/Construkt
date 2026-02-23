@@ -3,9 +3,9 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
+/// A declarative builder wrapper around `UIActivityIndicatorView`, providing modifiers
+/// for spinning styling and reactive bindings.
 public struct ActivityIndicator: ModifiableView {
     
     public let modifiableView = Modified(UIActivityIndicatorView(style: .medium))
@@ -25,13 +25,14 @@ public struct ActivityIndicator: ModifiableView {
         return self
     }
 
-    public func animating<B: RxBinding>(_ binding: B) -> ActivityIndicator where B.T == Bool {
-        binding
-            .asObservable()
-            .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .bind(to: modifiableView.rx.isAnimating)
-            .disposed(by: modifiableView.rxDisposeBag)
+    public func animating<Binding:ViewBinding>(_ binding: Binding) -> ActivityIndicator where Binding.Value == Bool {
+        binding.observe(on: .main) { [weak modifiableView] isAnimating in
+            if isAnimating {
+                modifiableView?.startAnimating()
+            } else {
+                modifiableView?.stopAnimating()
+            }
+        }.store(in: modifiableView.cancelBag)
         return self
     }
 }

@@ -1,6 +1,4 @@
 import UIKit
-import RxSwift
-import RxCocoa
 import SnapKit
 
 final class MovieDetailViewController: UIViewController {
@@ -31,7 +29,7 @@ final class MovieDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor("#0A0A0A")
-        observe()
+        setupUI()
         fetchDetail()
     }
     
@@ -39,21 +37,10 @@ final class MovieDetailViewController: UIViewController {
         viewModel.selectMovie(movie)
     }
     
-    private func observe() {
-        let details = viewModel.movieDetails
-            .observe(on: MainScheduler.instance)
-            .share(replay: 1)
-        
-        let casts = viewModel.movieCasts
-            .observe(on: MainScheduler.instance)
-            .share(replay: 1)
-        
-        setupUI(details: details, casts: casts)
-    }
-    
     // MARK: - Setup UI
-    private func setupUI(details: Observable<MovieDetail?>, casts: Observable<[Cast]>) {
-        let safeDetails = details.compactMap { $0 }
+    private func setupUI() {
+        let details = viewModel.movieDetails.compactMap { $0 }
+        let casts = viewModel.movieCasts
         
         view.subviews.forEach { $0.removeFromSuperview() }
         
@@ -62,7 +49,7 @@ final class MovieDetailViewController: UIViewController {
                 ImageView(nil)
                     .contentMode(.scaleAspectFill)
                     .clipsToBounds(true)
-                    .onReceive(safeDetails.map { $0.backdropURL ?? $0.posterURL }) { context in
+                    .onReceive(details.map { $0.backdropURL ?? $0.posterURL }) { context in
                         context.view.setImage(from: context.value)
                     }
                     .onReceive(viewModel.isLoadingDetails) { context in
@@ -84,15 +71,15 @@ final class MovieDetailViewController: UIViewController {
                     VerticalScrollView {
                         VStackView(spacing: 24) {
                             // Transparent Header Space + Content Overlay
-                            MovieDetailHero(details: safeDetails, height: self.heroHeight)
+                            MovieDetailHero(details: details, height: self.heroHeight)
                             
                             VStackView(spacing: 24) {
                                 actionButtons
-                                MovieStoryline(details: safeDetails)
+                                MovieStoryline(details: details)
                                 MovieCast(casts: casts) { cast in
                                     print("Tapped on cast: \(cast.name)")
                                 }
-                                MovieSimilar(details: safeDetails) { [weak self] movie in
+                                MovieSimilar(details: details) { [weak self] movie in
                                     if let scrollView = self?.scrollView as? UIScrollView {
                                         scrollView.setContentOffset(.zero, animated: true)
                                     }

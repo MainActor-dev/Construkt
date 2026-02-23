@@ -1,11 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
-import SnapKit
 
 struct MovieDetailHero: ViewBuilder {
     
-    let details: Observable<MovieDetail>
+    let details: AnyViewBinding<MovieDetail>
     let height: CGFloat
     
     var body: View {

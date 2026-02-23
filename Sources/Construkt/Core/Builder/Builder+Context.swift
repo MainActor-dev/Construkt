@@ -1,59 +1,91 @@
 //
-//  Builder+Context.swift
-//  Builder+Context
+//  👨‍💻 Created by @thatswiftdev on 23/02/26.
+//  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
-//  Created by Michael Long on 9/4/21.
+//  Originally created by Michael Long
+//  https://github.com/hmlongco/Builder
+
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
 //
 
 import UIKit
-import RxSwift
 
+/// A protocol that provides ambient access to the current `UIView` and its hierarchical environment
+/// (like `UIViewController` or `UINavigationController`) during builder evaluation.
 public protocol ViewBuilderContextProvider {
     associatedtype Base: UIView
     var view: Base { get }
 }
 
+/// An extension of `ViewBuilderContextProvider` that additionally carries a strongly-typed value payload,
+/// typically used in control event callbacks.
 public protocol ViewBuilderContextValueProvider: ViewBuilderContextProvider {
     associatedtype Value
     var value: Value { get }
 }
 
+/// Extension facilitating quick access to complex View Controller hierarchies directly from inline context handlers.
 extension ViewBuilderContextProvider {
     
+    /// The parent `UIViewController` hosting the view, walked up the responder chain.
     public var viewController: UIViewController? {
         view.parentViewController
     }
     
+    /// The `UINavigationController` belonging to the parent view controller, if any.
     public var navigationController: UINavigationController? {
         viewController?.navigationController
     }
 
+    /// The `UINavigationItem` associated with the parent view controller.
     public var navigationItem: UINavigationItem? {
         viewController?.navigationItem
     }
 
+    /// Presents a new View declaratively by wrapping it in a generic `UIViewController`.
     public func present(_ view: View, animated: Bool = true) {
         navigationController?.present(UIViewController(view()), animated: animated)
     }
     
+    /// Presents a specific `UIViewController` directly.
     public func present<VC:UIViewController>(_ vc: VC, configure: ((_ vc: VC) -> Void)? = nil) {
         configure?(vc)
         navigationController?.present(vc, animated: true)
     }
 
+    /// Pushes a new View onto the current `UINavigationController` stack by wrapping it in a generic `UIViewController`.
     public func push(_ view: View, animated: Bool = true) {
         navigationController?.pushViewController(UIViewController(view()), animated: animated)
     }
 
+    /// Pushes a specific `UIViewController` directly onto the nav stack.
     public func push<VC:UIViewController>(_ vc: VC, configure: ((_ vc: VC) -> Void)? = nil) {
         configure?(vc)
         navigationController?.pushViewController(vc, animated: true)
     }
 
+    /// Smoothly transitions the view's content to a new `View` configuration.
     public func transition(to view: View, delay: Double = 0.2) {
         self.view.transition(to: view, delay: delay)
     }
 
+    /// Smoothly transitions the view's content, hosting a new `UIViewController`.
     public func transition(to viewController: UIViewController, delay: Double = 0.2) {
         view.transition(to: viewController, delay: delay)
     }
@@ -68,8 +100,8 @@ extension ViewBuilderContextProvider {
         view.rootview.firstSubview(where: { $0.isFirstResponder })?.resignFirstResponder()
     }
 
-    public var disposeBag: DisposeBag {
-        view.rxDisposeBag
+    public var cancelBag: CancelBag {
+        view.cancelBag
     }
 
 }
@@ -104,10 +136,12 @@ extension ViewBuilderContextProvider {
 
 }
 
+/// A concrete implementation of `ViewBuilderContextProvider` wrapping a given `UIView`.
 public struct ViewBuilderContext<Base:UIView>: ViewBuilderContextProvider {
     public var view: Base
 }
 
+/// A concrete implementation of `ViewBuilderContextValueProvider` coupling a view with a contextual value.
 public struct ViewBuilderValueContext<Base:UIView, Value>: ViewBuilderContextValueProvider {
     public let view: Base
     public var value: Value

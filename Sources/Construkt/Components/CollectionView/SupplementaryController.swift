@@ -25,6 +25,8 @@
 
 import UIKit
 
+/// A type-erased wrapper that encapsulates dequeueing and configuring supplementary views 
+/// (headers/footers) attached to `UICollectionView` sections.
 public struct SupplementaryController {
     public var id: AnyHashable
     let elementKind: String
@@ -50,6 +52,8 @@ public struct SupplementaryController {
     }
 }
 
+/// A static cache managing deduplicated `UICollectionView.SupplementaryRegistration` instances 
+/// mapped by component type and element kind.
 class SupplementaryRegistrationCache {
     static var cache = [String: Any]()
     

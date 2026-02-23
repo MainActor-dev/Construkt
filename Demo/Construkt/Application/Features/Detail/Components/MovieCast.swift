@@ -1,10 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 struct MovieCast: ViewBuilder {
     
-    let casts: Observable<[Cast]>
+    let casts: AnyViewBinding<[Cast]>
     var onCastSelected: ((Cast) -> Void)?
     
     var body: View {
@@ -25,11 +23,14 @@ struct MovieCast: ViewBuilder {
                         context.view.reset(to: context.value)
                     }
                     .spacing(16)
-                    .alignment(.top)
+                    .spacing(16)
+                    .alignment(.fill)
             )
             .showHorizontalIndicator(false)
             .bounces(false)
-            .height(min: 120)
+            .with {
+                $0.heightAnchor.constraint(equalTo: $0.contentLayoutGuide.heightAnchor).isActive = true
+            }
         }
         .onReceive(casts.map { $0.isEmpty }) { context in
             context.view.isHidden = context.value
