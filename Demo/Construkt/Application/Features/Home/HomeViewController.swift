@@ -84,11 +84,11 @@ class HomeViewController: UIViewController {
             me.showDetail(for: movie)
         }
         .layout { [weak self] _ in
-            let layout = HomeSection.hero.layout
-            layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
-                self?.handleHeroScroll(items: items, offset: offset, env: env)
+            HomeSection.hero.layout.then { layout in
+                layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
+                    self?.handleHeroScroll(items: items, offset: offset, env: env)
+                }
             }
-            return layout
         }
         .skeleton(count: 1, when: viewModel.isNowPlayingLoading) {
             Modified(HeroContentView()) { $0.configure(with: .placeholder) }
@@ -118,7 +118,7 @@ class HomeViewController: UIViewController {
             GenresCell(id: -2, genre: .placeholder)
         }
         .layout { _ in
-            return HomeSection.categories.layout
+            HomeSection.categories.layout
         }
     }
     
@@ -140,7 +140,7 @@ class HomeViewController: UIViewController {
             me.showDetail(for: movie)
         }
         .layout { _ in
-            return HomeSection.popular.layout
+            HomeSection.popular.layout
         }
         .skeleton(
             count: 4,
@@ -169,7 +169,7 @@ class HomeViewController: UIViewController {
             me.showDetail(for: movie)
         }
         .layout { _ in
-            return HomeSection.upcoming.layout
+            HomeSection.upcoming.layout
         }
         .skeleton(
             count: 2,
@@ -202,7 +202,7 @@ class HomeViewController: UIViewController {
             print("Ad Selected: \(ad)")
         }
         .layout { _ in
-            return HomeSection.topRated.layout
+            HomeSection.topRated.layout
         }
         .skeleton(count: 3, when: viewModel.isTopRatedLoading) {
             TopRatedCell(index: 0, movie: .placeholder)
