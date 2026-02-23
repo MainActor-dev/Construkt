@@ -27,7 +27,7 @@ public class SearchViewController: UIViewController {
                 // Search Results
                 ZStackView {
                     // Empty State
-                    LabelView("Type to search TMDB movies...")
+                    LabelView("No movies")
                         .color(.lightGray)
                         .alignment(.center)
                         .font(.systemFont(ofSize: 16, weight: .medium))
@@ -108,8 +108,8 @@ public class SearchViewController: UIViewController {
         .padding(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
         .cornerRadius(12)
         .backgroundColor(UIColor("#0A0A0A"))
-        .padding(insets: .init(top: 16, left: 16, bottom: 0, right: 16))
         .zIndex(100)
+        .height(48)
     }
 }
 

@@ -296,14 +296,6 @@ extension HomeViewController {
                  item.transform = CGAffineTransform(translationX: 0, y: translationY)
                      .scaledBy(x: 1, y: scale)
              }
-        } else {
-            let fadeRange: CGFloat = 350
-            let alpha = max(0, 1 - (y / fadeRange))
-            
-            items.forEach { item in
-                item.alpha = alpha
-                item.transform = .identity
-            }
         }
     }
     

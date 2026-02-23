@@ -5,7 +5,7 @@ final class MovieDetailViewController: UIViewController {
     
     // MARK: - Properties
     private let viewModel = MovieViewModel()
-    private let movie: Movie
+    private var movie: Movie
     private let heroHeight: CGFloat = 450
     
     private weak var scrollView: UIScrollView?
@@ -113,7 +113,7 @@ final class MovieDetailViewController: UIViewController {
                     
                     // Overlay Navigation Bar
                     MovieDetailNavBar(
-                        title: movie.title,
+                        title: details.compactMap { $0.title },
                         onBack: { [weak self] in self?.navigationController?.popViewController(animated: true) },
                         backgroundViewCapture: { [weak self] view in self?.navBarBackgroundView = view },
                         titleLabelCapture: { [weak self] view in self?.navBarTitleLabel = view }

@@ -3,7 +3,7 @@ import ConstruktKit
 
 struct MovieDetailNavBar: ViewBuilder {
     
-    let title: String
+    let title: AnyViewBinding<String>
     let onBack: () -> Void
     var onFavorite: (() -> Void)?
     var onShare: (() -> Void)?
@@ -34,6 +34,8 @@ struct MovieDetailNavBar: ViewBuilder {
                         .color(.white)
                         .alignment(.center)
                         .alpha(0)
+                        .numberOfLines(1)
+                        .contentCompressionResistancePriority(.defaultLow, for: .horizontal)
                         .with { view in
                             titleLabelCapture?(view)
                         }
