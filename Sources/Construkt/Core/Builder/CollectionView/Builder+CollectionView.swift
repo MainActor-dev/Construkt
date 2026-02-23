@@ -24,8 +24,6 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
 // MARK: - CollectionView Wrapper
 
@@ -35,16 +33,13 @@ public struct CollectionView: ModifiableView {
     
     public let modifiableView = CollectionViewWrapperView()
     
-    /// Initializes a declarative collection view dynamically mapped to an Rx stream of `Section` arrays.
-    public init(@SectionResultBuilder content: () -> Observable<[SectionController]>) {
-        let sectionsObservable = content()
+    /// Initializes a declarative collection view dynamically mapped to a reactive stream of `Section` arrays.
+    public init(@SectionResultBuilder content: () -> AnyViewBinding<[SectionController]>) {
+        let sectionsBinding = content()
         
-        sectionsObservable
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak modifiableView] sections in
-                modifiableView?.update(sections: sections)
-            })
-            .store(in: modifiableView.cancelBag)
+        sectionsBinding.observe(on: .main) { [weak modifiableView] sections in
+            modifiableView?.update(sections: sections)
+        }.store(in: modifiableView.cancelBag)
     }
 }
 
@@ -232,7 +227,6 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
     internal func setRefreshing(_ isRefreshing: Bool) {
         if isRefreshing {
-            // Only begin refreshing if we are on screen to avoid "offscreen beginRefreshing" warning
             if window != nil {
                 if !(collectionView.refreshControl?.isRefreshing ?? false) {
                     collectionView.refreshControl?.beginRefreshing()
@@ -271,22 +265,19 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
 
 public extension CollectionView {
     /// Dynamically swaps the internal collection view display for a custom empty state `View` when the
-    /// bounding Rx stream resolves to `true`.
+    /// bounding binding resolves to `true`.
     func emptyState<B: ViewBinding>(when binding: B, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> CollectionView where B.Value == Bool {
         let views = content().asViews()
         let view = VStackView(views)
             .alignment(.center)
             .build()
-        // Set the view provider (could be just the view instance)
         modifiableView.emptyStateProvider = { view }
         
-        // Subscribe to binding
-        binding.asObservable()
+        binding
             .distinctUntilChanged()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak modifiableView] show in
+            .observe(on: .main) { [weak modifiableView] show in
                 modifiableView?.updateEmptyState(show: show)
-            })
+            }
             .store(in: modifiableView.cancelBag)
             
         return self
@@ -310,17 +301,14 @@ public extension ModifiableView where Base: CollectionViewWrapperView {
     }
     
     /// Installs a `UIRefreshControl` directly into the collection view, binding its active state
-    /// to a specific Rx boolean stream.
+    /// to a specific boolean binding.
     @discardableResult
     func onRefresh<B: ViewBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.Value == Bool {
         modifiableView.setupRefreshControl(action: action)
         
-        binding.asObservable()
-            .observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak modifiableView] isRefreshing in
-                modifiableView?.setRefreshing(isRefreshing)
-            })
-            .store(in: modifiableView.cancelBag)
+        binding.observe(on: .main) { [weak modifiableView] isRefreshing in
+            modifiableView?.setRefreshing(isRefreshing)
+        }.store(in: modifiableView.cancelBag)
             
         return ViewModifier(modifiableView)
     }

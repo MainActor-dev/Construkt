@@ -78,7 +78,6 @@ public struct ImageView: ModifiableView {
     public init(configuration: (_ view: UIImageView) -> Void) {
         configuration(modifiableView)
     }
-
 }
 
 

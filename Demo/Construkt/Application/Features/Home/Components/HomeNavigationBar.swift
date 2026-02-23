@@ -1,8 +1,7 @@
 import UIKit
-import RxSwift
 
 struct HomeNavigationBar: ViewBuilder {
-    let isLoading: Observable<Bool>
+    let isLoading: AnyViewBinding<Bool>
     let onBackgroundReference: (UIView) -> Void
     
     var body: View {

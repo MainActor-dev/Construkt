@@ -1,6 +1,4 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 // MARK: - API Protocols
 
@@ -35,7 +33,7 @@ public class StateContainer<State: Equatable>: UIView {
     public var transitionDuration: TimeInterval = 0.2
     
     // Internal
-    private let disposeBag = DisposeBag()
+    // Uses NSObject.cancelBag from Construkt core
     private var currentState: State?
     private var activeView: UIView? // Tracks the currently active view to prevent race conditions
     private let builder: (State) -> ViewConvertable

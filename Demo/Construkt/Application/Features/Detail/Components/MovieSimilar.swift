@@ -1,10 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 struct MovieSimilar: ViewBuilder {
     
-    let details: Observable<MovieDetail>
+    let details: AnyViewBinding<MovieDetail>
     var onMovieSelected: ((Movie) -> Void)?
     
     var body: View {

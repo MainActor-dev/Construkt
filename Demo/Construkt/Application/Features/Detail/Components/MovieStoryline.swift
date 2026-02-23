@@ -1,10 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 struct MovieStoryline: ViewBuilder {
     
-    let details: Observable<MovieDetail>
+    let details: AnyViewBinding<MovieDetail>
     
     var body: View {
         VStackView(spacing: 12) {

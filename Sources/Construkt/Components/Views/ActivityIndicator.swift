@@ -3,8 +3,6 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
 /// A declarative builder wrapper around `UIActivityIndicatorView`, providing modifiers
 /// for spinning styling and reactive bindings.

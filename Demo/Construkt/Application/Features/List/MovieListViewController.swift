@@ -1,6 +1,4 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 enum MovieListSection: String, SectionControllerIdentifier {
     case filter
@@ -12,7 +10,6 @@ enum MovieListSection: String, SectionControllerIdentifier {
 class MovieListViewController: UIViewController {
     
     private let viewModel: MovieListViewModel
-    private let disposeBag = DisposeBag()
     private var filterCollectionViewWrapper: CollectionViewWrapperView?
     
     init(viewModel: MovieListViewModel) {
@@ -34,14 +31,13 @@ class MovieListViewController: UIViewController {
     }
     
     private func observe() {
-        viewModel.$selectedGenre.asObservable()
-            .observe(on: MainScheduler.asyncInstance)
+        viewModel.$selectedGenre
             .compactMap { $0 }
             .distinctUntilChanged()
-            .subscribe(onNext: { [weak self] item in
+            .observe(on: .main) { [weak self] item in
                 self?.scrollToFilter(item.id)
-            })
-            .disposed(by: disposeBag)
+            }
+            .store(in: cancelBag)
     }
     
     private func setupUI() {
@@ -61,7 +57,7 @@ class MovieListViewController: UIViewController {
                     CollectionView {
                          gridSection
                     }
-                    .pagination(model: viewModel.$paginationState.asObservable()) { [weak self] _ in
+                    .pagination(model: viewModel.$paginationState) { [weak self] _ in
                         self?.viewModel.loadMore()
                     }
                     .onRefresh(viewModel.$isLoading) { [weak self] in
@@ -115,7 +111,7 @@ class MovieListViewController: UIViewController {
                     ZStackView {
                         ActivityIndicator(style: .large)
                             .color(.white)
-                            .animating(viewModel.$paginationState.asObservable().map { $0.isPaginating })
+                            .animating(viewModel.$paginationState.map { $0.isPaginating })
                     }
                     .padding(12)
                 }
@@ -141,7 +137,7 @@ class MovieListViewController: UIViewController {
             
             let groupSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalWidth(0.75) // Aspect ratio for poster
+                heightDimension: .fractionalWidth(0.75)
             )
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             let section = NSCollectionLayoutSection(group: group)
@@ -159,7 +155,6 @@ class MovieListViewController: UIViewController {
         guard let wrapper = filterCollectionViewWrapper,
               let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource else { return }
         
-        // Retry scroll if data isn't ready yet
         if dataSource.snapshot().numberOfItems == 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 self?.scrollToFilter(id)

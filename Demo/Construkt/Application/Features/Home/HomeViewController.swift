@@ -7,8 +7,6 @@
 
 import UIKit
 import SnapKit
-import RxSwift
-import RxCocoa
 
 class HomeViewController: UIViewController {
     
@@ -258,7 +256,6 @@ extension HomeViewController {
         let containerWidth = env.container.contentSize.width
         let visibleRectCenter = offset.x + containerWidth / 2.0
         
-        // We need to find the actual cells to update them
         let collectionView: UICollectionView
         
         if let cached = cachedCollectionView {
@@ -271,15 +268,10 @@ extension HomeViewController {
             return
         }
                 
-        // Map visible items to their progress
         for item in items {
-            // Distance of item center from viewport center
             let distanceFromCenter = abs(item.center.x - visibleRectCenter)
-            
-            // Normalize distance: 0 at center, 1 at edge
             let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
             
-            // Match layout item to cell by indexPath (more robust than coordinate matching)
             if let cell = collectionView.cellForItem(at: item.indexPath),
                let heroView = findAllHeroViews(in: cell).first {
                 heroView.setScrollProgress(progress)
@@ -300,7 +292,6 @@ extension HomeViewController {
                      .scaledBy(x: 1, y: scale)
              }
         } else {
-            // Scroll Up: Fade Effect
             let fadeRange: CGFloat = 350
             let alpha = max(0, 1 - (y / fadeRange))
             
@@ -320,7 +311,6 @@ extension HomeViewController {
     
     private func handleNavBarScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
-        // Fade in between 0 and 100pt scroll
         let alpha = min(1.0, max(0.0, y / 100.0))
         navBarBackgroundView?.alpha = alpha
     }

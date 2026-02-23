@@ -1,10 +1,8 @@
 import UIKit
-import RxSwift
-import RxCocoa
 
 struct MovieCast: ViewBuilder {
     
-    let casts: Observable<[Cast]>
+    let casts: AnyViewBinding<[Cast]>
     var onCastSelected: ((Cast) -> Void)?
     
     var body: View {
