@@ -13,7 +13,10 @@ public class SearchViewModel {
     }
     
     public var isLoadingObservable: AnyViewBinding<Bool> {
-        $searchResults.mapLoading()
+        $searchResults.map {
+            if case .loading = $0 { return true }
+            return false
+        }
     }
     
     public var isEmptyObservable: AnyViewBinding<Bool> {
@@ -54,6 +57,8 @@ public class SearchViewModel {
         searchResults = .loading
         
         Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            
             do {
                 let result = try await service.searchMovies(query: trimmed, page: 1)
                 await MainActor.run {
