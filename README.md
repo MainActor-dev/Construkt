@@ -123,8 +123,8 @@ If you need a completely custom binding, use `onReceive`:
 
 ```swift
 ImageView()
-    .onReceive($viewModel.profileImage) { context, image in
-        context.view.image = image
+    .onReceive($viewModel.profileImage) { context in
+        context.view.image = context.value
     }
 ```
 
@@ -188,18 +188,32 @@ struct MainUsersTableView: ViewBuilder {
 `CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `Section`-based `ResultBuilder` syntax.
 
 ```swift
-CollectionView(movies) { movie in
-    Section {
-        CellView {
-            MoviePosterCell(movie: movie)
+CollectionView {
+    Section(id: "trending", items: movies, header: Header { LabelView("Trending Now").font(.title1) }) { movie in
+        Cell(movie, id: movie.id) { movieData in
+            MoviePosterCell(movie: movieData)
         }
     }
     .layout(.horizontalOrthogonal(
         width: .fractionalWidth(0.8), 
         height: .fractionalHeight(1.0)
     ))
-    .header {
-        LabelView("Trending Now").font(.title1)
+}
+```
+
+### Static Collection Views
+
+You can also build statically-defined declarative collections (e.g., Settings menus) by listing explicit `Cell` components within a `Section`:
+
+```swift
+CollectionView {
+    Section(id: "settings", header: Header { LabelView("General") }) {
+        Cell("Notifications", id: "notifications") { title in
+            SettingsRowView(title: title)
+        }
+        Cell("Privacy", id: "privacy") { title in
+            SettingsRowView(title: title)
+        }
     }
 }
 ```
@@ -208,10 +222,14 @@ CollectionView(movies) { movie in
 Building sophisticated loading UIs is built-in natively:
 
 ```swift
-Section {
-    CellView { MoviePosterCell(movie: nil) }
+Section(id: "popular", items: movies) { movie in
+    Cell(movie, id: movie.id) { movieData in 
+        MoviePosterCell(movie: movieData) 
+    }
 }
-.skeleton(bind: $viewModel.isLoading, count: 5)
+.skeleton(count: 5, when: $viewModel.isLoading) {
+    MoviePosterCell(movie: .placeholder)
+}
 ```
 
 When `isLoading` is true, Construkt automatically generates 5 skeleton placeholder geometries based on your ViewBuilder structure and animates a shimmer gradient across them. When the data loads, it cross-dissolves them back to your actual fetched data natively.
@@ -232,8 +250,8 @@ ZStackView {
     
     LabelView("Featured Content")
         .color(.white)
-        .alignment(.bottomLeft)
-        .padding(h: 20, v: 20)
+        .position(.bottomLeft)
+        .margins(h: 20, v: 20)
 }
 .height(300)
 .clipsToBounds(true)
