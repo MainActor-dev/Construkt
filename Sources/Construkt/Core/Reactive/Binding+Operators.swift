@@ -127,29 +127,181 @@ public extension ViewBinding {
         }
     }
     
+    
+    /// Only forwards values matching the given predicate.
+    func filter(_ predicate: @escaping (Value) -> Bool) -> AnyViewBinding<Value> {
+        return AnyViewBinding<Value> { queue, handler in
+            return self.observe(on: queue) { value in
+                if predicate(value) {
+                    handler(value)
+                }
+            }
+        }
+    }
+    
+    /// Accumulates values using the provided closure, emitting the running result.
+    func scan<Result>(_ initial: Result, _ accumulator: @escaping (Result, Value) -> Result) -> AnyViewBinding<Result> {
+        return AnyViewBinding<Result> { queue, handler in
+            let lock = NSLock()
+            var accumulated = initial
+            
+            return self.observe(on: queue) { value in
+                lock.lock()
+                accumulated = accumulator(accumulated, value)
+                let current = accumulated
+                lock.unlock()
+                handler(current)
+            }
+        }
+    }
+    
+    /// Skips the first `count` values, forwarding only subsequent ones.
+    func skip(_ count: Int) -> AnyViewBinding<Value> {
+        return AnyViewBinding<Value> { queue, handler in
+            let lock = NSLock()
+            var skipped = 0
+            
+            return self.observe(on: queue) { value in
+                lock.lock()
+                let shouldSkip = skipped < count
+                if shouldSkip { skipped += 1 }
+                lock.unlock()
+                
+                if !shouldSkip {
+                    handler(value)
+                }
+            }
+        }
+    }
+    
+    /// Waits until values stop arriving for the specified duration before forwarding the latest.
+    func debounce(for interval: TimeInterval, on scheduler: DispatchQueue = .main) -> AnyViewBinding<Value> {
+        return AnyViewBinding<Value> { queue, handler in
+            let lock = NSLock()
+            var workItem: DispatchWorkItem?
+            
+            return self.observe(on: nil) { value in
+                lock.lock()
+                workItem?.cancel()
+                let item = DispatchWorkItem {
+                    if let targetQueue = queue {
+                        targetQueue.async { handler(value) }
+                    } else {
+                        handler(value)
+                    }
+                }
+                workItem = item
+                lock.unlock()
+                scheduler.asyncAfter(deadline: .now() + interval, execute: item)
+            }
+        }
+    }
+    
+    /// Rate-limits emissions to at most one per interval.
+    /// - Parameter latest: If `true`, emits the most recent value at the end of each window.
+    ///   If `false`, emits the first value and suppresses the rest until the window expires.
+    func throttle(for interval: TimeInterval, latest: Bool = true, on scheduler: DispatchQueue = .main) -> AnyViewBinding<Value> {
+        return AnyViewBinding<Value> { queue, handler in
+            let lock = NSLock()
+            var lastEmitTime: Date = .distantPast
+            var pendingValue: Value?
+            var pendingWorkItem: DispatchWorkItem?
+            
+            return self.observe(on: nil) { value in
+                let now = Date()
+                lock.lock()
+                let elapsed = now.timeIntervalSince(lastEmitTime)
+                
+                if elapsed >= interval {
+                    // Window expired — emit immediately
+                    lastEmitTime = now
+                    pendingWorkItem?.cancel()
+                    pendingWorkItem = nil
+                    pendingValue = nil
+                    lock.unlock()
+                    
+                    if let targetQueue = queue {
+                        targetQueue.async { handler(value) }
+                    } else {
+                        handler(value)
+                    }
+                } else if latest {
+                    // Within window — schedule the latest value at window end
+                    pendingValue = value
+                    if pendingWorkItem == nil {
+                        let remaining = interval - elapsed
+                        let item = DispatchWorkItem { [weak lock] in
+                            guard let lock = lock else { return }
+                            lock.lock()
+                            let val = pendingValue
+                            pendingValue = nil
+                            pendingWorkItem = nil
+                            lastEmitTime = Date()
+                            lock.unlock()
+                            
+                            if let val = val {
+                                if let targetQueue = queue {
+                                    targetQueue.async { handler(val) }
+                                } else {
+                                    handler(val)
+                                }
+                            }
+                        }
+                        pendingWorkItem = item
+                        lock.unlock()
+                        scheduler.asyncAfter(deadline: .now() + remaining, execute: item)
+                    } else {
+                        lock.unlock()
+                    }
+                } else {
+                    // Not latest mode — just drop
+                    lock.unlock()
+                }
+            }
+        }
+    }
+    
+    /// Merges emissions from this binding and another binding of the same type into a single stream.
+    func merge<B: ViewBinding>(with other: B) -> AnyViewBinding<Value> where B.Value == Value {
+        return AnyViewBinding<Value> { queue, handler in
+            let tokenA = self.observe(on: queue, handler)
+            let tokenB = other.observe(on: queue, handler)
+            return CompoundCancellable([tokenA, tokenB])
+        }
+    }
+    
+    /// Filters out consecutive duplicate values using a custom comparator.
+    func removeDuplicates(by predicate: @escaping (Value, Value) -> Bool) -> AnyViewBinding<Value> {
+        return AnyViewBinding<Value> { queue, handler in
+            let lock = NSLock()
+            var lastValue: Value?
+            
+            return self.observe(on: queue) { value in
+                lock.lock()
+                let isDuplicate: Bool
+                if let last = lastValue {
+                    isDuplicate = predicate(last, value)
+                } else {
+                    isDuplicate = false
+                }
+                if !isDuplicate {
+                    lastValue = value
+                }
+                lock.unlock()
+                
+                if !isDuplicate {
+                    handler(value)
+                }
+            }
+        }
+    }
 }
 
 public extension ViewBinding where Value: Equatable {
     
     /// Filters out consecutive duplicate values from being emitted.
     func distinctUntilChanged() -> AnyViewBinding<Value> {
-        return AnyViewBinding<Value> { queue, handler in
-            var lastValue: Value?
-            let lock = NSLock()
-            
-            return self.observe(on: queue) { value in
-                lock.lock()
-                let isDistinct = (lastValue != value)
-                if isDistinct {
-                    lastValue = value
-                }
-                lock.unlock()
-                
-                if isDistinct {
-                    handler(value)
-                }
-            }
-        }
+        return removeDuplicates(by: ==)
     }
     
 }

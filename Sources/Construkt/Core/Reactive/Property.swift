@@ -88,14 +88,18 @@ public final class Property<T>: MutableViewBinding {
 /// Internal lifecycle token for `Property` observations.
 private final class PropertyCancellable: AnyCancellableLifecycle {
     private var onCancel: (() -> Void)?
+    private let lock = NSLock()
     
     init(_ onCancel: @escaping () -> Void) {
         self.onCancel = onCancel
     }
     
     func cancel() {
-        onCancel?()
+        lock.lock()
+        let action = onCancel
         onCancel = nil
+        lock.unlock()
+        action?()
     }
     
     deinit {
