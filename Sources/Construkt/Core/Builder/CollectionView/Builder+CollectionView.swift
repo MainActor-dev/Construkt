@@ -57,7 +57,7 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
     private lazy var refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.tintColor = UIColor("#FFFFFF") // Default to white for dark mode app
+        refreshControl.tintColor = .white
         refreshControl.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         return refreshControl
