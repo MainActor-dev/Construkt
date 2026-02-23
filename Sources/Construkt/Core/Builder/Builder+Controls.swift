@@ -61,25 +61,25 @@ extension ModifiableView where Base: UIControl {
 
 }
 
-/// Standard declarative RxBindings for `UIControl` baseline state properties.
+/// Standard declarative ViewBindings for `UIControl` baseline state properties.
 extension ModifiableView where Base: UIControl {
 
     /// Binds the `isEnabled` state to a reactive boolean stream.
     @discardableResult
-    public func enabled<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
-        ViewModifier(modifiableView, binding: binding) { $0.isEnabled = $1 }
+    public func enabled<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
+        ViewModifier(modifiableView, binding: binding) { $0.view.isEnabled = $0.value }
     }
 
     /// Binds the `isHighlighted` state to a reactive boolean stream.
     @discardableResult
-    public func highlighted<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
-        ViewModifier(modifiableView, binding: binding) { $0.isHighlighted = $1 }
+    public func highlighted<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
+        ViewModifier(modifiableView, binding: binding) { $0.view.isHighlighted = $0.value }
     }
 
     /// Binds the `isSelected` state to a reactive boolean stream.
     @discardableResult
-    public func selected<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
-        ViewModifier(modifiableView, binding: binding) { $0.isSelected = $1 }
+    public func selected<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
+        ViewModifier(modifiableView, binding: binding) { $0.view.isSelected = $0.value }
     }
 
 }

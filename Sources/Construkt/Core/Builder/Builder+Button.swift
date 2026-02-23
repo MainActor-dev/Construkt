@@ -25,8 +25,6 @@
 //
 
 import UIKit
-import RxSwift
-import RxCocoa
 
 
 /// A builder component that wraps a `UIButton`, providing declarative methods for titles, colors, fonts,
@@ -107,14 +105,15 @@ extension ModifiableView where Base: UIButton {
     /// Attaches an `RxSwift` tap handler to the button, automatically throttled to prevent double taps.
     ///
     /// - Parameter handler: A closure providing the builder context for contextual access.
-    /// - Returns: A modified view wrapper.
+    /// Assigns a native execution block directly binding towards `touchUpInside` tap events.
     @discardableResult
-    public func onTap(_ handler: @escaping (_ context: ViewBuilderContext<UIButton>) -> Void) -> ViewModifier<Base> {
-        ViewModifier(modifiableView) { [unowned modifiableView] view in
-            view.rx.tap
-                .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-                .subscribe(onNext: { () in handler(ViewBuilderContext(view: modifiableView)) })
-                .disposed(by: view.rxDisposeBag)
+    public func onTap(_ handler: @escaping (_ context: ViewBuilderContext<Base>) -> Void) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { view in
+            let action = UIAction { [weak view] _ in
+                guard let view = view else { return }
+                handler(ViewBuilderContext(view: view))
+            }
+            view.addAction(action, for: .touchUpInside)
         }
     }
 

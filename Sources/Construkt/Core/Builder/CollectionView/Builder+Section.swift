@@ -245,10 +245,10 @@ public struct Section: SectionObservable {
     }
     
     /// Reactive Binding initializer
-    public init<B: RxBinding>(
+    public init<B: ViewBinding>(
         id: SectionControllerIdentifier,
         binding: B,
-        @CellResultBuilder content: @escaping (B.T) -> [CellController]
+        @CellResultBuilder content: @escaping (B.Value) -> [CellController]
     ) {
         self.observable = binding.asObservable()
             .map { items in
@@ -257,13 +257,13 @@ public struct Section: SectionObservable {
     }
     
     /// Reactive Binding with element iteration helper
-    public init<B: RxBinding, Element>(
+    public init<B: ViewBinding, Element>(
         id: SectionControllerIdentifier,
         items binding: B,
         header: Header? = nil,
         footer: Footer? = nil,
         @CellResultBuilder content: @escaping (Element) -> [CellController]
-    ) where B.T == [Element] {
+    ) where B.Value == [Element] {
         self.observable = binding.asObservable()
             .map { items in
                 let cells = items.flatMap { content($0) }
@@ -308,7 +308,7 @@ public struct Section: SectionObservable {
                 )
             }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
     
     /// Binds an externally injected target reference weakly into every item's tap action dynamically inside this section.
@@ -341,7 +341,7 @@ public struct Section: SectionObservable {
                     )
                 }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
 
     /// Builder Initializer with Header/Footer support
@@ -370,7 +370,7 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
     
     /// Uses a declarative `@LayoutBuilder` closure to synthesize the UI layout for this specific section implicitly.
@@ -382,7 +382,7 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
     
     /// Uses a declarative `@LayoutBuilder` closure dynamically injected with an environment string identifier.
@@ -394,7 +394,7 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
     
     /// Modifies the structural definition of the section's header by providing an internally injected declarative `Header` block.
@@ -410,7 +410,7 @@ public struct Section: SectionObservable {
                 )
             }
         }
-        return Section(observable: improved)
+        return Section(observable: improved.asObservable())
     }
     
     /// Modifies the structural definition of the section's footer by providing an internally injected declarative `Footer` block.
@@ -426,7 +426,7 @@ public struct Section: SectionObservable {
                  )
              }
          }
-         return Section(observable: improved)
+         return Section(observable: improved.asObservable())
      }
     
     /// Imposes an automated animated "Skeleton mode" replacing layout components with shimmer placeholder items.
@@ -438,7 +438,7 @@ public struct Section: SectionObservable {
         includeSuppmentary: Bool = false,
         hideSupplementary: Bool = false,
         configure: ((C) -> Void)? = nil
-    ) -> Section where C: UICollectionViewCell, B: RxBinding, B.T == Bool {
+    ) -> Section where C: UICollectionViewCell, B: ViewBinding, B.Value == Bool {
         
         let loadingObservable = binding.asObservable()
                 
@@ -465,17 +465,17 @@ public struct Section: SectionObservable {
                 }
             }
             
-        return Section(observable: combined)
+        return Section(observable: combined.asObservable())
     }
     
     /// Imposes an automated declarative "Skeleton mode" loading block via `HostingCell` replacing the current section layout.
-    public func skeleton<Content: View, B: RxBinding>(
+    public func skeleton<Content: View, B: ViewBinding>(
         count: Int,
         when binding: B,
         includeSupplementary: Bool = false,
         hideSupplementary: Bool = false,
         placeholder: @escaping () -> Content
-    ) -> Section where B.T == Bool {
+    ) -> Section where B.Value == Bool {
         return skeleton(
             HostingCell<Content>.self,
             count: count,

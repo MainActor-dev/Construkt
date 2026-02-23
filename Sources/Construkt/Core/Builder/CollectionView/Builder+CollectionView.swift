@@ -44,7 +44,7 @@ public struct CollectionView: ModifiableView {
             .subscribe(onNext: { [weak modifiableView] sections in
                 modifiableView?.update(sections: sections)
             })
-            .disposed(by: modifiableView.rxDisposeBag)
+            .store(in: modifiableView.cancelBag)
     }
 }
 
@@ -272,7 +272,7 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
 public extension CollectionView {
     /// Dynamically swaps the internal collection view display for a custom empty state `View` when the
     /// bounding Rx stream resolves to `true`.
-    func emptyState<B: RxBinding>(when binding: B, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> CollectionView where B.T == Bool {
+    func emptyState<B: ViewBinding>(when binding: B, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> CollectionView where B.Value == Bool {
         let views = content().asViews()
         let view = VStackView(views)
             .alignment(.center)
@@ -287,7 +287,7 @@ public extension CollectionView {
             .subscribe(onNext: { [weak modifiableView] show in
                 modifiableView?.updateEmptyState(show: show)
             })
-            .disposed(by: modifiableView.rxDisposeBag)
+            .store(in: modifiableView.cancelBag)
             
         return self
     }
@@ -312,7 +312,7 @@ public extension ModifiableView where Base: CollectionViewWrapperView {
     /// Installs a `UIRefreshControl` directly into the collection view, binding its active state
     /// to a specific Rx boolean stream.
     @discardableResult
-    func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
+    func onRefresh<B: ViewBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.Value == Bool {
         modifiableView.setupRefreshControl(action: action)
         
         binding.asObservable()
@@ -320,7 +320,7 @@ public extension ModifiableView where Base: CollectionViewWrapperView {
             .subscribe(onNext: { [weak modifiableView] isRefreshing in
                 modifiableView?.setRefreshing(isRefreshing)
             })
-            .disposed(by: modifiableView.rxDisposeBag)
+            .store(in: modifiableView.cancelBag)
             
         return ViewModifier(modifiableView)
     }

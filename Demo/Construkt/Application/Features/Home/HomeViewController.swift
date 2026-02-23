@@ -270,10 +270,7 @@ extension HomeViewController {
         } else {
             return
         }
-        
-        // Use visible cells to find hero views (much more efficient and robust)
-        let heroViews = collectionView.visibleCells.flatMap { findAllHeroViews(in: $0) }
-        
+                
         // Map visible items to their progress
         for item in items {
             // Distance of item center from viewport center

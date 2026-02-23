@@ -55,33 +55,35 @@ extension ModifiableView where Base: BuilderInternalScrollView {
     @discardableResult
     @available(iOS 12, *)
     public func automaticallyAdjustForKeyboard() -> ViewModifier<Base> {
-        ViewModifier(modifiableView) {
-            NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification, object: nil)
-                .subscribe(onNext: { [unowned modifiableView] notification in
-                    modifiableView.contentInset = .zero
-                    modifiableView.scrollIndicatorInsets = modifiableView.contentInset
-                })
-                .disposed(by: $0.rxDisposeBag)
+        ViewModifier(modifiableView) { scrollView in
+            let center = NotificationCenter.default
+            
+            let hideObserver = center.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { [weak scrollView] _ in
+                scrollView?.contentInset = .zero
+                scrollView?.scrollIndicatorInsets = .zero
+            }
+            
+            let showObserver = center.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { [weak scrollView] notification in
+                guard let scrollView = scrollView else { return }
+                guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
 
-            NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification, object: nil)
-                .subscribe(onNext: { [unowned modifiableView] notification in
-                    guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+                let keyboardScreenEndFrame = keyboardValue.cgRectValue
+                let keyboardViewEndFrame = scrollView.convert(keyboardScreenEndFrame, from: scrollView.window)
+                let bottom = keyboardViewEndFrame.height - scrollView.safeAreaInsets.bottom
+                let oldInsets = scrollView.contentInset
 
-                    let keyboardScreenEndFrame = keyboardValue.cgRectValue
-                    let keyboardViewEndFrame = modifiableView.convert(keyboardScreenEndFrame, from: modifiableView.window)
-                    let bottom = keyboardViewEndFrame.height - modifiableView.safeAreaInsets.bottom
-                    let oldInsets = modifiableView.contentInset
+                scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: bottom, right: 0)
+                scrollView.scrollIndicatorInsets = scrollView.contentInset
 
-                    modifiableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: bottom, right: 0)
-                    modifiableView.scrollIndicatorInsets = modifiableView.contentInset
-
-                    if oldInsets.bottom == 0, let textfield = modifiableView.firstSubview(where: { $0 is UITextField && $0.isFirstResponder }) {
-                        DispatchQueue.main.async {
-                            textfield.scrollIntoView()
-                        }
+                if oldInsets.bottom == 0, let textfield = scrollView.firstSubview(where: { $0 is UITextField && $0.isFirstResponder }) {
+                    DispatchQueue.main.async {
+                        textfield.scrollIntoView()
                     }
-                })
-                .disposed(by: $0.rxDisposeBag)
+                }
+            }
+            
+            scrollView.cancelBag.insert(NotificationToken(token: hideObserver))
+            scrollView.cancelBag.insert(NotificationToken(token: showObserver))
         }
     }
 
@@ -163,4 +165,9 @@ public class BuilderVerticalScrollView: BuilderInternalScrollView {
         subviews.forEach { superview?.widthAnchor.constraint(equalTo: $0.widthAnchor).isActive = true }
     }
 
+}
+
+private struct NotificationToken: AnyCancellableLifecycle {
+    let token: NSObjectProtocol
+    func cancel() { NotificationCenter.default.removeObserver(token) }
 }

@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 import SwiftUI
 
 
@@ -82,7 +81,7 @@ public struct VStackView: ModifiableView {
         subscribe(to: builder)
     }
 
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == [View] {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == [View] {
         onReceive(binding) { context in
             context.view.reset(to: context.value)
         }
@@ -151,11 +150,10 @@ extension ModifiableView where Base: UIStackView {
             modifiableView.reset(to: builder.asViews())
             // subscribe for updates
             builder.updated?
-                .observe(on: ConcurrentMainScheduler.instance)
-                .subscribe(onNext: { [weak modifiableView] views in
+                .observe(on: .main) { [weak modifiableView] _ in
                     modifiableView?.reset(to: builder.asViews())
-                })
-                .disposed(by: $0.rxDisposeBag)
+                }
+                .store(in: $0.cancelBag)
         }
     }
 

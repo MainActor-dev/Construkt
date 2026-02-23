@@ -25,72 +25,39 @@
 //
 
 import Foundation
-import RxSwift
-import RxCocoa
 
-/// A property wrapper that leverages RxSwift's `BehaviorRelay` to provide easy 
-/// reactive bindings and local state management for custom views.
-@propertyWrapper public struct Variable<T> {
+/// A property wrapper bridging the gap between declarative definitions and variable states.
+/// It wraps a native `Property` internally, projecting a predictable memory model.
+@propertyWrapper
+public struct Variable<T> {
     
-    private var relay: BehaviorRelay<T>
-    
-    public init(_ relay: BehaviorRelay<T>) {
-        self.relay = relay
-    }
-    
-    /// Provides transparent get/set variable access while routing updates through the underlying reactive relay.
+    private let property: Property<T>
+
     public var wrappedValue: T {
-        get { return relay.value }
-        nonmutating set { relay.accept(newValue) }
+        get { property.value }
+        set { property.value = newValue }
     }
-    
-    /// Exposes the property wrapper instance directly, allowing bindings using the `$` syntax.
-    public var projectedValue: Variable<T> {
-        get { return self }
-    }
-    
-}
 
-extension Variable {
-    
+    public var projectedValue: Property<T> {
+        return property
+    }
+
     public init(wrappedValue: T) {
-        self.relay = BehaviorRelay<T>(value: wrappedValue)
+        self.property = Property(wrappedValue)
     }
-    
 }
 
-extension Variable where T:Equatable {
+extension Variable: MutableViewBinding {
+    public typealias Value = T
     
-    public func onChange(_ observer: @escaping (_ value: T) -> ()) -> Disposable {
-        relay
-            .skip(1)
-            .distinctUntilChanged()
-            .subscribe { observer($0) }
-    }
-
-}
-
-extension Variable: RxBinding {
-    
-    public func asObservable() -> Observable<T> {
-        return relay.asObservable()
+    public var value: T {
+        get { property.value }
+        set { property.value = newValue }
     }
     
-    public func observe(on scheduler: ImmediateSchedulerType) -> Observable<T> {
-        return relay.observe(on: scheduler)
+    public func observe(on queue: DispatchQueue?, _ handler: @escaping (T) -> Void) -> AnyCancellableLifecycle {
+        return property.observe(on: queue, handler)
     }
-    
-    public func bind(_ observable: Observable<T>) -> Disposable {
-        return observable.bind(to: relay)
-    }
-        
-}
-
-extension Variable: RxBidirectionalBinding {
-    public func asRelay() -> BehaviorRelay<T> {
-        return relay
-    }
-    
 }
 
 //struct A: ViewBuilder {

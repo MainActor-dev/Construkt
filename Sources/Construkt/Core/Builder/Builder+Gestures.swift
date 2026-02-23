@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// Context provided when a builder view is tapped.
 public struct BuilderTapGestureContext<Base:UIView>: ViewBuilderContextProvider {
@@ -55,15 +54,12 @@ extension ModifiableView {
             gesture.numberOfTapsRequired = numberOfTaps
             view.addGestureRecognizer(gesture)
             view.isUserInteractionEnabled = true
-            gesture.rx.event
-                .asControlEvent()
-                .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-                .subscribe { [weak view, weak gesture] (e) in
-                    guard let view = view, let gesture = gesture else { return }
-                    let context = BuilderTapGestureContext(view: view, gesture: gesture)
-                    handler(context)
-                }
-                .disposed(by: view.rxDisposeBag)
+            
+            let target = NativeGestureTarget(gesture: gesture) { [weak view, weak gesture] _ in
+                guard let view = view, let gesture = gesture else { return }
+                handler(BuilderTapGestureContext(view: view, gesture: gesture))
+            }
+            view.cancelBag.insert(target)
         }
     }
 
@@ -78,15 +74,12 @@ extension ModifiableView {
             gesture.direction = .left
             view.addGestureRecognizer(gesture)
             view.isUserInteractionEnabled = true
-            gesture.rx.event
-                .asControlEvent()
-                .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-                .subscribe { [weak view, weak gesture] (e) in
-                    guard let view = view, let gesture = gesture else { return }
-                    let context = BuilderSwipeGestureContext(view: view, gesture: gesture)
-                    handler(context)
-                }
-                .disposed(by: view.rxDisposeBag)
+            
+            let target = NativeGestureTarget(gesture: gesture) { [weak view, weak gesture] _ in
+                guard let view = view, let gesture = gesture else { return }
+                handler(BuilderSwipeGestureContext(view: view, gesture: gesture))
+            }
+            view.cancelBag.insert(target)
         }
     }
 
@@ -101,15 +94,12 @@ extension ModifiableView {
             gesture.direction = .right
             view.addGestureRecognizer(gesture)
             view.isUserInteractionEnabled = true
-            gesture.rx.event
-                .asControlEvent()
-                .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-                .subscribe { [weak view, weak gesture] (e) in
-                    guard let view = view, let gesture = gesture else { return }
-                    let context = BuilderSwipeGestureContext(view: view, gesture: gesture)
-                    handler(context)
-                }
-                .disposed(by: view.rxDisposeBag)
+            
+            let target = NativeGestureTarget(gesture: gesture) { [weak view, weak gesture] _ in
+                guard let view = view, let gesture = gesture else { return }
+                handler(BuilderSwipeGestureContext(view: view, gesture: gesture))
+            }
+            view.cancelBag.insert(target)
         }
     }
 
@@ -124,15 +114,35 @@ extension ModifiableView {
             gesture.numberOfTapsRequired = 1
             gesture.cancelsTouchesInView = cancelsTouchesInView
             view.addGestureRecognizer(gesture)
-            gesture.rx.event
-                .asControlEvent()
-                .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-                .subscribe { [weak view] _ in
-                    view?.endEditing(true)
-                }
-                .disposed(by: view.rxDisposeBag)
+            
+            let target = NativeGestureTarget(gesture: gesture) { [weak view] _ in
+                view?.endEditing(true)
+            }
+            view.cancelBag.insert(target)
         }
     }
+}
 
-
+private final class NativeGestureTarget<T: UIGestureRecognizer>: NSObject, AnyCancellableLifecycle {
+    let handler: (T) -> Void
+    var gesture: T?
+    
+    init(gesture: T, handler: @escaping (T) -> Void) {
+        self.handler = handler
+        self.gesture = gesture
+        super.init()
+        gesture.addTarget(self, action: #selector(handleGesture))
+    }
+    
+    @objc func handleGesture(_ recognizer: UIGestureRecognizer) {
+        if let g = recognizer as? T {
+            handler(g)
+        }
+    }
+    
+    func cancel() {
+        if let g = gesture {
+            g.removeTarget(self, action: #selector(handleGesture))
+        }
+    }
 }

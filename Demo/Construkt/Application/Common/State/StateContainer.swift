@@ -55,11 +55,9 @@ public class StateContainer<State: Equatable>: UIView {
         
         self.translatesAutoresizingMaskIntoConstraints = false
         
-        variable.observe(on: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] state in
-                self?.transition(to: state)
-            })
-            .disposed(by: disposeBag)
+        variable.observe(on: .main) { [weak self] state in
+            self?.transition(to: state)
+        }.store(in: cancelBag)
     }
     
     required init?(coder: NSCoder) {

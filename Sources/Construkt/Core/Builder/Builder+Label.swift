@@ -46,11 +46,11 @@ public struct LabelView: ModifiableView {
         modifiableView.text = text
     }
     
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == String {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == String {
         self.text(bind: binding)
     }
 
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == String? {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == String? {
         self.text(bind: binding)
     }
 
@@ -118,22 +118,22 @@ extension ModifiableView where Base: UILabel {
 extension ModifiableView where Base: UILabel {
 
     @discardableResult
-    public func color<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIColor {
+    public func color<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIColor {
         ViewModifier(modifiableView, binding: binding, keyPath: \.textColor)
     }
 
     @discardableResult
-    public func color<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIColor? {
+    public func color<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIColor? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.textColor)
     }
 
     @discardableResult
-    public func text<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == String {
-        ViewModifier(modifiableView, binding: binding) { $0.text = $1 } // binding non-optional to optional
+    public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String {
+        ViewModifier(modifiableView, binding: binding) { $0.view.text = $0.value } // binding non-optional to optional
     }
 
     @discardableResult
-    public func text<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == String? {
+    public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.text)
     }
 

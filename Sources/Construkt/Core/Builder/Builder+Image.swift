@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// A builder component that wraps a `UIImageView`, enabling simple instantiation from local
 /// assets, system images, or remote URLs, and supporting reactive bindings.
@@ -66,12 +65,12 @@ public struct ImageView: ModifiableView {
     }
 
     /// Initializes an image view tightly bound to an Rx stream of images.
-    public init<Binding:RxBinding>(_ image: Binding) where Binding.T == UIImage {
+    public init<Binding:ViewBinding>(_ image: Binding) where Binding.Value == UIImage {
         self.image(bind: image)
     }
 
     /// Initializes an image view tightly bound to an Rx stream of optional images.
-    public init<Binding:RxBinding>(_ image: Binding) where Binding.T == UIImage? {
+    public init<Binding:ViewBinding>(_ image: Binding) where Binding.Value == UIImage? {
         self.image(bind: image)
     }
     
@@ -98,14 +97,14 @@ extension ModifiableView where Base: UIImageView {
 
     /// Dynamically binds the `image` property to an upstream Rx sequence.
     @discardableResult
-    public func image<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIImage {
-        ViewModifier(modifiableView, binding: binding) { $0.image = $1 }
+    public func image<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIImage {
+        ViewModifier(modifiableView, binding: binding) { $0.view.image = $0.value }
     }
 
     /// Dynamically binds the `image` property to an upstream Rx sequence of optional images.
     @discardableResult
-    public func image<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIImage? {
-        ViewModifier(modifiableView, binding: binding) { $0.image = $1 }
+    public func image<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == UIImage? {
+        ViewModifier(modifiableView, binding: binding) { $0.view.image = $0.value }
     }
 
 }

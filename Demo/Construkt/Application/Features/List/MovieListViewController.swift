@@ -34,7 +34,7 @@ class MovieListViewController: UIViewController {
     }
     
     private func observe() {
-        viewModel.$selectedGenre
+        viewModel.$selectedGenre.asObservable()
             .observe(on: MainScheduler.asyncInstance)
             .compactMap { $0 }
             .distinctUntilChanged()
@@ -61,7 +61,7 @@ class MovieListViewController: UIViewController {
                     CollectionView {
                          gridSection
                     }
-                    .pagination(model: viewModel.$paginationState) { [weak self] _ in
+                    .pagination(model: viewModel.$paginationState.asObservable()) { [weak self] _ in
                         self?.viewModel.loadMore()
                     }
                     .onRefresh(viewModel.$isLoading) { [weak self] in

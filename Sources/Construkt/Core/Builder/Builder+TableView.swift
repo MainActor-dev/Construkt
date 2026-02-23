@@ -112,10 +112,10 @@ open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITable
     public func set(_ builder: AnyIndexableViewBuilder) {
         self.builder = builder
         builder.updated?
-            .subscribe { [weak self] _ in
+            .observe(on: .main) { [weak self] _ in
                 self?.reloadData()
             }
-            .disposed(by: rxDisposeBag)
+            .store(in: cancelBag)
     }
     
     override public func didMoveToWindow() {

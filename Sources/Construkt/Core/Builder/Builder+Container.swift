@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// A lightweight builder component that manages an arbitrary child view layout.
 ///
@@ -52,13 +51,11 @@ public struct ContainerView: ModifiableView {
 public typealias DynamicContainerView = ContainerView
 
 extension DynamicContainerView {
-    public init<Value, Binding:RxBinding>(_ binding: Binding, @ViewResultBuilder _ builder: @escaping (_ value: Value) -> ViewConvertable)
-    where Binding.T == Value {
-        binding.asObservable()
-            .subscribe(onNext: { [weak modifiableView] value in
-                modifiableView?.transition(to: builder(value))
-            })
-            .disposed(by: modifiableView.rxDisposeBag)
+    public init<Value, Binding:ViewBinding>(_ binding: Binding, @ViewResultBuilder _ builder: @escaping (_ value: Value) -> ViewConvertable)
+    where Binding.Value == Value {
+        binding.observe(on: .main) { [weak modifiableView] value in
+            modifiableView?.transition(to: builder(value))
+        }.store(in: modifiableView.cancelBag)
     }
 
 }

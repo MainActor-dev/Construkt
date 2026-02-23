@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// A protocol that provides ambient access to the current `UIView` and its hierarchical environment
 /// (like `UIViewController` or `UINavigationController`) during builder evaluation.
@@ -101,8 +100,8 @@ extension ViewBuilderContextProvider {
         view.rootview.firstSubview(where: { $0.isFirstResponder })?.resignFirstResponder()
     }
 
-    public var disposeBag: DisposeBag {
-        view.rxDisposeBag
+    public var cancelBag: CancelBag {
+        view.cancelBag
     }
 
 }

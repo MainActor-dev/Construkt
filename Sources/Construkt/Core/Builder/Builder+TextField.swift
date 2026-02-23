@@ -26,8 +26,6 @@
 
 import Foundation
 import UIKit
-import RxSwift
-import RxCocoa
 
 /// A builder component that wraps a `UITextField`, providing a declarative configuration interface
 /// and bidirectional responsive bindings.
@@ -46,15 +44,15 @@ public struct TextField: ModifiableView {
         modifiableView.text = text
     }
     
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == String? {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == String? {
         text(bind: binding)
     }
 
-    public init<Binding:RxBidirectionalBinding>(_ binding: Binding) where Binding.T == String {
+    public init<Binding:MutableViewBinding>(_ binding: Binding) where Binding.Value == String {
         text(bidirectionalBind: binding)
     }
 
-    public init<Binding:RxBidirectionalBinding>(_ binding: Binding) where Binding.T == String? {
+    public init<Binding:MutableViewBinding>(_ binding: Binding) where Binding.Value == String? {
         text(bidirectionalBind: binding)
     }
 
@@ -125,51 +123,41 @@ extension ModifiableView where Base: UITextField {
 extension ModifiableView where Base: UITextField {
 
     @discardableResult
-    public func text<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == String? {
+    public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.text)
     }
 
     @discardableResult
-    public func text<Binding:RxBidirectionalBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.T == String {
+    public func text<Binding:MutableViewBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.Value == String {
         ViewModifier(modifiableView) { textField in
-            let relay = binding.asRelay()
-            textField.rxDisposeBag.insert(
-                relay
-                    .observe(on: ConcurrentMainScheduler.instance)
-                    .subscribe(onNext: { [weak textField] text in
-                        if let textField = textField, textField.text != text {
-                            textField.text = text
-                        }
-                    }),
-                textField.rx.text
-                    .subscribe(onNext: { [weak relay] text in
-                        if let relay = relay, relay.value != text {
-                            relay.accept(text ?? "")
-                        }
-                    })
-            )
+            binding.observe(on: .main) { [weak textField] text in
+                if textField?.text != text { textField?.text = text }
+            }.store(in: textField.cancelBag)
+            
+            textField.addAction(UIAction { [weak textField] _ in
+                let newText = textField?.text ?? ""
+                if binding.value != newText {
+                    var mutableBinding = binding
+                    mutableBinding.value = newText
+                }
+            }, for: .editingChanged)
         }
     }
 
     @discardableResult
-    public func text<Binding:RxBidirectionalBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.T == String? {
+    public func text<Binding:MutableViewBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.Value == String? {
         ViewModifier(modifiableView) { textField in
-            let relay = binding.asRelay()
-            textField.rxDisposeBag.insert(
-                relay
-                    .observe(on: ConcurrentMainScheduler.instance)
-                    .subscribe(onNext: { [weak textField] text in
-                        if let textField = textField, textField.text != text {
-                            textField.text = text
-                        }
-                    }),
-                textField.rx.text
-                    .subscribe(onNext: { [weak relay] text in
-                        if let relay = relay, relay.value != text {
-                            relay.accept(text)
-                        }
-                    })
-            )
+            binding.observe(on: .main) { [weak textField] text in
+                if textField?.text != text { textField?.text = text }
+            }.store(in: textField.cancelBag)
+            
+            textField.addAction(UIAction { [weak textField] _ in
+                let newText = textField?.text ?? ""
+                if binding.value != newText {
+                    var mutableBinding = binding
+                    mutableBinding.value = newText
+                }
+            }, for: .editingChanged)
         }
     }
 }
@@ -179,13 +167,11 @@ extension ModifiableView where Base: UITextField {
 extension ModifiableView where Base: UITextField {
     public func onControlEvent(_ event: UIControl.Event,
                                handler: @escaping (_ context: ViewBuilderValueContext<UITextField, String?>) -> Void) -> ViewModifier<Base> {
-        ViewModifier(modifiableView) {
-            $0.rx.controlEvent([event])
-                .observe(on: MainScheduler.instance)
-                .subscribe(onNext: { [unowned modifiableView] () in
-                    handler(ViewBuilderValueContext(view: modifiableView, value: modifiableView.text))
-                })
-                .disposed(by: $0.rxDisposeBag)
+        ViewModifier(modifiableView) { textField in
+            textField.addAction(UIAction { [weak textField] _ in
+                guard let view = textField else { return }
+                handler(ViewBuilderValueContext(view: view, value: view.text))
+            }, for: event)
         }
     }
 

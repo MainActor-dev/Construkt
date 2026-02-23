@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// Allows `UIView` objects to serve as primitives in the declarative builder syntax.
 extension UIView: ModifiableView {
@@ -176,12 +175,12 @@ extension ModifiableView {
 extension ModifiableView {
     
     @discardableResult
-    public func hidden<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func hidden<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isHidden)
     }
 
     @discardableResult
-    public func userInteractionEnabled<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func userInteractionEnabled<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isUserInteractionEnabled)
     }
 

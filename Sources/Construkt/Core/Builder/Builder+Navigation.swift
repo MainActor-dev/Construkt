@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// Extends `UINavigationController` for simple SwiftUI-like push transitions.
 extension UINavigationController {
@@ -72,13 +71,14 @@ extension UIBarButtonItem {
         self.init(title: title, style: style, target: nil, action: nil)
     }
 
-    /// Attaches an Rx-powered tap handler to the bar button item.
+    /// Attaches a native tap handler to the bar button item.
     @discardableResult
     public func onTap(_ handler: @escaping (_ item: UIBarButtonItem) -> Void) -> Self {
-        self.rx.tap
-            .throttle(.milliseconds(300), latest: false, scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [unowned self] () in handler(self) })
-            .disposed(by: rxDisposeBag)
+        let action = UIAction { [weak self] _ in
+            guard let self = self else { return }
+            handler(self)
+        }
+        self.primaryAction = action
         return self
     }
 

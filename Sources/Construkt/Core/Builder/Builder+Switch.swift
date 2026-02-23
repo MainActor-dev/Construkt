@@ -25,7 +25,6 @@
 //
 
 import UIKit
-import RxSwift
 
 /// A builder component that wraps a `UISwitch`, offering declarative two-way bindings to its value.
 public struct SwitchView: ModifiableView {
@@ -40,11 +39,11 @@ public struct SwitchView: ModifiableView {
         modifiableView.isOn = isOn
     }
     
-    public init<Binding:RxBinding>(_ binding: Binding) where Binding.T == Bool {
+    public init<Binding:ViewBinding>(_ binding: Binding) where Binding.Value == Bool {
         isOn(bind: binding)
     }
     
-    public init<Binding:RxBidirectionalBinding>(_ binding: Binding) where Binding.T == Bool {
+    public init<Binding:MutableViewBinding>(_ binding: Binding) where Binding.Value == Bool {
         isOn(bidirectionalBind: binding)
     }
     
@@ -56,30 +55,24 @@ extension ModifiableView where Base: UISwitch {
     
     /// Binds the switch state downstream.
     @discardableResult
-    public func isOn<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func isOn<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isOn)
     }
     
     /// Bi-directionally binds the switch state with a mutable upstream state container.
     @discardableResult
-    public func isOn<Binding:RxBidirectionalBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
+    public func isOn<Binding:MutableViewBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.Value == Bool {
         ViewModifier(modifiableView) { switchView in
-            let relay = binding.asRelay()
-            switchView.rxDisposeBag.insert(
-                relay
-                    .observe(on: ConcurrentMainScheduler.instance)
-                    .subscribe(onNext: { [weak switchView] value in
-                        if let view = switchView, view.isOn != value {
-                            view.isOn = value
-                        }
-                    }),
-                switchView.rx.isOn
-                    .subscribe(onNext: { [weak relay] value in
-                        if let relay = relay, relay.value != value {
-                            relay.accept(value)
-                        }
-                    })
-            )
+            binding.observe(on: .main) { [weak switchView] value in
+                if switchView?.isOn != value { switchView?.isOn = value }
+            }.store(in: switchView.cancelBag)
+            
+            switchView.addAction(UIAction { [weak switchView] _ in
+                if let isOn = switchView?.isOn, isOn != binding.value {
+                    var mutableBinding = binding
+                    mutableBinding.value = isOn
+                }
+            }, for: .valueChanged)
         }
     }
     
@@ -92,13 +85,11 @@ extension ModifiableView where Base: UISwitch {
     /// Reacts continuously to user-driven changes to the switch value.
     @discardableResult
     public func onChange(_ handler: @escaping (_ context: ViewBuilderValueContext<UISwitch, Bool>) -> Void) -> ViewModifier<Base> {
-        ViewModifier(modifiableView) {
-            $0.rx.isOn
-                .changed
-                .subscribe(onNext: { [unowned modifiableView] value in
-                    handler(ViewBuilderValueContext(view: modifiableView, value: modifiableView.isOn))
-                })
-                .disposed(by: $0.rxDisposeBag)
+        ViewModifier(modifiableView) { switchView in
+            switchView.addAction(UIAction { [weak switchView] _ in
+                guard let view = switchView else { return }
+                handler(ViewBuilderValueContext(view: view, value: view.isOn))
+            }, for: .valueChanged)
         }
     }
 

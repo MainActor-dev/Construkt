@@ -25,14 +25,13 @@
 //
 
 import UIKit
-import RxSwift
 
 /// A protocol representing a collection of `View` components that can be indexed and observed for updates.
 public protocol AnyIndexableViewBuilder: ViewConvertable {
     /// The number of built views.
     var count: Int { get }
     /// An observable stream that emits whenever the underlying data structure reloads views.
-    var updated: Observable<Void>? { get }
+    var updated: Signal<Void>? { get }
     /// Provides the constructed `View` at the specified index.
     func view(at index: Int) -> View?
 }
@@ -47,7 +46,7 @@ public struct StaticViewBuilder: AnyIndexableViewBuilder {
     }
 
     public var count: Int { views.count }
-    public var updated: Observable<Void>?
+    public var updated: Signal<Void>?
 
     public func view(at index: Int) -> View? {
         guard views.indices.contains(index) else { return nil }
@@ -66,14 +65,14 @@ public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 
     public var items: [Item] {
         didSet {
-            updatePublisher.onNext(())
+            updatePublisher.send(())
         }
     }
 
     public var count: Int { items.count }
-    public var updated: Observable<Void>? { updatePublisher }
+    public var updated: Signal<Void>? { updatePublisher }
 
-    private let updatePublisher = PublishSubject<Void>()
+    private let updatePublisher = Signal<Void>()
     private let builder: (_ item: Item) -> View?
 
     public init(_ items: [Item]?, builder: @escaping (_ item: Item) -> View?) {
@@ -102,22 +101,19 @@ public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var count: Int { view == nil ? 0 : 1 }
     /// An observable stream that triggers upon the underlying generic observable changing state.
-    public var updated: Observable<Void>? { updatePublisher }
+    public var updated: Signal<Void>? { updatePublisher }
 
-    private let updatePublisher = PublishSubject<Void>()
+    private let updatePublisher = Signal<Void>()
     private var view: View?
-    private let disposeBag = DisposeBag()
+    private let cancelBag = CancelBag()
 
     /// Initializes a builder that tracks an observable property dynamically rendering it into a single `View`.
-    public init<Binding:RxBinding>(_ binding: Binding, builder: @escaping (_ value: Value) -> View?)
-    where Binding.T == Value {
-        binding.asObservable()
-            .do(onNext: { [weak self] value in
-                self?.view = builder(value)
-                self?.updatePublisher.onNext(())
-            })
-            .subscribe()
-            .disposed(by: disposeBag)
+    public init<Binding:ViewBinding>(_ binding: Binding, builder: @escaping (_ value: Value) -> View?)
+    where Binding.Value == Value {
+        binding.observe(on: .main) { [weak self] value in
+            self?.view = builder(value)
+            self?.updatePublisher.send(())
+        }.store(in: cancelBag)
     }
 
     public func view(at index: Int) -> View? {
@@ -137,14 +133,14 @@ public class DynamicValueViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var value: Value {
         didSet {
-            updatePublisher.onNext(())
+            updatePublisher.send(())
         }
     }
 
     public var count: Int = 1
-    public var updated: Observable<Void>? { updatePublisher }
+    public var updated: Signal<Void>? { updatePublisher }
 
-    private let updatePublisher = PublishSubject<Void>()
+    private let updatePublisher = Signal<Void>()
     private let builder: (_ value: Value) -> View
 
     public init(_ value: Value, builder: @escaping (_ value: Value) -> View) {
