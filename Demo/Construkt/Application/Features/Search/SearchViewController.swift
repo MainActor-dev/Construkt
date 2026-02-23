@@ -57,11 +57,11 @@ public class SearchViewController: UIViewController {
                         Section(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
                             Cell(movie, id: movie.id) { movie in
                                 MovieSearchRow(movie: movie)
-                                    .onTapGesture { [weak self] _ in
-                                        let vc = MovieDetailViewController(movie: movie)
-                                        self?.navigationController?.pushViewController(vc, animated: true)
-                                    }
                             }
+                        }
+                        .onSelect(on: self) { (self, movie: Movie) in
+                            let vc = MovieDetailViewController(movie: movie)
+                            self.navigationController?.pushViewController(vc, animated: true)
                         }
                         .layout { _ in
                             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
@@ -80,6 +80,7 @@ public class SearchViewController: UIViewController {
                         context.view.isHidden = context.value.isEmpty
                     }
                 }
+                .backgroundColor(UIColor("#0A0A0A"))
             }
         }
     }
@@ -102,7 +103,6 @@ public class SearchViewController: UIViewController {
                 }
         }
         .padding(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
-        .backgroundColor(UIColor(white: 1.0, alpha: 0.1))
         .cornerRadius(12)
         .padding(insets: .init(top: 16, left: 16, bottom: 0, right: 16))
     }
