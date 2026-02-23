@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 struct UpcomingCell: ViewBuilder {
     let movie: Movie

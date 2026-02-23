@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public enum MoviesEndpoint: Endpoint {
     case getPopularMovies(page: Int)

@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public final class RequestBuilder {
     private let configuration: NetworkConfiguration

@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public protocol MovieServiceProtocol {
     func getPopularMovies(page: Int) async throws -> MovieResponse

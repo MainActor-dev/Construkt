@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public struct Movie: Decodable, Identifiable, Equatable {
     public let id: Int

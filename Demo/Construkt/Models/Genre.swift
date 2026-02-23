@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public struct Genre: Codable, Identifiable, Equatable, Hashable {
     public let id: Int

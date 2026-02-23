@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import ConstruktKit
 
 /// Makes Combine `Publisher` intrinsically compatible with Construkt's agnostic `ViewBinding` architecture.
 /// This allows codebases using Combine to pass publishers directly into builder components.

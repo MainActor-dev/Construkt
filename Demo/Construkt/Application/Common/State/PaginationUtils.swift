@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import ConstruktKit
 
 /// A standard struct modeling pagination state, tailored for infinite scrolling within `CollectionListViewController`s.
 public struct ListPaginationModel: Equatable {

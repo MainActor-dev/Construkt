@@ -1,5 +1,6 @@
 import UIKit
 import SnapKit
+import ConstruktKit
 
 final class MovieDetailViewController: UIViewController {
     

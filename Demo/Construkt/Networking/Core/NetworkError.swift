@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public enum NetworkError: Error, LocalizedError {
     case invalidURL

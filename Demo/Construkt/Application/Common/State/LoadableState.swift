@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 /// A generic state enum for loading data.
 /// Automatically handles "production grade" features like Stable Cache Keys and Smart Updates.

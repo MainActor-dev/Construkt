@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ConstruktKit
 
 public struct GradientView: ModifiableView {
     

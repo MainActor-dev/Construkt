@@ -1,5 +1,6 @@
 
 import UIKit
+import ConstruktKit
 
 // Make it public so it can be seen from other modules if needed, though they are in the same app target.
 struct CustomNavigationBar: ViewBuilder {

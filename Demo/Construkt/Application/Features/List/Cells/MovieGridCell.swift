@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 struct MovieGridCell: ViewBuilder {
     let movie: Movie

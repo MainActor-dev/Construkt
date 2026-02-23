@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 struct GenresCell: ViewBuilder {
     let id: Int

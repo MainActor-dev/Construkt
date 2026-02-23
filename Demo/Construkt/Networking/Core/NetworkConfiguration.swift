@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public struct NetworkConfiguration {
     public let baseURL: URL

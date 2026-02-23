@@ -1,5 +1,6 @@
 import UIKit
 import SnapKit
+import ConstruktKit
 
 class HeroContentView: UIView {
     

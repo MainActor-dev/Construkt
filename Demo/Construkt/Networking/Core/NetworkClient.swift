@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public protocol NetworkClientProtocol {
     func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T

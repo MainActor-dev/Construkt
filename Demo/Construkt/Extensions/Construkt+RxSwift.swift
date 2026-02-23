@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import ConstruktKit
 
 /// Makes RxSwift `Observable` intrinsically compatible with Construkt's new agnostic `ViewBinding` architecture.
 /// This allows existing codebases to continue passing Rx observables directly into builder components.
