@@ -157,33 +157,35 @@ LabelView(publisher) // Construkt treats Combine Publishers as native ViewBindin
 
 ## Modern Collection and Table Views
 
-Building lists in UIKit traditionally requires massive `UITableViewController` boilerplates, DTO mappings, and manual `reloadData()` calls. Construkt abstracts this all away leveraging **DiffableDataSources**.
+Building lists in UIKit traditionally requires massive boilerplates, DTO mappings, and manual `reloadData()` calls. Construkt abstracts this all away.
+
+### Table Views
+
+`TableView` accepts a `DynamicItemViewBuilder` to declaratively map data to cells — no delegates, no data sources.
 
 ```swift
 struct MainUsersTableView: ViewBuilder {
     
-    let users: Property<[User]> // Our reactive data source
+    let users: [User]
     
     var body: View {
-        TableView(users) { user in
-            Section {
-                TableViewCell {
-                    MainCardView(user: user)
-                }
-                .accessoryType(.disclosureIndicator)
-                .onSelect { context in
-                    // Native navigation abstraction
-                    context.push(DetailViewController(user: user)) 
-                    return false
-                }
+        TableView(DynamicItemViewBuilder(users) { user in
+            TableViewCell {
+                MainCardView(user: user)
             }
-        }
+            .accessoryType(.disclosureIndicator)
+            .onSelect { context in
+                context.push(DetailViewController(user: user))
+                return false
+            }
+        })
     }
 }
 ```
 
 ### Dynamic Collection Views
-A robust, layout-independent wrapper around `UICollectionView` makes horizontal scrolling carousels effortless:
+
+`CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `Section`-based `ResultBuilder` syntax.
 
 ```swift
 CollectionView(movies) { movie in
@@ -252,9 +254,12 @@ LabelView("Direct UIKit Access")
 
 ## Author
 
-Construkt is designed, implemented, documented, and maintained by **Michael Long**, a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
+Construkt was originally created by **Michael Long**, a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
 - LinkedIn: [@hmlong](https://www.linkedin.com/in/hmlong/)
 - Medium: [@michaellong](https://medium.com/@michaellong)
+
+Continued and maintained by **Bayu Kurniawan**.
+- GitHub: [@MainActor-dev](https://github.com/MainActor-dev)
 
 ---
 
