@@ -1,6 +1,8 @@
 //
-//  👨‍💻 Created by @thatswiftdev on 04/02/26.
+//  Created by @thatswiftdev on 11/02/26.
+//  Original framework created by Michael Long
 //
+//  Copyright © 2026 Michael Long. All rights reserved.
 //  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
 //
