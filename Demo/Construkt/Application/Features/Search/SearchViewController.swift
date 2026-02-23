@@ -45,13 +45,7 @@ public class SearchViewController: UIViewController {
                             context.view.isHidden = !context.value
                         }
 
-                    // Loading State
-                    LoadingView()
-                        .visible(false)
-                        .onReceive(viewModel.isLoadingObservable) { context in
-                            context.view.isHidden = !context.value
-                        }
-                    
+
                     // List
                     CollectionView {
                         Section(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
@@ -62,6 +56,9 @@ public class SearchViewController: UIViewController {
                         .onSelect(on: self) { (self, movie: Movie) in
                             let vc = MovieDetailViewController(movie: movie)
                             self.navigationController?.pushViewController(vc, animated: true)
+                        }
+                        .skeleton(count: 8, when: viewModel.isLoadingObservable) {
+                            MovieSearchRow(movie: .placeholder)
                         }
                         .layout { _ in
                             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
@@ -122,21 +119,25 @@ struct MovieSearchRow: ViewBuilder {
                 .height(120)
                 .cornerRadius(8)
                 .clipsToBounds(true)
+                .skeletonable(true)
 
             VStackView(spacing: 4) {
                 LabelView(movie.title)
                     .font(.systemFont(ofSize: 16, weight: .bold))
                     .color(.white)
                     .numberOfLines(2)
+                    .skeletonable(true)
                 
                 HStackView(spacing: 4) {
                     ImageView(UIImage(systemName: "star.fill"))
                         .tintColor(.systemYellow)
                         .size(width: 14, height: 14)
+                        .skeletonable(true)
                     
                     LabelView(String(format: "%.1f", movie.voteAverage))
                         .font(.systemFont(ofSize: 14, weight: .regular))
                         .color(.systemYellow)
+                        .skeletonable(true)
                 }
                 .alignment(.center)
                 
