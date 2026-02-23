@@ -14,5 +14,6 @@ let package = Package(
             name: "ConstruktTests",
             dependencies: ["ConstruktKit"]
         ),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )
