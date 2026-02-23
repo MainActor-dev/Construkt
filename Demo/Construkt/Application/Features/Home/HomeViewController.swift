@@ -64,6 +64,10 @@ class HomeViewController: UIViewController {
                 isLoading: viewModel.isNowPlayingLoading,
                 onBackgroundReference: { [weak self] view in
                     self?.navBarBackgroundView = view
+                },
+                onSearchTap: { [weak self] in
+                    let searchVC = SearchViewController()
+                    self?.navigationController?.pushViewController(searchVC, animated: true)
                 }
             )
         }

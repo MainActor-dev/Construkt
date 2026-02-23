@@ -4,6 +4,7 @@ import ConstruktKit
 struct HomeNavigationBar: ViewBuilder {
     let isLoading: AnyViewBinding<Bool>
     let onBackgroundReference: (UIView) -> Void
+    var onSearchTap: (() -> Void)?
     
     var body: View {
         ZStackView {
@@ -27,7 +28,8 @@ struct HomeNavigationBar: ViewBuilder {
                     ImageView(UIImage(systemName: "magnifyingglass"))
                         .tintColor(.white)
                         .size(width: 24, height: 24)
-                        .contentMode(.scaleAspectFit),
+                        .contentMode(.scaleAspectFit)
+                        .onTapGesture { _ in onSearchTap?() },
                     ImageView(UIImage(systemName: "person.crop.circle.fill"))
                         .tintColor(.gray)
                         .size(width: 32, height: 32)
