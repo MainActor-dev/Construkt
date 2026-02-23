@@ -115,10 +115,14 @@ struct MovieSearchRow: ViewBuilder {
             ImageView(url: movie.posterURL)
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
-                .width(80)
                 .height(120)
-                .contentCompressionResistancePriority(.required, for: .horizontal)
-                .contentHuggingPriority(.required, for: .horizontal)
+                .with { view in
+                    view.setContentCompressionResistancePriority(.required, for: .horizontal)
+                    view.setContentHuggingPriority(.required, for: .horizontal)
+                    let aspectConstraint = view.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 80.0/120.0)
+                    aspectConstraint.priority = .required
+                    aspectConstraint.isActive = true
+                }
                 .cornerRadius(8)
                 .clipsToBounds(true)
                 .skeletonable(true)
