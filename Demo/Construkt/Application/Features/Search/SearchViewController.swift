@@ -117,6 +117,8 @@ struct MovieSearchRow: ViewBuilder {
                 .backgroundColor(.darkGray)
                 .width(80)
                 .height(120)
+                .contentCompressionResistancePriority(.required, for: .horizontal)
+                .contentHuggingPriority(.required, for: .horizontal)
                 .cornerRadius(8)
                 .clipsToBounds(true)
                 .skeletonable(true)
