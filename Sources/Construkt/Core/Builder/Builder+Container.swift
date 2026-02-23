@@ -65,13 +65,21 @@ extension DynamicContainerView {
 
 extension ModifiableView where Base: BuilderInternalContainerView {
 
+    /// Sets the default embed placement policy (e.g., center vs. top edge) for children inside the wrapper views dynamically.
+    ///
+    /// - Parameter position: The `EmbedPosition` configuration logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
-    func defaultPosition(_ position: UIView.EmbedPosition) -> ViewModifier<Base> {
+    public func defaultPosition(_ position: UIView.EmbedPosition) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.position, value: position)
     }
 
+    /// Dictates whether the dynamic container should observe `safeAreaInsets` actively.
+    ///
+    /// - Parameter safeArea: `true` to confine children to the safe area.
+    /// - Returns: A modified view wrapper.
     @discardableResult
-    func defaultSafeArea(_ safeArea: Bool) -> ViewModifier<Base> {
+    public func defaultSafeArea(_ safeArea: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.safeArea, value: safeArea)
     }
 

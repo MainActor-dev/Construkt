@@ -56,21 +56,25 @@ extension ModifiableView {
 /// Standard `UIView` core visual and behavioral modifiers applicable to all view types.
 extension ModifiableView {
         
+    /// Sets an accessibility identifier for UI testing.
     @discardableResult
     public func accessibilityIdentifier<T:RawRepresentable>(_ accessibilityIdentifier: T) -> ViewModifier<Base> where T.RawValue == String {
         ViewModifier(modifiableView) { $0.accessibilityIdentifier = accessibilityIdentifier.rawValue }
     }
     
+    /// Sets the view's alpha transparency.
     @discardableResult
     public func alpha(_ alpha: CGFloat) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.alpha, value: alpha)
     }
 
+    /// Sets the view's background color.
     @discardableResult
     public func backgroundColor(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.backgroundColor, value: color)
     }
 
+    /// Applies a standard layer border with a specified color and width.
     @discardableResult
     public func border(color: UIColor, lineWidth: CGFloat = 0.5) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -79,16 +83,19 @@ extension ModifiableView {
         }
     }
 
+    /// Determines whether subviews are confined to the bounds of the view.
     @discardableResult
     public func clipsToBounds(_ clips: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.clipsToBounds, value: clips)
     }
 
+    /// Sets the content mode for rendering visual bounds and aspects.
     @discardableResult
     public func contentMode(_ contentMode: UIView.ContentMode) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.contentMode, value: contentMode)
     }
 
+    /// Applies a corner radius to the view's layer, automatically clipping content.
     @discardableResult
     public func cornerRadius(_ radius: CGFloat) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -97,14 +104,28 @@ extension ModifiableView {
         }
     }
 
+    /// Hides the view unconditionally. Can be used with conditionally compiled builder nodes.
     @discardableResult
     public func hidden(_ hidden: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.isHidden, value: hidden)
     }
     
+    /// Sets the view's accessibility identifier.
     @discardableResult
     public func identifier<T:RawRepresentable>(_ identifier: T) -> ViewModifier<Base> where T.RawValue == String {
         ViewModifier(modifiableView) { $0.accessibilityIdentifier = identifier.rawValue }
+    }
+    
+    /// Enables or disables drawing the layer's pixels strictly opaque for optimization.
+    @discardableResult
+    public func isOpaque(_ opaque: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.isOpaque, value: opaque)
+    }
+    
+    /// Determines whether the view actively registers tap and dragging gesture interactions.
+    @discardableResult
+    public func isUserInteractionEnabled(_ enabled: Bool) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.isUserInteractionEnabled, value: enabled)
     }
 
     @discardableResult
@@ -115,20 +136,22 @@ extension ModifiableView {
         }
     }
     
+    /// Attaches a custom drop shadow targeting the underlying layer.
     @discardableResult
-    public func shadow(color: UIColor, radius: CGFloat, opacity: Float = 0.5, offset: CGSize = .zero) -> ViewModifier<Base> {
+    public func shadow(color: UIColor, radius: CGFloat, opacity: Float, offset: CGSize = .zero) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
             $0.layer.shadowColor = color.cgColor
-            $0.layer.shadowOffset = offset
             $0.layer.shadowRadius = radius
             $0.layer.shadowOpacity = opacity
-            $0.clipsToBounds = false
+            $0.layer.shadowOffset = offset
+            $0.layer.masksToBounds = false
         }
     }
 
+    /// Associates a specific integer identifier to rapidly retrieve this specific subview instance.
     @discardableResult
     public func tag<T:RawRepresentable>(_ tag: T) -> ViewModifier<Base> where T.RawValue == Int {
-        ViewModifier(modifiableView, keyPath: \.tag, value: tag.rawValue)
+        ViewModifier(modifiableView) { $0.tag = tag.rawValue }
     }
 
     @discardableResult

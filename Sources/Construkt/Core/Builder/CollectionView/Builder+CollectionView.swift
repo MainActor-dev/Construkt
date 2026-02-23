@@ -1,8 +1,6 @@
 //
-//  Created by @thatswiftdev on 11/02/26.
-//  Original framework created by Michael Long
+//  👨‍💻 Created by @thatswiftdev on 04/02/26.
 //
-//  Copyright © 2026 Michael Long. All rights reserved.
 //  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
 //
@@ -37,6 +35,7 @@ public struct CollectionView: ModifiableView {
     
     public let modifiableView = CollectionViewWrapperView()
     
+    /// Initializes a declarative collection view dynamically mapped to an Rx stream of `Section` arrays.
     public init(@SectionResultBuilder content: () -> Observable<[SectionController]>) {
         let sectionsObservable = content()
         
@@ -271,6 +270,8 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
 }
 
 public extension CollectionView {
+    /// Dynamically swaps the internal collection view display for a custom empty state `View` when the
+    /// bounding Rx stream resolves to `true`.
     func emptyState<B: RxBinding>(when binding: B, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> CollectionView where B.T == Bool {
         let views = content().asViews()
         let view = VStackView(views)
@@ -295,6 +296,8 @@ public extension CollectionView {
 }
 
 public extension ModifiableView where Base: CollectionViewWrapperView {
+    
+    /// Adjusts the internal scroll view's content inset.
     @discardableResult
     func contentInset(
         top: CGFloat = 0,
@@ -306,6 +309,8 @@ public extension ModifiableView where Base: CollectionViewWrapperView {
         return ViewModifier(modifiableView)
     }
     
+    /// Installs a `UIRefreshControl` directly into the collection view, binding its active state
+    /// to a specific Rx boolean stream.
     @discardableResult
     func onRefresh<B: RxBinding>(_ binding: B, action: @escaping () -> Void) -> ViewModifier<Base> where B.T == Bool {
         modifiableView.setupRefreshControl(action: action)
@@ -320,24 +325,28 @@ public extension ModifiableView where Base: CollectionViewWrapperView {
         return ViewModifier(modifiableView)
     }
     
+    /// Forwarded `UIScrollViewDelegate` scroll event.
     @discardableResult
     func onScroll(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onScroll = handler
         return ViewModifier(modifiableView)
     }
     
+    /// Forwarded `UIScrollViewDelegate` scroll view delegate will begin dragging.
     @discardableResult
     func onWillBeginDragging(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onWillBeginDragging = handler
         return ViewModifier(modifiableView)
     }
     
+    /// Forwarded `UIScrollViewDelegate` did end dragging.
     @discardableResult
     func onDidEndDragging(_ handler: @escaping (UIScrollView, Bool) -> Void) -> ViewModifier<Base> {
         modifiableView.onDidEndDragging = handler
         return ViewModifier(modifiableView)
     }
     
+    /// Forwarded `UIScrollViewDelegate` did end decelerating.
     @discardableResult
     func onDidEndDecelerating(_ handler: @escaping (UIScrollView) -> Void) -> ViewModifier<Base> {
         modifiableView.onDidEndDecelerating = handler

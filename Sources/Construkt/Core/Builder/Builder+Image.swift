@@ -34,23 +34,29 @@ public struct ImageView: ModifiableView {
     public let modifiableView = Modified(UIImageView())
 
     // lifecycle
+    
+    /// Initializes an image view with an optional `UIImage`.
     public init(_ image: UIImage?) {
         modifiableView.image = image
     }
 
+    /// Initializes an image view with an image loaded from the asset catalog by name.
     public init(named name: String) {
         modifiableView.image = UIImage(named: name)
     }
 
+    /// Initializes an image view with a system symbol image (SFSymbols).
     @available(iOS 13, *)
     public init(systemName name: String) {
         modifiableView.image = UIImage(systemName: name)
     }
 
+    /// Initializes an image view with a remote URL, fetching asynchronously.
     public init(url: URL?, placeholder: UIImage? = nil) {
         modifiableView.setImage(from: url, placeholder: placeholder)
     }
 
+    /// Initializes an image view with a remote URL string, fetching asynchronously.
     public init(url: String?, placeholder: UIImage? = nil) {
         if let urlString = url, let url = URL(string: urlString) {
             modifiableView.setImage(from: url, placeholder: placeholder)
@@ -59,10 +65,12 @@ public struct ImageView: ModifiableView {
         }
     }
 
+    /// Initializes an image view tightly bound to an Rx stream of images.
     public init<Binding:RxBinding>(_ image: Binding) where Binding.T == UIImage {
         self.image(bind: image)
     }
 
+    /// Initializes an image view tightly bound to an Rx stream of optional images.
     public init<Binding:RxBinding>(_ image: Binding) where Binding.T == UIImage? {
         self.image(bind: image)
     }
@@ -78,6 +86,7 @@ public struct ImageView: ModifiableView {
 /// Standard modifiers for any `UIImageView` conforming to `ModifiableView`.
 extension ModifiableView where Base: UIImageView {
 
+    /// Sets a tint color dynamically for rendering template images.
     @discardableResult
     public func tintColor(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.tintColor, value: color)
@@ -87,11 +96,13 @@ extension ModifiableView where Base: UIImageView {
 
 extension ModifiableView where Base: UIImageView {
 
+    /// Dynamically binds the `image` property to an upstream Rx sequence.
     @discardableResult
     public func image<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIImage {
         ViewModifier(modifiableView, binding: binding) { $0.image = $1 }
     }
 
+    /// Dynamically binds the `image` property to an upstream Rx sequence of optional images.
     @discardableResult
     public func image<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == UIImage? {
         ViewModifier(modifiableView, binding: binding) { $0.image = $1 }

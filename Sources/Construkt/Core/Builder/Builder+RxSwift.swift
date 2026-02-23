@@ -57,6 +57,7 @@ extension BehaviorRelay: RxBidirectionalBinding {
 
 extension ViewModifier {
     
+    /// Initializes a modifier that executes a generic closure whenever the provided sequence emits.
     public init<B:RxBinding, T>(_ view: Base, binding: B, handler: @escaping (_ view: Base, _ value: T) -> Void) where B.T == T {
         self.modifiableView = view
         binding.asObservable()
@@ -69,6 +70,7 @@ extension ViewModifier {
             .disposed(by: view.rxDisposeBag)
     }
         
+    /// Initializes a modifier that binds an Rx sequence output directly into a property key path on the underlying view.
     public init<B:RxBinding, T:Equatable>(_ view: Base, binding: B, keyPath: ReferenceWritableKeyPath<Base, T>) where B.T == T {
         self.modifiableView = view
         binding.asObservable()
@@ -85,6 +87,7 @@ extension ViewModifier {
 
 extension ModifiableView {
 
+    /// Binds a reactive stream to a valid keypath on the underlying view.
     @discardableResult
     public func bind<B:RxBinding, T>(keyPath: ReferenceWritableKeyPath<Base, T>, binding: B) -> ViewModifier<Base> where B.T == T {
         ViewModifier(modifiableView) {
@@ -97,6 +100,7 @@ extension ModifiableView {
         }
     }
 
+    /// Executes a custom handler block each time the provided reactive sequence emits a new value.
     @discardableResult
     public func onReceive<B:RxBinding, T>(_ binding: B, handler: @escaping (_ context: ViewBuilderValueContext<Base, T>) -> Void)
         -> ViewModifier<Base> where B.T == T {

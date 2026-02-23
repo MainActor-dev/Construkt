@@ -51,6 +51,7 @@ public struct ScrollView: ModifiableView {
 
 extension ModifiableView where Base: BuilderInternalScrollView {
 
+    /// Automatically binds to keyboard notifications to squeeze the scroll view insets appropriately.
     @discardableResult
     @available(iOS 12, *)
     public func automaticallyAdjustForKeyboard() -> ViewModifier<Base> {
@@ -84,16 +85,19 @@ extension ModifiableView where Base: BuilderInternalScrollView {
         }
     }
 
+    /// Sets whether the scroll view bounces past the edge of content and back again.
     @discardableResult
     public func bounces(_ bounce: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.bounces, value: bounce)
     }
 
+    /// Handler triggered dynamically whenever the scroll view updates its internal offset.
     @discardableResult
     public func onDidScroll(_ handler: @escaping (_ context: ViewBuilderContext<UIScrollView>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.scrollViewDidScrollHandler = handler }
     }
   
+    /// Sets whether the vertical scroll indicator is visible.
     @discardableResult
     public func showVerticalIndicator(_ show: Bool) -> ViewModifier<Base> {
       ViewModifier(modifiableView, keyPath: \.showsVerticalScrollIndicator, value: show)

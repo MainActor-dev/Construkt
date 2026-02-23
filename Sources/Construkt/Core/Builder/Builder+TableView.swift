@@ -51,11 +51,13 @@ public struct TableView: ModifiableView {
 
 extension ModifiableView where Base: BuilderInternalTableView {
 
+    /// Re-binds the underlying data source builder governing the table view's children dynamically.
     @discardableResult
     public func source(_ builder: AnyIndexableViewBuilder) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.set(builder) }
     }
 
+    /// Sets the style of cell separators.
     @discardableResult
     public func separatorStyle(_ style: UITableViewCell.SeparatorStyle) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.separatorStyle, value: style)

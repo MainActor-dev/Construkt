@@ -38,11 +38,13 @@ import RxCocoa
         self.relay = relay
     }
     
+    /// Provides transparent get/set variable access while routing updates through the underlying reactive relay.
     public var wrappedValue: T {
         get { return relay.value }
         nonmutating set { relay.accept(newValue) }
     }
     
+    /// Exposes the property wrapper instance directly, allowing bindings using the `$` syntax.
     public var projectedValue: Variable<T> {
         get { return self }
     }

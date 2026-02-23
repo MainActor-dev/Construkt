@@ -44,40 +44,49 @@ public protocol ViewBuilderContextValueProvider: ViewBuilderContextProvider {
 /// Extension facilitating quick access to complex View Controller hierarchies directly from inline context handlers.
 extension ViewBuilderContextProvider {
     
+    /// The parent `UIViewController` hosting the view, walked up the responder chain.
     public var viewController: UIViewController? {
         view.parentViewController
     }
     
+    /// The `UINavigationController` belonging to the parent view controller, if any.
     public var navigationController: UINavigationController? {
         viewController?.navigationController
     }
 
+    /// The `UINavigationItem` associated with the parent view controller.
     public var navigationItem: UINavigationItem? {
         viewController?.navigationItem
     }
 
+    /// Presents a new View declaratively by wrapping it in a generic `UIViewController`.
     public func present(_ view: View, animated: Bool = true) {
         navigationController?.present(UIViewController(view()), animated: animated)
     }
     
+    /// Presents a specific `UIViewController` directly.
     public func present<VC:UIViewController>(_ vc: VC, configure: ((_ vc: VC) -> Void)? = nil) {
         configure?(vc)
         navigationController?.present(vc, animated: true)
     }
 
+    /// Pushes a new View onto the current `UINavigationController` stack by wrapping it in a generic `UIViewController`.
     public func push(_ view: View, animated: Bool = true) {
         navigationController?.pushViewController(UIViewController(view()), animated: animated)
     }
 
+    /// Pushes a specific `UIViewController` directly onto the nav stack.
     public func push<VC:UIViewController>(_ vc: VC, configure: ((_ vc: VC) -> Void)? = nil) {
         configure?(vc)
         navigationController?.pushViewController(vc, animated: true)
     }
 
+    /// Smoothly transitions the view's content to a new `View` configuration.
     public func transition(to view: View, delay: Double = 0.2) {
         self.view.transition(to: view, delay: delay)
     }
 
+    /// Smoothly transitions the view's content, hosting a new `UIViewController`.
     public func transition(to viewController: UIViewController, delay: Double = 0.2) {
         view.transition(to: viewController, delay: delay)
     }

@@ -28,15 +28,16 @@ import Foundation
 
 /// A semantic grouping construct allowing multiple views to be returned simultaneously when
 /// the result builder is structurally limited to returning a single `ViewConvertable`.
-struct Group: ViewConvertable {
+public struct Group: ViewConvertable {
     
     private var views: [View]
     
+    /// Initializes a group with a block of views.
     public init(@ViewResultBuilder  _ views: () -> ViewConvertable) {
         self.views = views().asViews()
     }
         
-    func asViews() -> [View] {
+    public func asViews() -> [View] {
         views
     }
     

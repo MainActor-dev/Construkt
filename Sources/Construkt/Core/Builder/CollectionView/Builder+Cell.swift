@@ -1,8 +1,6 @@
 //
-//  Created by @thatswiftdev on 11/02/26.
-//  Original framework created by Michael Long
+//  👨‍💻 Created by @thatswiftdev on 04/02/26.
 //
-//  Copyright © 2026 Michael Long. All rights reserved.
 //  © 2026, https://github.com/thatswiftdev. All rights reserved.
 //
 //
@@ -29,7 +27,9 @@ import UIKit
 
 // MARK: - Protocols
 
+/// A protocol that identifies types capable of resolving into a collection of `CellController`s.
 public protocol CellConvertible: SectionComponent {
+    /// Converts the conforming type into an array of cell controllers.
     func asCells() -> [CellController]
 }
 
@@ -106,12 +106,17 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
     
     // MARK: Modifiers
     
+    /// Attaches a selection handler to the cell, triggered when the user taps it.
+    ///
+    /// - Parameter handler: A closure providing the cell's underlying generic `Model`.
+    /// - Returns: A mutated copy of the `Cell` with the selection attached.
     public func onSelect(_ handler: @escaping (Model) -> Void) -> Cell {
         var copy = self
         copy.onSelect = handler
         return copy
     }
     
+    /// Specifies how many animated skeleton copies of this cell should be shown when in a loading state.
     public func skeleton(count: Int) -> Cell {
         var copy = self
         copy.skeletonCount = count
@@ -171,6 +176,7 @@ class RegistrationCache {
 
 // MARK: - Hosting Cell
 
+/// A specialized `UICollectionViewCell` designed to dynamically host an underlying declarative `View` hierarchy.
 public final class HostingCell<Content: View>: UICollectionViewCell {
     
     private var hostedView: UIView?
@@ -183,6 +189,7 @@ public final class HostingCell<Content: View>: UICollectionViewCell {
         super.init(coder: coder)
     }
     
+    /// Embeds a freshly built `View` hierarchy into the cell's content view.
     public func host(_ content: Content) {
         // Simple hosting strategy: Rebuild logic.
         // Optimally we would update, but View protocol implies build() -> UIView

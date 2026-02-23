@@ -54,11 +54,13 @@ public struct SwitchView: ModifiableView {
 /// Extension providing declarative subscription mapping to `UISwitch` control events and properties.
 extension ModifiableView where Base: UISwitch {
     
+    /// Binds the switch state downstream.
     @discardableResult
     public func isOn<Binding:RxBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
         ViewModifier(modifiableView, binding: binding, keyPath: \.isOn)
     }
     
+    /// Bi-directionally binds the switch state with a mutable upstream state container.
     @discardableResult
     public func isOn<Binding:RxBidirectionalBinding>(bidirectionalBind binding: Binding) -> ViewModifier<Base> where Binding.T == Bool {
         ViewModifier(modifiableView) { switchView in
@@ -81,11 +83,13 @@ extension ModifiableView where Base: UISwitch {
         }
     }
     
+    /// Sets the color of the switch when it is turned on.
     @discardableResult
     public func onTintColor(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.onTintColor, value: color)
     }
         
+    /// Reacts continuously to user-driven changes to the switch value.
     @discardableResult
     public func onChange(_ handler: @escaping (_ context: ViewBuilderValueContext<UISwitch, Bool>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {

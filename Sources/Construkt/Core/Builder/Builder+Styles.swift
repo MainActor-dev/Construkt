@@ -36,11 +36,13 @@ public protocol BuilderStyle {
 
 extension ModifiableView {
 
+    /// Applies the provided style definition specifically structured for this exact type of view.
     @discardableResult
     public func style<Style:BuilderStyle>(_ style: Style) -> ViewModifier<Base> where Style.Base == Base {
         ViewModifier(modifiableView) { style.apply(to: $0) }
     }
 
+    /// Applies the provided generic baseline style definition to this view (e.g., standard drop shadows targeting `UIView`).
     @discardableResult
     public func style<Style:BuilderStyle>(_ style: Style) -> ViewModifier<Base> where Style.Base == UIView {
         ViewModifier(modifiableView) { style.apply(to: $0) }

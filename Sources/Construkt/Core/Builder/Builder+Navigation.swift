@@ -30,6 +30,7 @@ import RxSwift
 /// Extends `UINavigationController` for simple SwiftUI-like push transitions.
 extension UINavigationController {
 
+    /// Pushes a declarative `View` onto the receiver’s stack.
     @discardableResult
     public func push(view: View, animated: Bool) -> Self {
         pushViewController(UIViewController(view), animated: animated)
@@ -41,6 +42,7 @@ extension UINavigationController {
 /// Standard modifiers for any `ModifiableView` allowing navigation attributes natively.
 extension ModifiableView {
 
+    /// Dynamically sets the navigation item's title when this view appears in a navigation stack.
     @discardableResult
     public func navigation(title: String?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -55,18 +57,22 @@ extension ModifiableView {
 /// Extends `UIBarButtonItem` to support modern, declarative initialization and Rx click bindings.
 extension UIBarButtonItem {
 
+    /// Creates a bar button item with a standard system item icon.
     convenience public init(barButtonSystemItem systemItem: UIBarButtonItem.SystemItem) {
         self.init(barButtonSystemItem: systemItem, target: nil, action: nil)
     }
 
+    /// Creates a bar button item with a custom image.
     convenience public init(image: UIImage?, style: UIBarButtonItem.Style) {
         self.init(image: image, style: style, target: nil, action: nil)
     }
 
+    /// Creates a bar button item with a text title.
     convenience public init(title: String?, style: UIBarButtonItem.Style) {
         self.init(title: title, style: style, target: nil, action: nil)
     }
 
+    /// Attaches an Rx-powered tap handler to the bar button item.
     @discardableResult
     public func onTap(_ handler: @escaping (_ item: UIBarButtonItem) -> Void) -> Self {
         self.rx.tap

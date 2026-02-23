@@ -63,36 +63,43 @@ public struct TextField: ModifiableView {
 
 extension ModifiableView where Base: UITextField {
 
+    /// Sets the auto-capitalization behavior.
     @discardableResult
     public func autocapitalizationType(_ type: UITextAutocapitalizationType) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.autocapitalizationType, value: type)
     }
 
+    /// Sets the autocorrection behavior.
     @discardableResult
     public func autocorrectionType(_ type: UITextAutocorrectionType) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.autocorrectionType, value: type)
     }
 
+    /// Prevents the return key until text is entered.
     @discardableResult
     public func enablesReturnKeyAutomatically(_ enabled: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.enablesReturnKeyAutomatically, value: enabled)
     }
 
+    /// Provides a custom view to display in place of the standard system keyboard.
     @discardableResult
     public func inputView(_ view: UIView?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.inputView, value: view)
     }
 
+    /// Provides a custom accessory view acting as a toolbar above the system keyboard.
     @discardableResult
     public func inputAccessoryView(_ view: UIView?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.inputAccessoryView, value: view)
     }
 
+    /// Specifies the visual style of the keyboard layout.
     @discardableResult
     public func keyboardType(_ type: UIKeyboardType) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.keyboardType, value: type)
     }
 
+    /// Sets the ghost text shown when the field is empty.
     @discardableResult
     public func placeholder(_ placeholder: String?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.placeholder, value: placeholder)

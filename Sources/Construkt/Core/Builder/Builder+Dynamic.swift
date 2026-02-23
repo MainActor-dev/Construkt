@@ -29,8 +29,11 @@ import RxSwift
 
 /// A protocol representing a collection of `View` components that can be indexed and observed for updates.
 public protocol AnyIndexableViewBuilder: ViewConvertable {
+    /// The number of built views.
     var count: Int { get }
+    /// An observable stream that emits whenever the underlying data structure reloads views.
     var updated: Observable<Void>? { get }
+    /// Provides the constructed `View` at the specified index.
     func view(at index: Int) -> View?
 }
 
@@ -58,6 +61,7 @@ public struct StaticViewBuilder: AnyIndexableViewBuilder {
 }
 
 /// A reactive builder component that maps an array of `Item` elements to a dynamic list of views.
+/// Used commonly to bind datasets to standard `UIView` stacks or wrappers natively without a collection view.
 public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 
     public var items: [Item] {
@@ -97,17 +101,23 @@ public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var count: Int { view == nil ? 0 : 1 }
-    public var updated: Observable<Void>?
+    /// An observable stream that triggers upon the underlying generic observable changing state.
+    public var updated: Observable<Void>? { updatePublisher }
 
+    private let updatePublisher = PublishSubject<Void>()
     private var view: View?
-    private var disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
 
-    public init(_ observable: Observable<Value>, builder: @escaping (_ value: Value) -> View) {
-        self.updated = observable
+    /// Initializes a builder that tracks an observable property dynamically rendering it into a single `View`.
+    public init<Binding:RxBinding>(_ binding: Binding, builder: @escaping (_ value: Value) -> View?)
+    where Binding.T == Value {
+        binding.asObservable()
             .do(onNext: { [weak self] value in
                 self?.view = builder(value)
+                self?.updatePublisher.onNext(())
             })
-            .map { _ in () }
+            .subscribe()
+            .disposed(by: disposeBag)
     }
 
     public func view(at index: Int) -> View? {

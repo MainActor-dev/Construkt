@@ -26,7 +26,7 @@
 
 import UIKit
 
-// Custom builder fot UILabel
+/// A lightweight builder component representing a horizontal separator line (1px high) typically used in menus, stacks, or lists.
 public struct DividerView: ModifiableView {
 
     public let modifiableView = Modified(BuilderInternalDividerView(frame: .zero)) {
@@ -53,6 +53,7 @@ public struct DividerView: ModifiableView {
 
 extension ModifiableView where Base: BuilderInternalDividerView {
 
+    /// Sets the color of the divider line.
     @discardableResult
     public func color(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.subviews.first?.backgroundColor = color }

@@ -101,34 +101,59 @@ public protocol ModifiableView: View {
 
 // Standard "builder" modifiers for all view types
 extension ModifiableView {
+    
+    /// Returns the underlying base `UIView` instance.
     public func asBaseView() -> Base {
         modifiableView
     }
     
+    /// Returns the underlying base `UIView` instance, fulfilling the `View` protocol.
     public func build() -> UIView {
         modifiableView
     }
     
+    /// Captures a reference to the underlying `UIView`, allowing it to be stored in a variable.
+    ///
+    /// - Parameter view: An `inout` reference to store the view.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func reference<V:UIView>(_ view: inout V?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view = $0 as? V }
     }
     
+    /// Performs a generic modification closure on the underlying `UIView`.
+    ///
+    /// - Parameter modifier: A closure containing the modification logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func with(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
     
+    /// Performs a generic modification closure on the underlying `UIView`. Alias for `with`.
+    ///
+    /// - Parameter modifier: A closure containing the modification logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func perform(_ modifier: (_ view: Base) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView, modifier: modifier)
     }
     
+    /// Toggles the visibility (`isHidden`) state of the underlying `UIView`.
+    ///
+    /// - Parameter isVisible: A boolean determining if the view should be visible.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func visible(_ isVisible: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.isHidden = !isVisible }
     }
     
+    /// Configures the view to support `SkeletonView` loading states.
+    ///
+    /// - Parameters:
+    ///   - isSkeletonAble: A boolean enabling skeleton animations on this view.
+    ///   - bgColor: The background color used during the skeleton state.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func skeletonable(
         _ isSkeletonAble: Bool,
@@ -148,17 +173,27 @@ extension ModifiableView {
 ///
 /// Each builder method (e.g. `.backgroundColor(:)`) returns a `ViewModifier` retaining the original underlying `UIView`.
 public struct ViewModifier<Base:UIView>: ModifiableView {
+    
+    /// The underlying view being modified.
     public let modifiableView: Base
+    
+    /// Initializes with an existing base view.
     public init(_ view: Base) {
         self.modifiableView = view
     }
+    
+    /// Initializes by building an abstract `View` into its tangible `UIView` form.
     public init(_ view: View) where Base == UIView {
         self.modifiableView = view()
     }
+    
+    /// Initializes with an existing base view and immediately applies a custom modifier closure to it.
     public init(_ view: Base, modifier: (_ view: Base) -> Void) {
         self.modifiableView = view
         modifier(view)
     }
+    
+    /// Initializes with an existing base view and modifies a specific property via its `ReferenceWritableKeyPath`.
     public init<Value>(_ view: Base, keyPath: ReferenceWritableKeyPath<Base, Value>, value: Value) {
         self.modifiableView = view
         self.modifiableView[keyPath: keyPath] = value
@@ -188,6 +223,8 @@ public func Modified<T:UIView>( _ instance: T, modify: ((_ instance: T) -> Void)
 /// Conforming objects implement the `body` property using the `ViewResultBuilder` syntax
 /// to combine existing primitive views into higher-level, reusable components.
 public protocol ViewBuilder: ModifiableView {
+    
+    /// The declarative body of the composite view component.
     var body: View { get }
 }
 

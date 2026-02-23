@@ -74,26 +74,31 @@ public struct LabelView: ModifiableView {
 /// Standard modifiers for any `UILabel` conforming to `ModifiableView`.
 extension ModifiableView where Base: UILabel {
     
+    /// Aligns the text within the label.
     @discardableResult
     public func alignment(_ alignment: NSTextAlignment) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.textAlignment, value: alignment)
     }
 
+    /// Sets the text color.
     @discardableResult
     public func color(_ color: UIColor?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.textColor, value: color)
     }
     
+    /// Applies a specific `UIFont`.
     @discardableResult
     public func font(_ font: UIFont?) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.font, value: font)
     }
     
+    /// Applies a dynamic type font style.
     @discardableResult
     public func font(_ style: UIFont.TextStyle) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.font, value: .preferredFont(forTextStyle: style))
     }
 
+    /// Configures the line break mode.
     @discardableResult
     public func lineBreakMode(_ mode: NSLineBreakMode) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.lineBreakMode, value: mode)

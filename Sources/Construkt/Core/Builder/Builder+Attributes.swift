@@ -46,6 +46,10 @@ public class ViewBuilderAttributes {
 
 extension ModifiableView {
 
+    /// Allows applying custom AutoLayout constraints after the view is added to the hierarchy.
+    ///
+    /// - Parameter constraints: A closure providing the initialized `UIView` for constraint setup.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func customConstraints(_ constraints: @escaping (_ view: UIView) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -53,26 +57,53 @@ extension ModifiableView {
         }
     }
 
+    /// Sets uniform margins applied to all edges when embedded in a container.
+    ///
+    /// - Parameter value: The margin padding for all edges.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func margins(_ value: CGFloat) -> ViewModifier<Base> {
         margins(insets: UIEdgeInsets(top: value, left: value, bottom: value, right: value))
     }
 
+    /// Sets specific horizontal and vertical margins applied when embedded in a container.
+    ///
+    /// - Parameters:
+    ///   - h: The horizontal margin logic.
+    ///   - v: The vertical margin logic.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func margins(h: CGFloat, v: CGFloat) -> ViewModifier<Base> {
         margins(insets: UIEdgeInsets(top: v, left: h, bottom: v, right: h))
     }
 
+    /// Sets explicit margins for each edge applied when embedded in a container.
+    ///
+    /// - Parameters:
+    ///   - top: The top margin.
+    ///   - left: The left margin.
+    ///   - bottom: The bottom margin.
+    ///   - right: The right margin.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func margins(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) -> ViewModifier<Base> {
         margins(insets: UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
     }
 
+    /// Sets detailed margins represented by `UIEdgeInsets`.
+    ///
+    /// - Parameter insets: The insets config.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func margins(insets: UIEdgeInsets) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.builderAttributes()?.insets = insets }
     }
 
+    /// Specifies the alignment constraints of the view when embedded inside a container view.
+    /// Useful for placing items centrally or locking to specific edges in composite backgrounds.
+    ///
+    /// - Parameter position: The `EmbedPosition` configuration (e.g. `.center`, `.topLeading`, etc.)
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func position(_ position: UIView.EmbedPosition) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
@@ -80,6 +111,10 @@ extension ModifiableView {
         }
     }
 
+    /// Determines if the container embeddings should respect the `safeAreaInsets`.
+    ///
+    /// - Parameter safeArea: `true` to constrain to the safe area, `false` to bleed to edges.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func safeArea(_ safeArea: Bool) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {

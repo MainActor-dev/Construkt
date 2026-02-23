@@ -27,11 +27,13 @@
 import UIKit
 import RxSwift
 
+/// Context provided when a builder view is tapped.
 public struct BuilderTapGestureContext<Base:UIView>: ViewBuilderContextProvider {
     public var view: Base
     public var gesture: UIGestureRecognizer
 }
 
+/// Context provided when a builder view is swiped.
 public struct BuilderSwipeGestureContext<Base:UIView>: ViewBuilderContextProvider {
     public var view: Base
     public var gesture: UISwipeGestureRecognizer
@@ -40,6 +42,12 @@ public struct BuilderSwipeGestureContext<Base:UIView>: ViewBuilderContextProvide
 /// Provides declarative Rx-powered gesture recognizers (e.g., taps, swipes) for all builder views.
 extension ModifiableView {
 
+    /// Adds a tap gesture recognizer to the view, enabling interaction.
+    ///
+    /// - Parameters:
+    ///   - numberOfTaps: The number of taps required to trigger the handler. Defaults to 1.
+    ///   - handler: A closure to execute when the gesture is recognized.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func onTapGesture(numberOfTaps: Int = 1, _ handler: @escaping (_ context: BuilderTapGestureContext<Base>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view in
@@ -59,6 +67,10 @@ extension ModifiableView {
         }
     }
 
+    /// Adds a swipe left gesture recognizer to the view.
+    ///
+    /// - Parameter handler: A closure to execute when the gesture is recognized.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func onSwipeLeft(_ handler: @escaping (_ context: BuilderSwipeGestureContext<Base>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view in
@@ -78,6 +90,10 @@ extension ModifiableView {
         }
     }
 
+    /// Adds a swipe right gesture recognizer to the view.
+    ///
+    /// - Parameter handler: A closure to execute when the gesture is recognized.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func onSwipeRight(_ handler: @escaping (_ context: BuilderSwipeGestureContext<Base>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view in
@@ -97,6 +113,10 @@ extension ModifiableView {
         }
     }
 
+    /// Adds a tap gesture recognizing background views to hide the keyboard.
+    ///
+    /// - Parameter cancelsTouchesInView: Whether the gesture should cancel underlying touches. Defaults to `true`.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func hideKeyboardOnBackgroundTap(cancelsTouchesInView: Bool = true) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { view in

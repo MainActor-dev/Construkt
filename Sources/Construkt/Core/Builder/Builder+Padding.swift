@@ -37,16 +37,19 @@ public protocol ViewBuilderPaddable {
 /// Extensions giving natively paddable views SwiftUI-style fluent padding injection methods.
 extension ModifiableView where Base: ViewBuilderPaddable {
     
+    /// Adds uniform padding to all edges.
     @discardableResult
     public func padding(_ value: CGFloat) -> ViewModifier<Base> {
         padding(insets: UIEdgeInsets(top: value, left: value, bottom: value, right: value))
     }
     
+    /// Adds specific horizontal and vertical padding.
     @discardableResult
     public func padding(h: CGFloat, v: CGFloat) -> ViewModifier<Base> {
         padding(insets: UIEdgeInsets(top: v, left: h, bottom: v, right: h))
     }
     
+    /// Adds specific granular padding to explicitly named edges.
     @discardableResult
     public func padding(
         top: CGFloat = 0,
@@ -57,6 +60,7 @@ extension ModifiableView where Base: ViewBuilderPaddable {
         padding(insets: UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
     }
     
+    /// Adds detailed padding governed by `UIEdgeInsets`.
     @discardableResult
     public func padding(insets: UIEdgeInsets) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.setPadding(insets) }

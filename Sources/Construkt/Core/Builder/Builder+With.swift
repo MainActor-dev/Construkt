@@ -26,4 +26,5 @@
 
 import UIKit
 
+/// An alias for `ViewModifier` to provide syntactic sugar when applying generic modifiers inline.
 public typealias With = ViewModifier

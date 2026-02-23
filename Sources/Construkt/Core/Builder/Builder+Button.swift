@@ -55,31 +55,59 @@ public struct ButtonView: ModifiableView {
 /// Standard modifiers for any `UIButton` conforming to `ModifiableView`.
 extension ModifiableView where Base: UIButton {
 
+    /// Adjusts the horizontal content alignment of the button.
+    ///
+    /// - Parameter alignment: The alignment enum value to set.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func alignment(_ alignment: UIControl.ContentHorizontalAlignment) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.contentHorizontalAlignment, value: alignment)
     }
 
+    /// Sets the background color of the button for a specific control state, by synthesizing a solid color image.
+    ///
+    /// - Parameters:
+    ///   - color: The color to apply.
+    ///   - state: The control state triggering the color.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func backgroundColor(_ color: UIColor, for state: UIControl.State) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.setBackgroundImage(UIImage(color: color), for: state) }
     }
 
+    /// Sets the title color of the button.
+    ///
+    /// - Parameters:
+    ///   - color: The color to apply to the text.
+    ///   - state: The control state triggering the color, defaulting to `.normal`.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func color(_ color: UIColor, for state: UIControl.State = .normal) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.setTitleColor(color, for: state) }
     }
 
+    /// Applies a specific `UIFont` to the title label.
+    ///
+    /// - Parameter font: The font to apply.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func font(_ font: UIFont?) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.titleLabel?.font = font }
     }
 
+    /// Applies a standard dynamic type font style to the title label.
+    ///
+    /// - Parameter style: The text style, e.g. `.headline`, `.body`.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func font(_ style: UIFont.TextStyle) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { $0.titleLabel?.font = .preferredFont(forTextStyle: style) }
     }
 
+    /// Attaches an `RxSwift` tap handler to the button, automatically throttled to prevent double taps.
+    ///
+    /// - Parameter handler: A closure providing the builder context for contextual access.
+    /// - Returns: A modified view wrapper.
     @discardableResult
     public func onTap(_ handler: @escaping (_ context: ViewBuilderContext<UIButton>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) { [unowned modifiableView] view in

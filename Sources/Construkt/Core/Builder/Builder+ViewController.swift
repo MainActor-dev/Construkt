@@ -40,10 +40,12 @@ extension UIViewController {
         self.view.embed(view(), padding: padding, safeArea: safeArea)
     }
     
+    /// Wraps the provided view transition over this controller's main `view`.
     public func transition(to view: View, padding: UIEdgeInsets? = nil, safeArea: Bool = false, delay: Double = 0.2) {
         self.view.transition(to: view, padding: padding, safeArea: safeArea, delay: delay)
     }
 
+    /// Wraps the provided controller transition over this controller's main `view`.
     public func transition(to viewController: UIViewController, delay: Double) {
         self.view.transition(to: viewController, delay: delay)
     }

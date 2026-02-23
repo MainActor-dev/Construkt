@@ -29,7 +29,9 @@ import RxCocoa
 
 // MARK: - Protocols
 
+/// A protocol that identifies types capable of resolving into a reactive stream of `SectionController` arrays.
 public protocol SectionObservable {
+    /// Converts the conforming type into an Rx observable of section controllers.
     func asSectionObservable() -> Observable<[SectionController]>
 }
 
@@ -41,6 +43,7 @@ extension Array: SectionObservable where Element == SectionController {
     public func asSectionObservable() -> Observable<[SectionController]> { .just(self) }
 }
 
+/// A marker protocol identifying valid declarative components belonging within a `Section` body.
 public protocol SectionComponent {}
 
 extension Array: SectionComponent where Element == CellController {}
@@ -51,6 +54,7 @@ extension Array: SectionComponent where Element == CellController {}
 public struct Header: SectionComponent {
     public let controller: SupplementaryController
     
+    /// Initializes the header with a unique ID and a statically structured declarative `View` block.
     public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
             id: id ?? AnyHashable(UUID()),
@@ -68,6 +72,7 @@ public struct Header: SectionComponent {
         self.controller = controller
     }
     
+    /// Imperatively hides or shows the header.
     public func hidden(_ isHidden: Bool) -> Header {
         var copy = self.controller
         copy.isHidden = isHidden
@@ -79,6 +84,7 @@ public struct Header: SectionComponent {
 public struct Footer: SectionComponent {
     public let controller: SupplementaryController
     
+    /// Initializes the footer with a unique ID and a statically structured declarative `View` block.
     public init(id: AnyHashable? = nil, @ViewResultBuilder content: @escaping () -> ViewConvertable) {
         self.controller = SupplementaryController(
             id: id ?? AnyHashable(UUID()),
@@ -96,6 +102,7 @@ public struct Footer: SectionComponent {
         self.controller = controller
     }
     
+    /// Imperatively hides or shows the footer.
     public func hidden(_ isHidden: Bool) -> Footer {
         var copy = self.controller
         copy.isHidden = isHidden
@@ -112,12 +119,14 @@ extension CellController: SectionComponent {}
 
 // MARK: - Section Content Builder
 
+/// An intermediate structure aggregating parsed cells, headers, and footers from a single `SectionContentBuilder`.
 public struct SectionContent {
     var cells: [CellController] = []
     var header: SupplementaryController?
     var footer: SupplementaryController?
 }
 
+/// A result builder designed to aggregate headers, footers, and cells into a unified `SectionContent` model.
 @resultBuilder
 public struct SectionContentBuilder {
     public static func buildBlock(_ components: SectionComponent...) -> SectionContent {
@@ -175,6 +184,7 @@ public struct SectionContentBuilder {
 }
 
 // MARK: - Section Result Builder
+/// A robust result builder mapping discrete `Section` definitions into unified Rx-powered observables.
 @resultBuilder
 public struct SectionResultBuilder {
     public static func buildBlock() -> Observable<[SectionController]> {
@@ -271,6 +281,7 @@ public struct Section: SectionObservable {
 
     // MARK: - Actions Modifier
     
+    /// Attaches a type-safe selection action that applies uniformly to every item housed dynamically within this section.
     public func onSelect<T>(_ handler: @escaping (T) -> Void) -> Section {
         let improved: Observable<[SectionController]> = observable.map { sections in
             sections.map { section in
@@ -300,6 +311,7 @@ public struct Section: SectionObservable {
         return Section(observable: improved)
     }
     
+    /// Binds an externally injected target reference weakly into every item's tap action dynamically inside this section.
     public func onSelect<T, Target: AnyObject>(on target: Target, _ handler: @escaping (Target, T) -> Void) -> Section {
         let improved: Observable<[SectionController]> = observable
             .map { [weak target] sections in
@@ -385,6 +397,7 @@ public struct Section: SectionObservable {
         return Section(observable: improved)
     }
     
+    /// Modifies the structural definition of the section's header by providing an internally injected declarative `Header` block.
     public func header(_ handler: @escaping () -> Header) -> Section {
         let improved = observable.map { sections in
             sections.map { section in
@@ -400,6 +413,7 @@ public struct Section: SectionObservable {
         return Section(observable: improved)
     }
     
+    /// Modifies the structural definition of the section's footer by providing an internally injected declarative `Footer` block.
     public func footer(_ handler: @escaping () -> Footer) -> Section {
         let improved = observable.map { sections in
              sections.map { section in
@@ -415,6 +429,8 @@ public struct Section: SectionObservable {
          return Section(observable: improved)
      }
     
+    /// Imposes an automated animated "Skeleton mode" replacing layout components with shimmer placeholder items.
+    /// Dictated dynamically by resolving an Rx stream boolean argument `when:`.
     public func skeleton<C, B>(
         _ type: C.Type,
         count: Int,
@@ -452,6 +468,7 @@ public struct Section: SectionObservable {
         return Section(observable: combined)
     }
     
+    /// Imposes an automated declarative "Skeleton mode" loading block via `HostingCell` replacing the current section layout.
     public func skeleton<Content: View, B: RxBinding>(
         count: Int,
         when binding: B,
@@ -470,6 +487,8 @@ public struct Section: SectionObservable {
         }
     }
     
+    /// Submits a distinct declarative nested view substituting this entire section context if the 
+    /// dynamically resolved properties within evaluate functionally completely empty or to length 0 count.
     public func emptyState(
         layout: ((String) -> NSCollectionLayoutSection)? = nil,
         @ViewResultBuilder _ content: @escaping () -> ViewConvertable

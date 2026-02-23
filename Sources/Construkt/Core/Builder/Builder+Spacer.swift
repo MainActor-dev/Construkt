@@ -31,16 +31,19 @@ public struct SpacerView: ModifiableView {
 
     public var modifiableView = Modified(UIView())
     
+    /// Initializes a flexible spacer that tries to expand horizontally and vertically.
     public init() {
         modifiableView.setContentHuggingPriority(.defaultLow, for: .horizontal)
         modifiableView.setContentHuggingPriority(.defaultLow, for: .vertical)
     }
 
+    /// Initializes a flexible spacer with a minimum height for vertical stacks.
     public init(h: CGFloat = 16) {
         modifiableView.heightAnchor.constraint(greaterThanOrEqualToConstant: h).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 
+    /// Initializes a flexible spacer with a minimum width for horizontal stacks.
     public init(w: CGFloat = 8) {
         modifiableView.widthAnchor.constraint(greaterThanOrEqualToConstant: w).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -53,16 +56,19 @@ public struct FixedSpacerView: ModifiableView {
 
     public var modifiableView = Modified(UIView())
     
+    /// Initializes a rigid spacer that heavily resists stretching or compressing.
     public init() {
         modifiableView.setContentHuggingPriority(.required, for: .horizontal)
         modifiableView.setContentHuggingPriority(.required, for: .vertical)
     }
 
+    /// Initializes a rigid vertical spacer locked to a specific height.
     public init(_ height: CGFloat = 16) {
         modifiableView.heightAnchor.constraint(equalToConstant: height).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 
+    /// Initializes a rigid horizontal spacer locked to a specific width.
     public init(width: CGFloat = 8) {
         modifiableView.widthAnchor.constraint(equalToConstant: width).isActive = true
         modifiableView.setContentCompressionResistancePriority(.required, for: .horizontal)

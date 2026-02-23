@@ -31,12 +31,22 @@ public struct ForEach: ViewConvertable {
 
     private var views: [View] = []
 
+    /// Emits a dynamically built array of views mapped by indices across a specified repeating count.
+    ///
+    /// - Parameters:
+    ///   - count: The number of times to iterate.
+    ///   - builder: A closure yielding the concrete views per index.
     public init(_ count: Int, _ builder: (_ index: Int) -> View) {
         for index in 0..<count {
             views.append(builder(index))
         }
     }
 
+    /// Emits a dynamically built array of views based on mapped entries directly from the provided source array.
+    ///
+    /// - Parameters:
+    ///   - array: The source elements providing iteration.
+    ///   - builder: A closure yielding views explicitly mapping to elements.
     public init<Element>(_ array: [Element], _ builder: (_ element: Element) -> View) {
         views = array.map { builder($0) }
     }
