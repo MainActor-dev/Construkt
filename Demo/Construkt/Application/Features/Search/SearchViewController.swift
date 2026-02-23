@@ -82,6 +82,14 @@ public class SearchViewController: UIViewController {
 
     private var searchBar: View {
         HStackView(spacing: 8) {
+            ImageView(systemName: "chevron.left")
+                .tintColor(.white)
+                .size(width: 24, height: 24)
+                .contentMode(.scaleAspectFit)
+                .onTapGesture { [weak self] _ in
+                    self?.navigationController?.popViewController(animated: true)
+                }
+
             ImageView(UIImage(systemName: "magnifyingglass"))
                 .tintColor(.lightGray)
                 .size(width: 20, height: 20)
