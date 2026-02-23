@@ -9,6 +9,8 @@
 import UIKit
 import RxSwift
 
+/// A builder component that wraps a `UIImageView`, enabling simple instantiation from local
+/// assets, system images, or remote URLs, and supporting reactive bindings.
 public struct ImageView: ModifiableView {
     
     public let modifiableView = Modified(UIImageView())
@@ -55,8 +57,7 @@ public struct ImageView: ModifiableView {
 }
 
 
-// Custom UIImageView modifiers
-
+/// Standard modifiers for any `UIImageView` conforming to `ModifiableView`.
 extension ModifiableView where Base: UIImageView {
 
     @discardableResult

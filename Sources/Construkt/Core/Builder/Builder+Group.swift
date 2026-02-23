@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// A semantic grouping construct allowing multiple views to be returned simultaneously when
+/// the result builder is structurally limited to returning a single `ViewConvertable`.
 struct Group: ViewConvertable {
     
     private var views: [View]

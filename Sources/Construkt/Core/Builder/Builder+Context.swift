@@ -8,16 +8,21 @@
 import UIKit
 import RxSwift
 
+/// A protocol that provides ambient access to the current `UIView` and its hierarchical environment
+/// (like `UIViewController` or `UINavigationController`) during builder evaluation.
 public protocol ViewBuilderContextProvider {
     associatedtype Base: UIView
     var view: Base { get }
 }
 
+/// An extension of `ViewBuilderContextProvider` that additionally carries a strongly-typed value payload,
+/// typically used in control event callbacks.
 public protocol ViewBuilderContextValueProvider: ViewBuilderContextProvider {
     associatedtype Value
     var value: Value { get }
 }
 
+/// Extension facilitating quick access to complex View Controller hierarchies directly from inline context handlers.
 extension ViewBuilderContextProvider {
     
     public var viewController: UIViewController? {
@@ -104,10 +109,12 @@ extension ViewBuilderContextProvider {
 
 }
 
+/// A concrete implementation of `ViewBuilderContextProvider` wrapping a given `UIView`.
 public struct ViewBuilderContext<Base:UIView>: ViewBuilderContextProvider {
     public var view: Base
 }
 
+/// A concrete implementation of `ViewBuilderContextValueProvider` coupling a view with a contextual value.
 public struct ViewBuilderValueContext<Base:UIView, Value>: ViewBuilderContextValueProvider {
     public let view: Base
     public var value: Value

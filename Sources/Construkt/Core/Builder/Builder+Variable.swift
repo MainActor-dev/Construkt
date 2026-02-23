@@ -9,6 +9,8 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+/// A property wrapper that leverages RxSwift's `BehaviorRelay` to provide easy 
+/// reactive bindings and local state management for custom views.
 @propertyWrapper public struct Variable<T> {
     
     private var relay: BehaviorRelay<T>

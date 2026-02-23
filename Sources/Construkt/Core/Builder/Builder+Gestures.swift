@@ -18,6 +18,7 @@ public struct BuilderSwipeGestureContext<Base:UIView>: ViewBuilderContextProvide
     public var gesture: UISwipeGestureRecognizer
 }
 
+/// Provides declarative Rx-powered gesture recognizers (e.g., taps, swipes) for all builder views.
 extension ModifiableView {
 
     @discardableResult

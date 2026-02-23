@@ -8,10 +8,12 @@
 import UIKit
 
 
+/// A protocol defining an encapsulated style definition that can be applied to a `UIView`.
 public protocol BuilderStyle {
     associatedtype Base: UIView
     func apply(to view: Base)
 }
+
 
 extension ModifiableView {
 

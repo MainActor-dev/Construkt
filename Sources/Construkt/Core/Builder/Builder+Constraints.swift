@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Provides declarative layout bindings (e.g., width, height, priorities) mapping to AutoLayout constraints.
 extension ModifiableView {
     
     @discardableResult

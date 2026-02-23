@@ -9,6 +9,10 @@
 import UIKit
 import RxSwift
 
+/// A lightweight builder component that manages an arbitrary child view layout.
+///
+/// It provides a straightforward layer to host and dynamically swap content, or layer
+/// them similarly to a SwiftUI `ZStack`.
 public struct ContainerView: ModifiableView {
 
     public var modifiableView = Modified(BuilderInternalContainerView(frame: .zero)) {
@@ -26,6 +30,7 @@ public struct ContainerView: ModifiableView {
 
 }
 
+/// An alias for `ContainerView` emphasizing its capability to swap child views dynamically based on state.
 public typealias DynamicContainerView = ContainerView
 
 extension DynamicContainerView {
@@ -54,6 +59,8 @@ extension ModifiableView where Base: BuilderInternalContainerView {
 
 }
 
+/// A custom internal `UIView` subclass dedicated to orchestrating its children under
+/// a `ContainerView` or `ZStackView`.
 public class BuilderInternalContainerView: UIView, ViewBuilderEventHandling {
 
     fileprivate var views: ViewConvertable?

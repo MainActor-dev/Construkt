@@ -9,12 +9,14 @@
 import UIKit
 import RxSwift
 
+/// A protocol representing a collection of `View` components that can be indexed and observed for updates.
 public protocol AnyIndexableViewBuilder: ViewConvertable {
     var count: Int { get }
     var updated: Observable<Void>? { get }
     func view(at index: Int) -> View?
 }
 
+/// A fixed-size builder collection wrapping statically defined declarative `View` structures.
 public struct StaticViewBuilder: AnyIndexableViewBuilder {
 
     private var views: [View]
@@ -37,6 +39,7 @@ public struct StaticViewBuilder: AnyIndexableViewBuilder {
 
 }
 
+/// A reactive builder component that maps an array of `Item` elements to a dynamic list of views.
 public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 
     public var items: [Item] {
@@ -72,6 +75,7 @@ public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 
 }
 
+/// A reactive builder component that maps an RxSwift `Observable` emission to a dynamically rebuilt view.
 public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var count: Int { view == nil ? 0 : 1 }
@@ -100,6 +104,7 @@ public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder {
 
 }
 
+/// A reactive builder component that monitors a local `value` setter to trigger reactive downstream view rebuilds.
 public class DynamicValueViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var value: Value {

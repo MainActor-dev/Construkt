@@ -47,6 +47,7 @@ extension Array: SectionComponent where Element == CellController {}
 
 // MARK: - Section Constructs
 
+/// A declarative wrapper defining a supplementary header view for a `Section`.
 public struct Header: SectionComponent {
     public let controller: SupplementaryController
     
@@ -74,6 +75,7 @@ public struct Header: SectionComponent {
     }
 }
 
+/// A declarative wrapper defining a supplementary footer view for a `Section`.
 public struct Footer: SectionComponent {
     public let controller: SupplementaryController
     
@@ -204,6 +206,8 @@ public struct SectionResultBuilder {
 
 
 // MARK: - Section
+/// A declarative constructor for generating a `SectionController` via RxSwift data bindings 
+/// or static `CellResultBuilder` closures.
 public struct Section: SectionObservable {
     private let observable: Observable<[SectionController]>
     
@@ -345,12 +349,36 @@ public struct Section: SectionObservable {
     }
     
     // MARK: Modifiers
+    /// Uses a standard closure returning an optional `NSCollectionLayoutSection`, parameterized by environment.
     public func layout(_ handler: @escaping (String) -> NSCollectionLayoutSection?) -> Section {
-        // Apply layout to the inner section controllers when they emit
         let improved = observable.map { sections in
             sections.map { section in
                 var copy = section
                 copy.layoutProvider = handler
+                return copy
+            }
+        }
+        return Section(observable: improved)
+    }
+    
+    /// Uses a declarative `@LayoutBuilder` closure to synthesize the UI layout for this specific section implicitly.
+    public func layout(@LayoutBuilder _ builder: @escaping () -> NSCollectionLayoutSection) -> Section {
+        let improved = observable.map { sections in
+            sections.map { section in
+                var copy = section
+                copy.layoutProvider = { _ in builder() }
+                return copy
+            }
+        }
+        return Section(observable: improved)
+    }
+    
+    /// Uses a declarative `@LayoutBuilder` closure dynamically injected with an environment string identifier.
+    public func layout(@LayoutBuilder _ builder: @escaping (String) -> NSCollectionLayoutSection) -> Section {
+        let improved = observable.map { sections in
+            sections.map { section in
+                var copy = section
+                copy.layoutProvider = builder
                 return copy
             }
         }

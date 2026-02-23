@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 
 
+/// A protocol for wrapping types that emit standard, one-way RxSwift `Observable` events.
 public protocol RxBinding {
     associatedtype T
     func asObservable() -> Observable<T>
@@ -22,6 +23,8 @@ extension Observable: RxBinding {
 
 
 
+/// A protocol extending `RxBinding` for types that act as both observers and observables, 
+/// facilitating two-way UI bindings (e.g. `BehaviorRelay`).
 public protocol RxBidirectionalBinding: RxBinding {
     associatedtype T
     func asRelay() -> BehaviorRelay<T>
@@ -90,18 +93,36 @@ extension ModifiableView {
             }
     }
 
+    /// Explicitly injects a parent `DisposeBag` to manage the Rx lifecycle of this component.
+    ///
+    /// - Note: When provided, this overrides the lazily created view-scoped `rxDisposeBag`. 
+    /// To prevent prematurely cancelling earlier bindings in the builder chain, applying this modifier 
+    /// should generally occur *before* subsequent `.bind` or `.onReceive` modifiers.
+    @discardableResult
+    public func disposed(by bag: DisposeBag) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) { view in
+            objc_setAssociatedObject(view, &NSObject.RxDisposeBagAttributesKey, bag, .OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+
 }
 
 extension NSObject {
 
-    private static var RxDisposeBagAttributesKey: UInt8 = 0
+    fileprivate static var RxDisposeBagAttributesKey: UInt8 = 0
 
+    /// Returns a generic RxSwift `DisposeBag` stored dynamically on the `NSObject` class via the Objective-C runtime.
+    ///
+    /// - Important: `ViewBuilder` uses this internally to manage subscription lifecycles. 
+    /// Because the bag is retained by the parent `UIView` (or NSObject) object, it means all Rx streams binding to builders
+    /// will intrinsically outlive the declarative function stack and bind strictly to the view's lifecycle. 
+    /// If you wish to explicitly manage this, use the `.disposed(by:)` modifier on the builder to inject your own bag.
     public var rxDisposeBag: DisposeBag {
-        if let disposeBag = objc_getAssociatedObject( self, &UIView.RxDisposeBagAttributesKey ) as? DisposeBag {
+        if let disposeBag = objc_getAssociatedObject(self, &NSObject.RxDisposeBagAttributesKey) as? DisposeBag {
             return disposeBag
         }
         let disposeBag = DisposeBag()
-        objc_setAssociatedObject(self, &UIView.RxDisposeBagAttributesKey, disposeBag, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(self, &NSObject.RxDisposeBagAttributesKey, disposeBag, .OBJC_ASSOCIATION_RETAIN)
         return disposeBag
     }
 

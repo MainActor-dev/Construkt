@@ -7,7 +7,8 @@
 
 import UIKit
 
-// Custom builder fot UILabel
+/// A builder component that wraps a `UILabel`, exposing a declarative API for configuring text,
+/// fonts, colors, and reactive bindings.
 public struct LabelView: ModifiableView {
     
     public let modifiableView = Modified(BuilderInternalUILabel()) {
@@ -51,7 +52,7 @@ public struct LabelView: ModifiableView {
 }
 
 
-// Custom UILabel modifiers
+/// Standard modifiers for any `UILabel` conforming to `ModifiableView`.
 extension ModifiableView where Base: UILabel {
     
     @discardableResult
@@ -115,6 +116,8 @@ extension ModifiableView where Base: UILabel {
 }
 
 
+/// A custom subclass of `UILabel` designed to interface smoothly with `ViewBuilder` lifecycle
+/// events and handle custom padding logic natively.
 public class BuilderInternalUILabel: UILabel, ViewBuilderEventHandling {
 
     var labelMargins: UIEdgeInsets = .zero

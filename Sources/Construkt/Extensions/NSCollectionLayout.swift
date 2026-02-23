@@ -25,6 +25,7 @@
 import UIKit
 
 extension NSCollectionLayoutItem {
+    /// Generates an item that occupies the entire width and height of its parent container.
     static func withEntireSize() -> NSCollectionLayoutItem {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -44,6 +45,7 @@ extension NSCollectionLayoutItem {
 
 extension NSCollectionLayoutGroup {
     // MARK: - Vertical Scroll
+    /// Creates a vertical layout group scaling the specified width and height.
     static func vertically(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,

@@ -8,7 +8,8 @@
 import UIKit
 
 
-// ViewResultBuilder allows SwiftUI-like definitions of UIView trees
+/// A result builder that enables a declarative, SwiftUI-like syntax for constructing `UIView` hierarchies.
+/// It converts combinations of `ViewConvertable` expressions into a flat array of abstract `View` components.
 @resultBuilder public struct ViewResultBuilder {
     public static func buildBlock() -> [View] {
         []
@@ -32,7 +33,10 @@ import UIKit
 
 
 
-// Arrays of views are the building blocks of ViewResultBuilder
+/// A protocol representing a type that can be converted into an array of abstract `View` objects.
+///
+/// This is the fundamental building block for the `ViewResultBuilder`, allowing elements like single views,
+/// arrays of views, and dynamic builders to coexist cleanly in the DSL.
 public protocol ViewConvertable {
     func asViews() -> [View]
 }
@@ -49,7 +53,9 @@ extension Array where Element == ViewConvertable {
 
 
 
-// Fundamental view object that knows how to build a UIView from a given view or view definition
+/// An abstract representation of a UI component that knows how to build a tangible `UIView`.
+///
+/// Types conforming to this protocol can be used inside `ViewResultBuilder` blocks to assemble UI hierarchically.
 public protocol View: ViewConvertable {
     func build() -> UIView
     func callAsFunction() -> UIView
@@ -65,7 +71,10 @@ extension View {
     }
 }
 
-// Allows view builder modifications to be made to a given UIView type
+/// A specialized `View` that exposes an underlying `UIView` of a specific type (`Base`) for modification.
+///
+/// Conform to this protocol when you want to use the standard chainable `ViewModifier` methods
+/// (like `.hidden()`, `.backgroundColor()`, etc.) on a custom object wrapping a `UIView`.
 public protocol ModifiableView: View {
     associatedtype Base: UIView
     var modifiableView: Base { get }
@@ -116,7 +125,9 @@ extension ModifiableView {
     }
 }
 
-// Generic return type for building/chaining view modifiers
+/// A generic wrapper type used to chain sequential modifications to a `UIView`.
+///
+/// Each builder method (e.g. `.backgroundColor(:)`) returns a `ViewModifier` retaining the original underlying `UIView`.
 public struct ViewModifier<Base:UIView>: ModifiableView {
     public let modifiableView: Base
     public init(_ view: Base) {
@@ -137,7 +148,12 @@ public struct ViewModifier<Base:UIView>: ModifiableView {
 
 
 
-// Helper function to simplify custom view builder initialization
+/// A convenience utility for instantiating and configuring a `UIView` subclass in a single expression.
+///
+/// - Parameters:
+///   - instance: The view instance to modify.
+///   - modify: A closure exposing the instance for inline configuration.
+/// - Returns: The configured `UIView` instance.
 public func Modified<T:UIView>( _ instance: T, modify: ((_ instance: T) -> Void)? = nil) -> T {
     // common modifications
     instance.translatesAutoresizingMaskIntoConstraints = false
@@ -148,7 +164,10 @@ public func Modified<T:UIView>( _ instance: T, modify: ((_ instance: T) -> Void)
 
 
 
-// ViewBuilder allows for user-defined custom view configurations
+/// A protocol that enables building custom composite views declaratively.
+///
+/// Conforming objects implement the `body` property using the `ViewResultBuilder` syntax
+/// to combine existing primitive views into higher-level, reusable components.
 public protocol ViewBuilder: ModifiableView {
     var body: View { get }
 }
@@ -166,6 +185,10 @@ extension ViewBuilder {
 
 
 
+/// A central configuration store for default styling properties across Construkt builders.
+///
+/// By providing ambient constants here, components like `Button` and `Label` can inherit standard
+/// application aesthetics without declaring style modifiers explicitly on every instance.
 public struct ViewBuilderEnvironment {
     static public var defaultButtonFont: UIFont?
     static public var defaultButtonColor: UIColor?

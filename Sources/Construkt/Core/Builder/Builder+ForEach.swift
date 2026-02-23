@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// A builder construct for iterating over arrays or closed ranges to dynamically generate views.
 public struct ForEach: ViewConvertable {
 
     private var views: [View] = []

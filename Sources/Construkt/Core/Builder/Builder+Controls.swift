@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Extension providing declarative subscription mapping to `UIControl` baseline configurations.
 extension ModifiableView where Base: UIControl {
 
     @discardableResult
@@ -36,6 +37,7 @@ extension ModifiableView where Base: UIControl {
 
 }
 
+/// Standard declarative RxBindings for `UIControl` baseline state properties.
 extension ModifiableView where Base: UIControl {
 
     @discardableResult

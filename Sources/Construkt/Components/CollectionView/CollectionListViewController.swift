@@ -24,6 +24,8 @@
 
 import UIKit
 
+/// A fundamental `UIViewController` subclass pre-configured with a `UICollectionView`, 
+/// a Diffable Data Source, and pull-to-refresh capabilities.
 class CollectionListViewController: UIViewController {
     
     private(set) lazy var collectionView = UICollectionView(

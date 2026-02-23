@@ -26,6 +26,8 @@ import UIKit
 
 private typealias CollectionDelegate = UICollectionViewDelegate & UICollectionViewDataSourcePrefetching
 
+/// An internal adapter that conforms to `UICollectionViewDelegate` and `UICollectionViewDataSourcePrefetching`,
+/// bridging user interactions and prefetching events from the collection view directly to the corresponding `CellController`.
 public final class CellControllerAdapter: NSObject, CollectionDelegate {
 
     private weak var dataSource: CollectionDiffableDataSource?

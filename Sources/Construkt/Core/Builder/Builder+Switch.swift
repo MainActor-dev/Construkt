@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-// Custom builder fot UILabel
+/// A builder component that wraps a `UISwitch`, offering declarative two-way bindings to its value.
 public struct SwitchView: ModifiableView {
     
     public let modifiableView: UISwitch = Modified(UISwitch()) {
@@ -32,7 +32,7 @@ public struct SwitchView: ModifiableView {
 }
 
 
-// Custom UILabel modifiers
+/// Extension providing declarative subscription mapping to `UISwitch` control events and properties.
 extension ModifiableView where Base: UISwitch {
     
     @discardableResult

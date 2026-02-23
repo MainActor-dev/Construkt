@@ -24,6 +24,7 @@
 
 import UIKit
 
+/// A protocol defining a unique identity for a collection view section, used by diffable data sources.
 public protocol SectionControllerIdentifier {
     var uniqueId: String { get }
 }
@@ -47,6 +48,8 @@ public struct DefaultSectionIdentifier: SectionControllerIdentifier {
     }
 }
 
+/// A container that coordinates the components of a single `UICollectionView` section,
+/// including its cells, supplementary views (header/footer), and layout definitions.
 public struct SectionController {
     
     public typealias Identifier = SectionControllerIdentifier

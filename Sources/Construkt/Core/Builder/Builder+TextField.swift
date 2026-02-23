@@ -10,6 +10,8 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+/// A builder component that wraps a `UITextField`, providing a declarative configuration interface
+/// and bidirectional responsive bindings.
 public struct TextField: ModifiableView {
 
     public let modifiableView: UITextField = Modified(UITextField()) {
@@ -147,9 +149,8 @@ extension ModifiableView where Base: UITextField {
 }
 
 
+/// Extension providing declarative subscription mapping to `UITextField` control events.
 extension ModifiableView where Base: UITextField {
-
-    @discardableResult
     public func onControlEvent(_ event: UIControl.Event,
                                handler: @escaping (_ context: ViewBuilderValueContext<UITextField, String?>) -> Void) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {

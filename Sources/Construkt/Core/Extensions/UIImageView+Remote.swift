@@ -19,6 +19,9 @@ public class ImageCache {
 private var currentTaskKey: UInt8 = 0
 
 public extension UIImageView {
+    
+    /// Asynchronously fetches and assigns an image from a given URL, displaying a placeholder 
+    /// while loading. Re-requests to a changed URL automatically cancel previous loads.
     func setImage(from url: URL?, placeholder: UIImage? = nil) {
         // Cancel prior task
         if let existingTask = objc_getAssociatedObject(self, &currentTaskKey) as? Task<Void, Never> {

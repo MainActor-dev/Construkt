@@ -8,6 +8,7 @@
 
 import UIKit
 
+/// A flexible empty space view designed to push sibling views apart in a `StackView`.
 public struct SpacerView: ModifiableView {
 
     public var modifiableView = Modified(UIView())
@@ -29,6 +30,7 @@ public struct SpacerView: ModifiableView {
     
 }
 
+/// A rigid empty space view designed to hold a static footprint in a `StackView` layout without expanding.
 public struct FixedSpacerView: ModifiableView {
 
     public var modifiableView = Modified(UIView())

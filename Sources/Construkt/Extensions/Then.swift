@@ -28,6 +28,7 @@ import Foundation
   import UIKit.UIGeometry
 #endif
 
+/// A protocol enabling syntactic sugar for inline object initialization and configuration.
 public protocol Then {}
 
 extension Then where Self: Any {

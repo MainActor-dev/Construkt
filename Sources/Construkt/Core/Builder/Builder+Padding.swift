@@ -8,11 +8,14 @@
 import UIKit
 
 
+/// Protocol adopted by custom `.padding()`-compatible views (like `StackView` or `Label`) that natively
+/// support internal content margins.
 public protocol ViewBuilderPaddable {
     func setPadding(_ padding: UIEdgeInsets)
 }
 
 
+/// Extensions giving natively paddable views SwiftUI-style fluent padding injection methods.
 extension ModifiableView where Base: ViewBuilderPaddable {
     
     @discardableResult

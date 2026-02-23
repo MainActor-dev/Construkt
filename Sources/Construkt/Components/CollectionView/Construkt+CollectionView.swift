@@ -29,6 +29,8 @@ import RxCocoa
 
 // MARK: - CollectionView Wrapper
 
+/// A declarative builder component that bridges Construkt's View architecture with modern
+/// `UICollectionView` APIs powered by Diffable Data Sources and Compositional Layouts.
 public struct CollectionView: ModifiableView {
     
     public let modifiableView = CollectionViewWrapperView()
@@ -45,6 +47,8 @@ public struct CollectionView: ModifiableView {
     }
 }
 
+/// The internal `UIView` subclass responsible for hosting the actual `UICollectionView` and
+/// maintaining the Diffable Data Source mappings.
 public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     
     public private(set) lazy var collectionView: UICollectionView = {

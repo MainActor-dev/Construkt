@@ -7,6 +7,8 @@
 
 import UIKit
 
+/// An internal storage construct holding specialized builder data (e.g., margins, constraints, lifecycle handlers)
+/// that are applied dynamically when a view moves to the window hierarchy.
 public class ViewBuilderAttributes {
 
     var position: UIView.EmbedPosition?

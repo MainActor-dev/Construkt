@@ -6,6 +6,8 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+/// A declarative builder wrapper around `UIActivityIndicatorView`, providing modifiers
+/// for spinning styling and reactive bindings.
 public struct ActivityIndicator: ModifiableView {
     
     public let modifiableView = Modified(UIActivityIndicatorView(style: .medium))

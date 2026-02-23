@@ -25,6 +25,7 @@
 import Foundation
 
 extension Collection {
+    /// Safely accesses the element at the specified index, returning `nil` if the index is out of bounds.
     subscript(safe index: Index) -> Element? {
         indices.contains(index) ? self[index] : nil
     }

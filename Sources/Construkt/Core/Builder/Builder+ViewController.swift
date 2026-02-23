@@ -8,8 +8,10 @@
 
 import UIKit
 
+/// Extends `UIViewController` to allow initializing natively with a Construkt `View` hierarchy.
 extension UIViewController {
 
+    /// Convenience initializer mapping a declarative `View` into the controller's main view.
     convenience public init(_ view: View, padding: UIEdgeInsets? = nil, safeArea: Bool = false) {
         self.init()
         if #available(iOS 13, *) {
@@ -30,6 +32,8 @@ extension UIViewController {
 
 }
 
+/// A structural builder component specifically designed to host a child `UIViewController` natively within
+/// the declarative view tree.
 public struct ViewControllerHostView: ModifiableView {
 
     public var modifiableView = Modified(BuilderInternalViewControllerHostView()) {
@@ -42,6 +46,7 @@ public struct ViewControllerHostView: ModifiableView {
 
 }
 
+/// An internal hosting `UIView` subclass managing custom container child events for `ViewControllerHostView`.
 public class BuilderInternalViewControllerHostView: UIView {
 
     var viewController: UIViewController!

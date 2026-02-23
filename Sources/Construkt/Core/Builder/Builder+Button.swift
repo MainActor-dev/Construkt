@@ -11,6 +11,8 @@ import RxSwift
 import RxCocoa
 
 
+/// A builder component that wraps a `UIButton`, providing declarative methods for titles, colors, fonts,
+/// and RxSwift tap handlers.
 public struct ButtonView: ModifiableView {
     
     public let modifiableView = Modified(UIButton()) {
@@ -32,7 +34,7 @@ public struct ButtonView: ModifiableView {
 }
 
 
-// Custom UIImageView modifiers
+/// Standard modifiers for any `UIButton` conforming to `ModifiableView`.
 extension ModifiableView where Base: UIButton {
 
     @discardableResult

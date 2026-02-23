@@ -26,6 +26,7 @@
 import UIKit
 import ObjectiveC.runtime
 
+/// An internal `CAGradientLayer` configured to perform the continuous "shimmer" animation across bounds.
 final class SkeletonLayer: CAGradientLayer {
     private(set) var config: SkeletonConfig = SkeletonConfig()
 

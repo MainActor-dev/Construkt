@@ -9,6 +9,7 @@
 import UIKit
 
 
+/// A declarative builder component that constructs a multidirectional `UIScrollView`.
 public struct ScrollView: ModifiableView {
     
     public var modifiableView = Modified(BuilderInternalScrollView(frame: UIScreen.main.bounds)) {
@@ -87,6 +88,9 @@ extension ModifiableView where Base: BuilderInternalScrollView {
 
 }
 
+/// A declarative builder component that constructs a `UIScrollView` locked to vertical scrolling.
+///
+/// It implicitly ensures its child views match the scroll view's width.
 public struct VerticalScrollView: ModifiableView {
     
     public var modifiableView = Modified(BuilderVerticalScrollView(frame: UIScreen.main.bounds)) {

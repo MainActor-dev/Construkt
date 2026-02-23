@@ -8,7 +8,7 @@
 import UIKit
 import RxSwift
 
-// Allows UIView to use basic view modifiers and integrate with view builders
+/// Allows `UIView` objects to serve as primitives in the declarative builder syntax.
 extension UIView: ModifiableView {
     
     public var modifiableView: UIView {
@@ -34,7 +34,7 @@ extension ModifiableView {
 
 }
 
-// Standard UIView modifiers for all view types
+/// Standard `UIView` core visual and behavioral modifiers applicable to all view types.
 extension ModifiableView {
         
     @discardableResult
@@ -146,6 +146,7 @@ extension ModifiableView {
 }
 
 
+/// An internal hosting view responsible for anchoring a declaratively-defined arbitrary inner view.
 class BuilderHostView: UIView {
     
     public init(_ view: View) {

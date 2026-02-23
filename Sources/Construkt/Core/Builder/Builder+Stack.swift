@@ -10,6 +10,9 @@ import RxSwift
 import SwiftUI
 
 
+/// A builder component that constructs a horizontal `UIStackView`.
+///
+/// Use `HStackView` to arrange its child views in a horizontal line, equivalent to SwiftUI's `HStack`.
 public struct HStackView: ModifiableView {
     
     public let modifiableView = Modified(BuilderInternalUIStackView()) {
@@ -34,6 +37,9 @@ public struct HStackView: ModifiableView {
     
 }
 
+/// A builder component that constructs a vertical `UIStackView`.
+///
+/// Use `VStackView` to arrange its child views in a vertical column, equivalent to SwiftUI's `VStack`.
 public struct VStackView: ModifiableView {
     
     public let modifiableView = Modified(BuilderInternalUIStackView()) {
@@ -65,6 +71,7 @@ public struct VStackView: ModifiableView {
     
 }
 
+/// Standard modifiers for any `UIStackView` conforming to `ModifiableView`.
 extension ModifiableView where Base: UIStackView {
     
     @discardableResult
@@ -142,6 +149,8 @@ extension UIStackView {
     }
 }
 
+/// A custom subclass of `UIStackView` designed to interface smoothly with `ViewBuilder` lifecycle
+/// events and handle custom padding safely.
 public class BuilderInternalUIStackView: UIStackView, ViewBuilderEventHandling {
 
     override public func didMoveToWindow() {

@@ -41,6 +41,7 @@ extension Array: CellConvertible where Element == CellController {
 
 // MARK: - Result Builder
 
+/// A result builder that enables a declarative, SwiftUI-like syntax for generating arrays of `CellController`s.
 @resultBuilder
 public struct CellResultBuilder {
     public static func buildBlock() -> [CellController] {
@@ -74,6 +75,10 @@ public struct CellResultBuilder {
 
 // MARK: - Cell
 
+/// A lightweight declarative wrapper for generating a `CellController` inline.
+///
+/// It allows configuring cells with closures directly within a section block, eliminating the need
+/// for standard Delegate/DataSource boilerplate.
 public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
     
     private let model: Model?

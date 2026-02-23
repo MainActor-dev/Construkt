@@ -9,6 +9,7 @@
 import UIKit
 import RxSwift
 
+/// Extends `UINavigationController` for simple SwiftUI-like push transitions.
 extension UINavigationController {
 
     @discardableResult
@@ -19,6 +20,7 @@ extension UINavigationController {
 
 }
 
+/// Standard modifiers for any `ModifiableView` allowing navigation attributes natively.
 extension ModifiableView {
 
     @discardableResult
@@ -32,6 +34,7 @@ extension ModifiableView {
 
 }
 
+/// Extends `UIBarButtonItem` to support modern, declarative initialization and Rx click bindings.
 extension UIBarButtonItem {
 
     convenience public init(barButtonSystemItem systemItem: UIBarButtonItem.SystemItem) {
