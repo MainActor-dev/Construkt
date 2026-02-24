@@ -86,7 +86,7 @@ extension ModifiableView {
     ///   - right: The right margin.
     /// - Returns: A modified view wrapper.
     @discardableResult
-    public func margins(top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat) -> ViewModifier<Base> {
+    public func margins(top: CGFloat = 0, left: CGFloat = 0, bottom: CGFloat = 0, right: CGFloat = 0) -> ViewModifier<Base> {
         margins(insets: UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
     }
 

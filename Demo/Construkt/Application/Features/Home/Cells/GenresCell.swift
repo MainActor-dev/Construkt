@@ -24,72 +24,142 @@ struct GenresCell: ViewBuilder {
 }
 
 import UIKit
-import Construkt
 
-struct PaymentSuccessView: ViewBuilder {
+struct DeliveryTrackingView: ViewBuilder {
     var body: View {
-        VerticalScrollView(safeArea: true) {
-            ZStackView {
-                
-                VStackView(spacing: 8) {
-                    // Success icon
-                    ZStackView {
-                        Modified(UIView())
-                            .size(width: 128, height: 128)
-                            .backgroundColor(.systemGreen)
-                            .cornerRadius(64)
+        ZStackView {
+            VStackView {
+                // Main container with max width and centered
+                VStackView {
+                    // First Section - New Tracking Number
+                    VStackView {
+                        // Header with tracking number
+                        HStackView {
+                            LabelView("No. Resi (Baru)")
+                                .font(.systemFont(ofSize: 12))
+                                .color(.secondaryLabel)
+                            
+                            HStackView {
+                                LabelView("88LP98754725363")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.label)
+                                
+                                ImageView(UIImage(systemName: "doc.on.doc")!)
+                                    .tintColor(.systemRed)
+                                    .size(width: 20, height: 20)
+                            }
+                            .alignment(.center)
+                        }
+                        .padding(top: 4, left: 12, bottom: 4, right: 12)
+                        .backgroundColor(.systemGray5)
+                        .cornerRadius(8)
+                        .margins(bottom: 12)
                         
-                        // Checkmark icon (using a simple label with checkmark)
-                        LabelView("✓")
-                            .font(.systemFont(ofSize: 48, weight: .bold))
-                            .color(.white)
-                            .position(.center)
+                        // Recipient information
+                        HStackView {
+                            ZStackView {
+                                CircleView()
+                                    .backgroundColor(.systemOrange.withAlphaComponent(0.1))
+                                    .size(width: 40, height: 40)
+                                
+                                ImageView(UIImage(systemName: "location")!)
+                                    .tintColor(.systemOrange)
+                                    .size(width: 20, height: 20)
+                                    .position(.center)
+                            }
+                            .margins(right: 12)
+                            
+                            VStackView {
+                                LabelView("Alamat penerima")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.secondaryLabel)
+                                    .margins(bottom: 4)
+                                
+                                LabelView("Dewi Lestari • +6285678903790")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.label)
+                                    .margins(bottom: 4)
+                                
+                                LabelView("Kebon Jeruk, Jakarta Barat (CGK)")
+                                    .font(.systemFont(ofSize: 12))
+                                    .color(.secondaryLabel)
+                            }
+                        }
                     }
+                    .padding(16)
+                    .backgroundColor(.white)
+                    .cornerRadius(12)
+                    .shadow(color: .black, radius: 1, opacity: 0.1, offset: .zero)
                     
-                    // Title
-                    LabelView("Pembayaran berhasil!!")
-                        .font(.title2)
-                        .color(.label)
-                        .alignment(.center)
-                        .padding(h: 20, v: 0)
-                    
-                    // Subtitle
-                    LabelView("Terima kasih, pembayaranmu sudah kami terima.")
-                        .font(.body)
-                        .color(.secondaryLabel)
-                        .alignment(.center)
-                        .padding(h: 20, v: 0)
-                        .margins(h: 0, v: 20)
-                    
-                    // Buttons container
-                    VStackView(spacing: 16) {
-                        ButtonView("Lacak")
-                            .font(.headline)
-                            .color(.white)
-                            .backgroundColor(.systemRed)
-                            .padding(16)
-                            .cornerRadius(24)
-                            .contentHorizontalAlignment(.center)
-                            .width(200)
+                    // Second Section - Old Tracking Number
+                    VStackView {
+                        // Header with tracking number
+                        HStackView {
+                            LabelView("No. Resi (Lama)")
+                                .font(.systemFont(ofSize: 12))
+                                .color(.secondaryLabel)
+                            
+                            HStackView {
+                                LabelView("88LP98754725363")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.label)
+                                
+                                ImageView(UIImage(systemName: "doc.on.doc")!)
+                                    .tintColor(.systemRed)
+                                    .size(width: 20, height: 20)
+                            }
+                            .alignment(.center)
+                        }
+                        .padding(top: 4, left: 12, bottom: 4, right: 12)
+                        .backgroundColor(.systemGray5)
+                        .cornerRadius(8)
+                        .margins(bottom: 12)
                         
-                        ButtonView("Lihat bukti pembayaran")
-                            .font(.headline)
-                            .color(.systemRed)
-                            .border(color: .systemRed, lineWidth: 2)
-                            .padding(16)
-                            .cornerRadius(24)
-                            .contentHorizontalAlignment(.center)
-                            .width(200)
+                        // Recipient information
+                        HStackView {
+                            ZStackView {
+                                CircleView()
+                                    .backgroundColor(.systemOrange.withAlphaComponent(0.1))
+                                    .size(width: 40, height: 40)
+                                
+                                ImageView(UIImage(systemName: "location")!)
+                                    .tintColor(.systemOrange)
+                                    .size(width: 20, height: 20)
+                                    .position(.center)
+                            }
+                            .margins(right: 12)
+                            
+                            VStackView {
+                                LabelView("Alamat penerima")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.secondaryLabel)
+                                    .margins(bottom: 4)
+                                
+                                LabelView("Dewi Lestari • +6285678903790")
+                                    .font(.systemFont(ofSize: 14, weight: .medium))
+                                    .color(.label)
+                                    .margins(bottom: 4)
+                                
+                                LabelView("Kebon Jeruk, Jakarta Barat (CGK)")
+                                    .font(.systemFont(ofSize: 12))
+                                    .color(.secondaryLabel)
+                            }
+                        }
                     }
-                    .margins(h: 0, v: 40)
+                    .padding(16)
+                    .backgroundColor(.white)
+                    .cornerRadius(12)
+                    .shadow(color: .black, radius: 1, opacity: 0.1, offset: .zero)
                 }
-                .padding(h: 40, v: 0)
-                .alignment(.center)
+                .frame(width: 375)
+                .spacing(16)
             }
+            .backgroundColor(.systemGray6)
+            .padding(16)
         }
     }
 }
 
 #Preview {
-    PaymentSuccessView().build()
+    DeliveryTrackingView().build()
 }

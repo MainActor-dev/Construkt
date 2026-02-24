@@ -33,6 +33,7 @@ When generating UI, use the Construkt primitives:
 | `HStack` / `UIStackView` | `HStackView { ... }` |
 | `ZStack` / `UIView` | `ZStackView { ... }` |
 | `Spacer` / `UIView` | `SpacerView()` |
+| `Circle` / `UIView` | `CircleView()` |
 | `List` / `UITableView` | `TableView(DynamicItemViewBuilder) { ... }` |
 | `LazyVGrid`/`UICollectionView` | `CollectionView { Section { ... } }` |
 
@@ -234,7 +235,7 @@ You **must exclusively use** these native Construkt modifiers. Do not invent Swi
 - `.padding(insets: UIEdgeInsets)` — raw insets
 
 ### Container Embedding (from `Builder+Attributes`)
-- `.margins(CGFloat)` / `.margins(h:v:)` / `.margins(top:left:bottom:right:)` — embed margins
+- `.margins(CGFloat)` / `.margins(h:v:)` / `.margins(top: 12, bottom: 12)` — embed margins (parameters can be partial: `top:left:bottom:right:`)
 - `.position(.center)` / `.position(.top)` / `.position(.fill)` — embed alignment
 - `.safeArea(Bool)` — respect safe area when embedded
 - `.customConstraints { view in }` — raw AutoLayout access
