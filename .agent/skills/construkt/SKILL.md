@@ -176,7 +176,9 @@ Section(id: "popular", items: viewModel.popularMovies) { movie in
 
 ## 🏗 View Composition (Creating custom views)
 
-When a UI becomes complex, extract it into a separate struct adopting `ViewBuilder`.
+When a UI becomes complex, you **MUST** extract it into separate, context-specific structs adopting `ViewBuilder`. **Never** generate a massive, single `body` with dozens of nested stacks. 
+
+For instance, if building a user profile screen, separate it into `ProfileHeaderView`, `StatsRowView`, and `RecentActivityView`. Then assemble them inside the root view.
 
 ```swift
 import UIKit
