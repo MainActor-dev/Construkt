@@ -122,7 +122,18 @@ extension ModifiableView where Base: UIButton {
 extension UIButton: ViewBuilderPaddable {
     
     public func setPadding(_ padding: UIEdgeInsets) {
-        self.contentEdgeInsets = padding
+        if #available(iOS 15.0, *) {
+            var config = self.configuration ?? UIButton.Configuration.plain()
+            config.contentInsets = NSDirectionalEdgeInsets(
+                top: padding.top,
+                leading: padding.left,
+                bottom: padding.bottom,
+                trailing: padding.right
+            )
+            self.configuration = config
+        } else {
+            self.contentEdgeInsets = padding
+        }
     }
 
 }

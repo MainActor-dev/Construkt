@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 public extension CollectionView {
     /// Adds native pagination support using a `ViewBinding<ListPaginationModel>`.

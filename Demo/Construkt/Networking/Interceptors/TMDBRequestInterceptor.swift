@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public struct TMDBRequestInterceptor: RequestInterceptor {
     private let apiKey: String

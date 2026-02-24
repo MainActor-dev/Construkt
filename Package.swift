@@ -6,13 +6,14 @@ let package = Package(
     name: "Construkt",
     platforms: [.iOS(.v16)],
     products: [
-        .library(name: "Construkt", targets: ["Construkt"]),
+        .library(name: "ConstruktKit", targets: ["ConstruktKit"]),
     ],
     targets: [
-        .target(name: "Construkt"),
+        .target(name: "ConstruktKit", path: "Sources/Construkt"),
         .testTarget(
             name: "ConstruktTests",
-            dependencies: ["Construkt"]
+            dependencies: ["ConstruktKit"]
         ),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )

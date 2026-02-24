@@ -26,7 +26,7 @@ import UIKit
 
 extension NSCollectionLayoutItem {
     /// Generates an item that occupies the entire width and height of its parent container.
-    static func withEntireSize() -> NSCollectionLayoutItem {
+    public static func withEntireSize() -> NSCollectionLayoutItem {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -34,7 +34,7 @@ extension NSCollectionLayoutItem {
         return NSCollectionLayoutItem(layoutSize: itemSize)
     }
     
-    static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutItem {
+    public static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutItem {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: height
@@ -46,7 +46,7 @@ extension NSCollectionLayoutItem {
 extension NSCollectionLayoutGroup {
     // MARK: - Vertical Scroll
     /// Creates a vertical layout group scaling the specified width and height.
-    static func vertically(
+    public static func vertically(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
@@ -64,7 +64,7 @@ extension NSCollectionLayoutGroup {
         return group
     }
     
-    static func vertically(
+    public static func vertically(
         entireWidthWithHeight height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
@@ -76,7 +76,7 @@ extension NSCollectionLayoutGroup {
     }
     
     // MARK: - Horizontal Scroll
-    static func horizontally(
+    public static func horizontally(
         width: NSCollectionLayoutDimension,
         height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
@@ -94,7 +94,7 @@ extension NSCollectionLayoutGroup {
         return group
     }
     
-    static func horizontally(
+    public static func horizontally(
         entireWidthWithHeight height: NSCollectionLayoutDimension,
         insets: NSDirectionalEdgeInsets = .zero
     ) -> NSCollectionLayoutGroup {
@@ -107,7 +107,7 @@ extension NSCollectionLayoutGroup {
 }
 
 extension NSCollectionLayoutSection {
-    static func layout(
+    public static func layout(
         group: NSCollectionLayoutGroup,
         spacing: CGFloat = 0,
         insets: NSDirectionalEdgeInsets = .zero,
@@ -128,7 +128,7 @@ extension NSCollectionLayoutSection {
 }
 
 extension NSCollectionLayoutBoundarySupplementaryItem {
-    static func header(
+    public static func header(
         height: NSCollectionLayoutDimension,
         isSticky: Bool = false
     ) -> NSCollectionLayoutBoundarySupplementaryItem {
@@ -141,7 +141,7 @@ extension NSCollectionLayoutBoundarySupplementaryItem {
         return header
     }
     
-    static func footer(
+    public static func footer(
         height: NSCollectionLayoutDimension,
         isSticky: Bool = false
     ) -> NSCollectionLayoutBoundarySupplementaryItem {
@@ -156,7 +156,7 @@ extension NSCollectionLayoutBoundarySupplementaryItem {
 }
 
 extension NSCollectionLayoutDecorationItem {
-    static func background(insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
+    public static func background(insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
         let background = NSCollectionLayoutDecorationItem.background(elementKind: "background")
         background.contentInsets = insets
         return background
@@ -164,14 +164,14 @@ extension NSCollectionLayoutDecorationItem {
 }
 
 extension NSCollectionLayoutSize {
-    static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutSize {
+    public static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutSize {
         return NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: height
         )
     }
     
-    static func withEntireSize() -> NSCollectionLayoutSize {
+    public static func withEntireSize() -> NSCollectionLayoutSize {
         return NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: .fractionalHeight(1.0)
@@ -180,7 +180,7 @@ extension NSCollectionLayoutSize {
 }
 
 extension NSDirectionalEdgeInsets {
-    init(v: CGFloat, h: CGFloat) {
+    public init(v: CGFloat, h: CGFloat) {
         self.init(top: v, leading: h, bottom: v, trailing: h)
     }
 }

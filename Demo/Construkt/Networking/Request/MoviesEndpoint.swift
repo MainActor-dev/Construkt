@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public enum MoviesEndpoint: Endpoint {
     case getPopularMovies(page: Int)
@@ -8,6 +9,7 @@ public enum MoviesEndpoint: Endpoint {
     case getMovieCredits(id: Int)
     case getGenres
     case discover(page: Int, genreId: Int?)
+    case search(query: String, page: Int)
     
     public var path: String {
         switch self {
@@ -25,6 +27,8 @@ public enum MoviesEndpoint: Endpoint {
             return "/genre/movie/list"
         case .discover:
             return "/discover/movie"
+        case .search:
+            return "/search/movie"
         }
     }
     
@@ -50,6 +54,8 @@ public enum MoviesEndpoint: Endpoint {
                 params["with_genres"] = String(genreId)
             }
             return params
+        case .search(let query, let page):
+            return ["query": query, "page": String(page), "include_adult": "false"]
         }
     }
 }

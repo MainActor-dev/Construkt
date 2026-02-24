@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public enum HTTPMethod: String {
     case get = "GET"

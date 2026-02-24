@@ -1,6 +1,6 @@
 import Testing
 import UIKit
-@testable import Construkt
+@testable import ConstruktKit
 
 // MARK: - Property Tests
 
@@ -400,7 +400,7 @@ struct OperatorTests {
         let bag = CancelBag()
         var received: [[Int]] = []
         
-        Construkt.combineLatestBindings([a.map { $0 }, b.map { $0 }])
+        ConstruktKit.combineLatestBindings([a.map { $0 }, b.map { $0 }])
             .observe(on: nil) { value in
                 received.append(value)
             }.store(in: bag)

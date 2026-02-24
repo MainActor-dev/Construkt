@@ -1,18 +1,18 @@
 import UIKit
-import SnapKit
+import ConstruktKit
 
 final class MovieDetailViewController: UIViewController {
     
     // MARK: - Properties
     private let viewModel = MovieViewModel()
-    private let movie: Movie
+    private var movie: Movie
     private let heroHeight: CGFloat = 450
     
     private weak var scrollView: UIScrollView?
     private weak var heroImageView: UIView?
     private weak var navBarBackgroundView: UIView?
     private weak var navBarTitleLabel: UIView?
-    
+    private var heroHeightConstraint: NSLayoutConstraint?
     // MARK: - Init
     init(movie: Movie) {
         self.movie = movie
@@ -59,11 +59,16 @@ final class MovieDetailViewController: UIViewController {
                         self?.heroImageView = view
                     }
                     .customConstraints { [weak self] view in
-                        guard let self = self else { return }
-                        view.snp.makeConstraints { make in
-                            make.top.leading.trailing.equalToSuperview()
-                            make.height.equalTo(self.heroHeight)
-                        }
+                        guard let self = self, let superview = view.superview else { return }
+                        view.translatesAutoresizingMaskIntoConstraints = false
+                        let heightConstraint = view.heightAnchor.constraint(equalToConstant: self.heroHeight)
+                        self.heroHeightConstraint = heightConstraint
+                        NSLayoutConstraint.activate([
+                            view.topAnchor.constraint(equalTo: superview.topAnchor),
+                            view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+                            view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
+                            heightConstraint
+                        ])
                     }
                 
                 // Layer 2: Scroll Content
@@ -108,7 +113,7 @@ final class MovieDetailViewController: UIViewController {
                     
                     // Overlay Navigation Bar
                     MovieDetailNavBar(
-                        title: movie.title,
+                        title: details.compactMap { $0.title },
                         onBack: { [weak self] in self?.navigationController?.popViewController(animated: true) },
                         backgroundViewCapture: { [weak self] view in self?.navBarBackgroundView = view },
                         titleLabelCapture: { [weak self] view in self?.navBarTitleLabel = view }
@@ -127,16 +132,12 @@ final class MovieDetailViewController: UIViewController {
     }
     
     private func updateStretchyHeader(yOffset: CGFloat) {
-        guard let heroView = heroImageView else { return }
+        guard let _ = heroImageView else { return }
         
         if yOffset < 0 {
-            heroView.snp.updateConstraints { make in
-                make.height.equalTo(self.heroHeight + abs(yOffset))
-            }
+            heroHeightConstraint?.constant = heroHeight + abs(yOffset)
         } else {
-            heroView.snp.updateConstraints { make in
-                make.height.equalTo(max(0, self.heroHeight - yOffset))
-            }
+            heroHeightConstraint?.constant = max(0, heroHeight - yOffset)
         }
     }
     

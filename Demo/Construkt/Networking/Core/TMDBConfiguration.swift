@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public struct TMDBConfiguration {
     public static let baseURL = URL(string: "https://api.themoviedb.org/3")!

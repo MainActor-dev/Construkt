@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public protocol Endpoint {
     /// The path to be appended to the base URL (e.g., "/users")

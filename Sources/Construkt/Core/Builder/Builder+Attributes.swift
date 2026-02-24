@@ -153,7 +153,7 @@ extension UIView {
         return attributes
     }
 
-    internal func optionalBuilderAttributes() -> ViewBuilderAttributes? {
+    public func optionalBuilderAttributes() -> ViewBuilderAttributes? {
         return objc_getAssociatedObject( self, &UIView.BuilderAttributesKey ) as? ViewBuilderAttributes
     }
 

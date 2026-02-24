@@ -23,6 +23,7 @@
 //  THE SOFTWARE.
 
 import UIKit
+import ConstruktKit
 
 extension UIColor {
     convenience init(_ hexString: String, alpha: CGFloat = 1.0) {

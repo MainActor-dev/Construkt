@@ -1,4 +1,5 @@
 import Foundation
+import ConstruktKit
 
 public protocol RequestInterceptor {
     func adapt(_ request: URLRequest) async throws -> URLRequest

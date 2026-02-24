@@ -94,28 +94,48 @@ extension UIView {
 
 extension UIView {
 
-    // goes to top of view chain, then initiates full search of view tree
+    // MARK: - find() using Int (tag)
+    public func find(_ key: Int) -> UIView? {
+        rootview.firstSubview(where: { $0.tag == key })
+    }
+    public func find(subview key: Int) -> UIView? {
+        firstSubview(where: { $0.tag == key })
+    }
+    public func find(superview key: Int) -> UIView? {
+        firstSuperview(where: { $0.tag == key })
+    }
+
+    // MARK: - find() using String (accessibilityIdentifier)
+    public func find(_ key: String) -> UIView? {
+        rootview.firstSubview(where: { $0.accessibilityIdentifier == key })
+    }
+    public func find(subview key: String) -> UIView? {
+        firstSubview(where: { $0.accessibilityIdentifier == key })
+    }
+    public func find(superview key: String) -> UIView? {
+        firstSuperview(where: { $0.accessibilityIdentifier == key })
+    }
+
+    // MARK: - find() using RawRepresentable (e.g. Enums)
     public func find<K:RawRepresentable>(_ key: K) -> UIView? where K.RawValue == Int {
-        rootview.firstSubview(where: { $0.tag == key.rawValue })
+        find(key.rawValue)
     }
     public func find<K:RawRepresentable>(_ key: K) -> UIView? where K.RawValue == String {
-        rootview.firstSubview(where: { $0.accessibilityIdentifier == key.rawValue })
+        find(key.rawValue)
     }
 
-    // searches down the tree looking for identifier
     public func find<K:RawRepresentable>(subview key: K) -> UIView? where K.RawValue == Int {
-        firstSubview(where: { $0.tag == key.rawValue })
+        find(subview: key.rawValue)
     }
     public func find<K:RawRepresentable>(subview key: K) -> UIView? where K.RawValue == String {
-        firstSubview(where: { $0.accessibilityIdentifier == key.rawValue })
+        find(subview: key.rawValue)
     }
 
-    // searches up the tree looking for identifier in superview path
     public func find<K:RawRepresentable>(superview key: K) -> UIView? where K.RawValue == Int {
-        firstSuperview(where: { $0.tag == key.rawValue })
+        find(superview: key.rawValue)
     }
     public func find<K:RawRepresentable>(superview key: K) -> UIView? where K.RawValue == String {
-        firstSuperview(where: { $0.accessibilityIdentifier == key.rawValue })
+        find(superview: key.rawValue)
     }
 
 }
@@ -220,21 +240,5 @@ extension UIResponder {
     }
 }
 
-extension Int: RawRepresentable {
-    public init?(rawValue: Int) {
-        self = rawValue
-    }
-    public var rawValue: Int {
-        self
-    }
-}
 
-extension String: RawRepresentable {
-    public init?(rawValue: String) {
-        self = rawValue
-    }
-    public var rawValue: String {
-        self
-    }
-}
 

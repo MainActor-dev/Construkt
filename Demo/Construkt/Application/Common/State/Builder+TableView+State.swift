@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 extension ModifiableView where Base: BuilderInternalTableView {
     /// Automatically handles smart updates for LoadableState by injecting new data into the builder.
