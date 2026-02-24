@@ -1,0 +1,1 @@
+/Users/mac/Developer/pr0j3ct5/Construkt/Demo/Construkt/Application/Features/Home/Cells/GenresCell.swift:296:1: error: type of expression is ambiguous without a type annotation
