@@ -213,6 +213,42 @@ To instantiate this into a raw UIKit `UIView`, call `.build()`:
 let customView: UIView = UserProfileCard(user: currentUser).build()
 ```
 
+### Component Parameterization & Reusability
+
+If you are building a layout containing multiple identical UI blocks (e.g., a row of feature highlights, three pricing cards, or identical buttons), **you MUST** extract the structural boilerplate into a dynamically parameterized `ViewBuilder` component. Pass unique text, images, or configurations as immutable properties (`let`).
+
+**Example: Extracting identical statistics cards**
+```swift
+// 1. Define the reusable parameterized struct
+struct StatCard: ViewBuilder {
+    let title: String
+    let value: String
+
+    var body: View {
+        VStackView {
+            LabelView(value).font(.title1)
+            LabelView(title).font(.caption1).color(.secondaryLabel)
+        }
+        .padding(16)
+        .backgroundColor(.secondarySystemBackground)
+        .cornerRadius(12)
+    }
+}
+
+// 2. Instantiate multiple times in the parent scope rather than duplicating raw views
+struct DashboardStatsView: ViewBuilder {
+    var body: View {
+        HStackView {
+            StatCard(title: "Followers", value: "1.2k")
+            StatCard(title: "Following", value: "400")
+            StatCard(title: "Posts", value: "32")
+        }
+        .spacing(12)
+        .distribution(.fillEqually)
+    }
+}
+```
+
 ---
 
 ## 7. Comprehensive View Modifiers Reference
