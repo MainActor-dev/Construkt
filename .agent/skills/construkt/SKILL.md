@@ -279,21 +279,6 @@ You **must exclusively use** these native Construkt modifiers. Do not invent Swi
 - `.safeArea(Bool)` — respect safe area when embedded
 - `.customConstraints { view in }` — raw AutoLayout access
 
-### Inline Style → Modifier Mapping
-When translating HTML with inline `style="..."` attributes (e.g., from a visual inspector), apply this mapping:
-
-| CSS Inline Style | Construkt Modifier |
-|---|---|
-| `padding: 16px` | `.padding(16)` |
-| `padding-top: 8px` | `.padding(top: 8)` |
-| `margin-bottom: 12px` | `.margins(bottom: 12)` |
-| `margin: 12px` | `.margins(12)` |
-| `border-radius: 8px` | `.cornerRadius(8)` |
-| `font-size: 16px` | `.font(.systemFont(ofSize: 16))` |
-| `background-color: #1a1a2e` | `.backgroundColor(UIColor(hex: "#1a1a2e"))` |
-| `color: #ffffff` | `.color(.init(hex: "#ffffff"))` |
-| `width: 100px; height: 50px` | `.size(width: 100, height: 50)` |
-
 ### Appearance & Styling (from `Builder+View`)
 - `.backgroundColor(UIColor)`
 - `.alpha(CGFloat)`
