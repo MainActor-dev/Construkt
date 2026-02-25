@@ -1,6 +1,6 @@
 # Construkt: A Declarative UIKit Framework
 
-![Construkt Hero Banner](construkt_banner.png)
+![Construkt Hero Banner](construkt_banner.webp)
 
 ## Table of Contents
 - [Overview](#overview)
