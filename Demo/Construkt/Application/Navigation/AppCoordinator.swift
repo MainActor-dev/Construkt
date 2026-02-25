@@ -2,24 +2,31 @@ import UIKit
 import ma_ios_common
 
 @MainActor
-public final class AppCoordinator: BaseCoordinator {
-    private let window: UIWindow
+enum AppTab: Int {
+    case home = 0
+    case explore = 1
+}
+
+@MainActor
+final class AppCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
     
-    public init(window: UIWindow, router: RouterProtocol, factory: ScreenFactoryProtocol) {
-        self.window = window
+    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
         self.factory = factory
         super.init(router: router)
     }
     
-    public func start() {
+    func start() {
         let homeNav = NavigationController()
         let homeRouter = Router(navigationController: homeNav)
         let homeCoordinator = HomeCoordinator(router: homeRouter, factory: factory)
         addChild(homeCoordinator)
         
         // Setup Home Tab
+        homeCoordinator.onSwitchToExplore = { [weak self] in
+            self?.switchToTab(.explore)
+        }
         homeCoordinator.start()
         homeNav.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), selectedImage: UIImage(systemName: "house.fill"))
         
@@ -44,8 +51,13 @@ public final class AppCoordinator: BaseCoordinator {
         }
         tabBarController.tabBar.tintColor = .white
         tabBarController.tabBar.unselectedItemTintColor = .gray
-        
-        window.rootViewController = tabBarController
-        window.makeKeyAndVisible()
+    }
+    
+    func switchToTab(_ tab: AppTab) {
+        tabBarController.selectedIndex = tab.rawValue
+    }
+    
+    override func rootViewController() -> UIViewController {
+        tabBarController
     }
 }

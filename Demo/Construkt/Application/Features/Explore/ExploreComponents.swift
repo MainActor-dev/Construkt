@@ -37,25 +37,27 @@ struct ExploreGenreCard: ViewBuilder {
     
     var body: View {
         ZStackView {
-            // Background Image
-            ImageView(url: URL(string: genre.imageURL)!)
-                .contentMode(.scaleAspectFill)
-                .clipsToBounds(true)
-                .alpha(0.6)
+            // Abstract Decorative Icon in background
+            ImageView(UIImage(systemName: "film.fill"))
+                .tintColor(UIColor.white.withAlphaComponent(0.15))
+                .size(width: 80, height: 80)
+                .position(.bottomRight)
+                .margins(bottom: -20, right: -20)
             
             // Gradient Overlay
-            LinearGradient(colors: [UIColor.clear, UIColor.black.withAlphaComponent(0.8)])
+            LinearGradient(colors: [UIColor.clear, UIColor.black.withAlphaComponent(0.4)])
             
             // Title
             LabelView(genre.name)
-                .font(.systemFont(ofSize: 14, weight: .medium))
+                .font(.systemFont(ofSize: 16, weight: .bold))
                 .color(.white)
                 .position(.bottomLeft)
                 .margins(12)
         }
+        .backgroundColor(UIColor(genre.colorHex))
         .height(96)
         .cornerRadius(12)
-        .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
+        .border(color: UIColor(white: 1.0, alpha: 0.1), lineWidth: 1)
         .clipsToBounds(true)
     }
 }
@@ -78,6 +80,7 @@ struct ExploreCollectionCard: ViewBuilder {
             )
             
             VStackView {
+                SpacerView()
                 LabelView(collection.topic)
                     .font(.systemFont(ofSize: 10, weight: .bold))
                     .color(.systemYellow)
@@ -130,7 +133,7 @@ struct ExploreArrivalRow: ViewBuilder {
             ZStackView {
                 ImageView(UIImage(systemName: "chevron.right"))
                     .tintColor(.gray)
-                    .size(width: 14, height: 14)
+                    .size(width: 8, height: 14)
                     .position(.center)
             }
             .size(width: 32, height: 32)

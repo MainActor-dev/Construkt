@@ -11,6 +11,15 @@ enum ExploreSection: String, SectionControllerIdentifier {
 }
 
 class ExploreViewController: UIViewController {
+    
+    public enum Action {
+        case movieSelected(String)
+        case genreSelected(selected: ExploreGenre, all: [ExploreGenre])
+        case searchSelected
+    }
+    
+    public var onAction: ((Action) -> Void)?
+    
     private let viewModel = ExploreViewModel()
     
     override func viewDidLoad() {
@@ -41,7 +50,7 @@ class ExploreViewController: UIViewController {
                     arrivalsSection
                 }
                 .with {
-                    $0.collectionView.contentInset.top = 50
+                    $0.collectionView.contentInset.top = 60
                     $0.collectionView.showsVerticalScrollIndicator = false
                 }
                 
@@ -62,11 +71,8 @@ class ExploreViewController: UIViewController {
                 .padding(top: 12, left: 24, bottom: 12, right: 24)
             }
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: itemSize, subitems: [item])
-            return NSCollectionLayoutSection(group: group)
+        .layout {
+            .list(itemHeight: .estimated(60))
         }
     }
     
@@ -85,26 +91,14 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, genre: ExploreGenre) in
             me.showMovieList(for: genre)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(96))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6)
-            
-            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(96))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 18, bottom: 24, trailing: 18)
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(50))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
+        .layout {
+            .grid(
+                itemHeight: .absolute(96),
+                columns: 2,
+                itemInsets: .init(top: 6, leading: 6, bottom: 6, trailing: 6)
             )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+            .insets(top: 12, leading: 18, bottom: 24, trailing: 18)
+            .supplementaryHeader(height: .estimated(50))
         }
     }
     
@@ -123,27 +117,14 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, collection: ExploreCollection) in
             me.showDetail(for: collection.id)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .absolute(240), heightDimension: .absolute(140))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(240), heightDimension: .absolute(140))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
-            section.interGroupSpacing = 16
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 24, bottom: 24, trailing: 24)
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
+        .layout {
+            .carousel(
+                itemWidth: .absolute(240),
+                itemHeight: .absolute(140)
             )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+            .spacing(16)
+            .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
+            .supplementaryHeader(height: .estimated(60))
         }
     }
     
@@ -162,25 +143,11 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, arrival: ExploreArrival) in
             me.showDetail(for: arrival.id)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(80))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: itemSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 24, bottom: 24, trailing: 24)
-            section.interGroupSpacing = 8
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
-            )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+        .layout {
+            .list(itemHeight: .estimated(80))
+            .spacing(8)
+            .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
+            .supplementaryHeader(height: .estimated(60))
         }
     }
     
@@ -188,25 +155,17 @@ class ExploreViewController: UIViewController {
     
     private var headerOverlay: View {
         ZStackView {
-            // Background blur behind header
             BlurView(style: .dark)
-            
             HStackView {
                 LabelView("Explore")
-                    .font(.systemFont(ofSize: 22, weight: .semibold))
+                    .font(.systemFont(ofSize: 32, weight: .semibold))
                     .color(.white)
-                
                 SpacerView()
-                
-                // Profile Button
-                ZStackView {
-                    ImageView(url: URL(string: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop")!)
-                        .contentMode(.scaleAspectFill)
-                        .clipsToBounds(true)
-                }
-                .size(width: 32, height: 32)
-                .cornerRadius(16)
-                .border(color: UIColor(white: 1.0, alpha: 0.1), lineWidth: 1)
+                ImageView(UIImage(systemName: "magnifyingglass"))
+                    .tintColor(.white)
+                    .size(width: 24, height: 24)
+                    .contentMode(.scaleAspectFit)
+                    .onTapGesture { [weak self] _ in self?.showSearch() }
             }
             .padding(insets: .init(top: 12, left: 24, bottom: 12, right: 24))
         }
@@ -220,30 +179,16 @@ class ExploreViewController: UIViewController {
 // MARK: - Navigation
 
 extension ExploreViewController {
-    private func showDetail(for idString: String) {
-        guard let id = Int(idString) else { return }
-        
-        let dummyMovie = Movie(id: id, title: "", overview: "", releaseDate: nil, posterPath: nil, backdropPath: nil, voteAverage: 0, genreIds: nil)
-        let detailVC = MovieDetailViewController(movie: dummyMovie)
-        detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+    private func showDetail(for id: String) {
+        onAction?(.movieSelected(id))
     }
     
-    private func showMovieList(for exploreGenre: ExploreGenre) {
-        guard let id = Int(exploreGenre.id) else { return }
-        let selectedGenre = Genre(id: id, name: exploreGenre.name)
-        let allGenres = viewModel.genres.map { Genre(id: Int($0.id) ?? 0, name: $0.name) }
-        
-        let listViewModel = MovieListViewModel(
-            title: exploreGenre.name,
-            sectionType: .categories,
-            genres: allGenres,
-            selectedGenre: selectedGenre
-        )
-        
-        let vc = MovieListViewController(viewModel: listViewModel)
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
+    private func showMovieList(for genre: ExploreGenre) {
+        onAction?(.genreSelected(selected: genre, all: viewModel.allGenres))
+    }
+    
+    private func showSearch() {
+        onAction?(.searchSelected)
     }
 }
 

@@ -60,17 +60,10 @@ public class SearchViewController: UIViewController {
                         .skeleton(count: 8, when: viewModel.isLoadingObservable) {
                             MovieSearchRow(movie: .placeholder)
                         }
-                        .layout { _ in
-                            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
-                            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                            
-                            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(120))
-                            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                            
-                            let section = NSCollectionLayoutSection(group: group)
-                            section.interGroupSpacing = 16
-                            section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
-                            return section
+                        .layout {
+                            .list(itemHeight: .absolute(120))
+                            .spacing(16)
+                            .insets(.init(v: 16, h: 15))
                         }
                     }
                     .backgroundColor(.clear)
@@ -116,17 +109,19 @@ public class SearchViewController: UIViewController {
 // MARK: - Row View
 
 struct MovieSearchRow: ViewBuilder {
+    
     let movie: Movie
-
+    
     var body: View {
         HStackView(spacing: 16) {
-            ImageView(url: movie.posterURL)
-                .contentMode(.scaleAspectFill)
+            ImageView(url: movie.posterURL, placeholder: UIImage(systemName: "film.fill"))
+                .contentMode(movie.posterURL == nil ? .center : .scaleAspectFill)
                 .backgroundColor(.darkGray)
+                .tintColor(.white)
                 .height(120)
+                .contentCompressionResistancePriority(.required, for: .horizontal)
+                .contentHuggingPriority(.required, for: .horizontal)
                 .with { view in
-                    view.setContentCompressionResistancePriority(.required, for: .horizontal)
-                    view.setContentHuggingPriority(.required, for: .horizontal)
                     let aspectConstraint = view.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 80.0/120.0)
                     aspectConstraint.priority = .required
                     aspectConstraint.isActive = true
@@ -146,14 +141,13 @@ struct MovieSearchRow: ViewBuilder {
                     ImageView(UIImage(systemName: "star.fill"))
                         .tintColor(.systemYellow)
                         .size(width: 14, height: 14)
-                        .skeletonable(true)
                     
                     LabelView(String(format: "%.1f", movie.voteAverage))
                         .font(.systemFont(ofSize: 14, weight: .regular))
                         .color(.systemYellow)
-                        .skeletonable(true)
                 }
                 .alignment(.center)
+                .skeletonable(true)
                 
                 SpacerView()
             }

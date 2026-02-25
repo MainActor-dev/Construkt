@@ -4,7 +4,7 @@ import ConstruktKit
 public struct ExploreGenre: Hashable, Identifiable {
     public let id: String
     public let name: String
-    public let imageURL: String
+    public let colorHex: String
 }
 
 public struct ExploreCollection: Hashable, Identifiable {
@@ -25,7 +25,9 @@ public final class ExploreViewModel {
     @Variable public var searchQuery: String = ""
     @Variable public var isSearching: Bool = false
     
-    @Variable public var genres: [ExploreGenre] = []
+    @Variable public var genres: [ExploreGenre] = [] // Will hold suffix(4) for the Explore View
+    @Variable public var allGenres: [ExploreGenre] = [] // All genres to pass to MovieList
+    
     @Variable public var collections: [ExploreCollection] = []
     @Variable public var arrivals: [ExploreArrival] = []
     
@@ -36,14 +38,26 @@ public final class ExploreViewModel {
     }
     
     public func loadData() {
-        genres = [
-            .init(id: "28", name: "Action", imageURL: "https://images.unsplash.com/photo-1552083375-1447ce886485?q=80&w=400&auto=format&fit=crop"),
-            .init(id: "18", name: "Drama", imageURL: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=400&auto=format&fit=crop"),
-            .init(id: "27", name: "Horror", imageURL: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=400&auto=format&fit=crop"),
-            .init(id: "35", name: "Comedy", imageURL: "https://images.unsplash.com/photo-1543584756-8f40a802e14f?q=80&w=400&auto=format&fit=crop")
-        ]
+
         
         Task {
+            do {
+                let genreResponse = try await service.getGenres()
+                let colors = ["#FF3B30", "#5AC8FA", "#FF9500", "#AF52DE"] // Vibrant iOS-like colors
+                await MainActor.run {
+                    self.allGenres = genreResponse.genres.enumerated().map { index, genre in
+                        ExploreGenre(
+                            id: String(genre.id),
+                            name: genre.name,
+                            colorHex: colors[index % colors.count]
+                        )
+                    }
+                    self.genres = Array(self.allGenres.prefix(4))
+                }
+            } catch {
+                print("Failed to fetch genres: \(error)")
+            }
+            
             do {
                 let popular = try await service.getPopularMovies(page: 1)
                 await MainActor.run {
