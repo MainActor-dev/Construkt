@@ -71,11 +71,8 @@ class ExploreViewController: UIViewController {
                 .padding(top: 12, left: 24, bottom: 12, right: 24)
             }
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: itemSize, subitems: [item])
-            return NSCollectionLayoutSection(group: group)
+        .layout {
+            .list(itemHeight: .estimated(60))
         }
     }
     
@@ -94,26 +91,14 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, genre: ExploreGenre) in
             me.showMovieList(for: genre)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(96))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6)
-            
-            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(96))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 18, bottom: 24, trailing: 18)
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(50))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
+        .layout {
+            .grid(
+                itemHeight: .absolute(96),
+                columns: 2,
+                itemInsets: .init(top: 6, leading: 6, bottom: 6, trailing: 6)
             )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+            .insets(top: 12, leading: 18, bottom: 24, trailing: 18)
+            .supplementaryHeader(height: .estimated(50))
         }
     }
     
@@ -132,27 +117,14 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, collection: ExploreCollection) in
             me.showDetail(for: collection.id)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .absolute(240), heightDimension: .absolute(140))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let groupSize = NSCollectionLayoutSize(widthDimension: .absolute(240), heightDimension: .absolute(140))
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.orthogonalScrollingBehavior = .continuous
-            section.interGroupSpacing = 16
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 24, bottom: 24, trailing: 24)
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
+        .layout {
+            .carousel(
+                itemWidth: .absolute(240),
+                itemHeight: .absolute(140)
             )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+            .spacing(16)
+            .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
+            .supplementaryHeader(height: .estimated(60))
         }
     }
     
@@ -171,25 +143,11 @@ class ExploreViewController: UIViewController {
         .onSelect(on: self) { (me, arrival: ExploreArrival) in
             me.showDetail(for: arrival.id)
         }
-        .layout { env in
-            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(80))
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            
-            let group = NSCollectionLayoutGroup.vertical(layoutSize: itemSize, subitems: [item])
-            
-            let section = NSCollectionLayoutSection(group: group)
-            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 24, bottom: 24, trailing: 24)
-            section.interGroupSpacing = 8
-            
-            let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(60))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
-            )
-            section.boundarySupplementaryItems = [header]
-            
-            return section
+        .layout {
+            .list(itemHeight: .estimated(80))
+                .spacing(8)
+                .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
+                .supplementaryHeader(height: .estimated(60))
         }
     }
     

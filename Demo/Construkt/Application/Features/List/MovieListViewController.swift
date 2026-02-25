@@ -91,15 +91,12 @@ class MovieListViewController: UIViewController {
             self.viewModel.selectGenre(item.genre)
         }
         .layout { _ in
-            return .layout(
-                group: .horizontally(
-                    width: .estimated(100),
-                    height: .absolute(40)
-                ),
-                spacing: 12,
-                insets: .init(v: 8, h: 16),
-                scrolling: .continuous
+            .carousel(
+                itemWidth: .estimated(100),
+                itemHeight: .absolute(40)
             )
+            .spacing(12)
+            .insets(top: 8, leading: 16, bottom: 8, trailing: 16)
         }
     }
     
@@ -129,21 +126,12 @@ class MovieListViewController: UIViewController {
             MovieGridCell(movie: .placeholder)
         }
         .layout { _ in
-            let itemSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(0.5),
-                heightDimension: .fractionalHeight(1.0)
+            .grid(
+                itemHeight: .fractionalWidth(0.75),
+                columns: 2,
+                itemInsets: .init(top: 12, leading: 8, bottom: 12, trailing: 8)
             )
-            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-            item.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8)
-            
-            let groupSize = NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalWidth(0.75)
-            )
-            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-            let section = NSCollectionLayoutSection(group: group)
-            section.boundarySupplementaryItems = [.footer(height: .absolute(40))]
-            return section
+            .supplementaryFooter(height: .absolute(40))
         }
     }
     
