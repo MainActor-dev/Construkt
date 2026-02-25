@@ -103,14 +103,14 @@ struct DetailCardView: ViewBuilder {
 
 ### Custom Components
 
-Creating reusable components is as simple as defining a struct that conforms to `ViewBuilder`.
+Creating reusable components that can accept standard Construkt modifiers (like padding, sizing, etc.) is as simple as defining a struct that conforms to `ModifiableView`.
 
 ```swift
-struct UserProfileView: ViewBuilder {
-    let name: String
+struct UserProfileView: ModifiableView {
+    let modifiableView: AnyView
     
-    var body: View {
-        HStackView {
+    init(name: String) {
+        self.modifiableView = HStackView {
             ImageView(UIImage(systemName: "person.circle"))
                 .size(width: 40, height: 40)
             
@@ -121,8 +121,12 @@ struct UserProfileView: ViewBuilder {
         }
         .spacing(12)
         .padding(16)
+        .asAnyView()
     }
 }
+
+// Usage:
+// UserProfileView(name: "John Doe").backgroundColor(.red)
 ```
 
 
@@ -333,12 +337,11 @@ LabelView("Direct UIKit Access")
 
 ## Author
 
-Construkt was originally created by **Michael Long**, a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
-- LinkedIn: [@hmlong](https://www.linkedin.com/in/hmlong/)
-- Medium: [@michaellong](https://medium.com/@michaellong)
+Construkt was originally created by **Michael Long** (Builder), a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
+- Github: [Builder](https://github.com/hmlongco/Builder)
 
 Continued and maintained by **Bayu Kurniawan**.
-- GitHub: [@MainActor-dev](https://github.com/MainActor-dev)
+- GitHub: [@thatswiftdev](https://github.com/thatswiftdev)
 
 ---
 
