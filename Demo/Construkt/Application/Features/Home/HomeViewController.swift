@@ -15,7 +15,7 @@ class HomeViewController: UIViewController {
     private weak var cachedCollectionView: UICollectionView?
     
     private var navBarBackgroundView: UIView?
-
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -272,7 +272,7 @@ extension HomeViewController {
         } else {
             return
         }
-                
+        
         for item in items {
             let distanceFromCenter = abs(item.center.x - visibleRectCenter)
             let progress = min(1.0, distanceFromCenter / (containerWidth / 2.0))
@@ -286,16 +286,16 @@ extension HomeViewController {
         // Stretchy Header Logic
         let y = offset.y
         if y < 0 {
-             items.forEach { item in
-                 let originalHeight: CGFloat = 550
-                 let newHeight = originalHeight + abs(y)
-                 let scale = newHeight / originalHeight
-                 
-                 let translationY = y / 2
-                 item.alpha = 1.0
-                 item.transform = CGAffineTransform(translationX: 0, y: translationY)
-                     .scaledBy(x: 1, y: scale)
-             }
+            items.forEach { item in
+                let originalHeight: CGFloat = 550
+                let newHeight = originalHeight + abs(y)
+                let scale = newHeight / originalHeight
+                
+                let translationY = y / 2
+                item.alpha = 1.0
+                item.transform = CGAffineTransform(translationX: 0, y: translationY)
+                    .scaledBy(x: 1, y: scale)
+            }
         }
     }
     
@@ -312,3 +312,4 @@ extension HomeViewController {
         navBarBackgroundView?.alpha = alpha
     }
 }
+
