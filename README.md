@@ -76,27 +76,34 @@ Simply inform your agent to read the `SKILL.md` file at the root of the reposito
 In Construkt, screens are composed of views inside views using familiar structuring. 
 
 ```swift
-struct DetailCardView: ViewBuilder {    
-
-    let user: User
-
+struct PosterCell: ViewBuilder {
+    let movie: Movie
+    
     var body: View {
-        StandardCardView {
-            VStackView {
-                LabeledPhotoView(photo: user.$photo, name: user.name)
-                    .height(250)
+        VStackView(spacing: 8) {
+            ImageView(url: movie.posterURL)
+                .skeletonable(true)
+                .contentMode(.scaleAspectFill)
+                .backgroundColor(.darkGray)
+                .cornerRadius(8)
+                .clipsToBounds(true)
+                .height(180)
+            
+            VStackView(spacing: 4) {
+                LabelView(movie.title)
+                    .font(.systemFont(ofSize: 14, weight: .semibold))
+                    .color(.white)
+                    .numberOfLines(1)
+                    .skeletonable(true)
                 
-                VStackView {
-                    NameValueView(name: "Email", value: user.email)
-                    NameValueView(name: "Phone", value: user.phone)
-                    SpacerView()
-                    ButtonView("Contact")
-                        .onTap { _ in print("Tapped") }
-                }
-                .spacing(8)
-                .padding(20)
+                LabelView("Adventure") // Placeholder genre
+                    .font(.systemFont(ofSize: 12))
+                    .color(.gray)
+                    .skeletonable(true)
             }
+            .alignment(.leading)
         }
+        .clipsToBounds(true)
     }
 }
 ```
@@ -130,7 +137,7 @@ public struct CircleView: ModifiableView {
 Any Construkt `ViewBuilder` protocol conformance generates an underlying set of standard `UIView` elements by simply calling `.build()`.
 
 ```swift
-let view: UIView = DetailCardView(user: user).build()
+let view: UIView = PosterCell(movie: movie).build()
 ```
 
 This structural approach encourages creating small, testable, highly-reusable interface components exactly like SwiftUI.
