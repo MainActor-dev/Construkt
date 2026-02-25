@@ -11,8 +11,34 @@ public final class HomeCoordinator: BaseCoordinator {
     }
     
     public func start() {
-        let homeScreen = factory.makeScreen(for: .home)
-        router.setRoot(homeScreen, animated: false, onPop: nil)
+        guard let homeVC = factory.makeScreen(for: .home) as? HomeViewController else { return }
+        
+        homeVC.onAction = { [weak self] action in
+            guard let self = self else { return }
+            switch action {
+            case .movieSelected(let movie):
+                let screen = self.factory.makeScreen(for: .movieDetail(movieId: String(movie.id)))
+                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+                
+            case .listSelected(let section, let genre):
+                let title: String
+                switch section {
+                case .categories: title = genre?.name ?? "Genre"
+                case .popular: title = "Popular Movies"
+                case .upcoming: title = "Upcoming Movies"
+                case .topRated: title = "Top Rated Movies"
+                default: title = "Movies"
+                }
+                let screen = self.factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: section.rawValue, genreId: genre?.id, genreName: genre?.name))
+                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+                
+            case .searchSelected:
+                let screen = self.factory.makeScreen(for: .search)
+                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+            }
+        }
+        
+        router.setRoot(homeVC, animated: false, onPop: nil)
     }
     
     public override func rootViewController() -> UIViewController {

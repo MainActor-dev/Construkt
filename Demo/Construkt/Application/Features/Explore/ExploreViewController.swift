@@ -11,6 +11,15 @@ enum ExploreSection: String, SectionControllerIdentifier {
 }
 
 class ExploreViewController: UIViewController {
+    
+    public enum Action {
+        case movieSelected(String)
+        case genreSelected(ExploreGenre)
+        case searchSelected
+    }
+    
+    public var onAction: ((Action) -> Void)?
+    
     private let viewModel = ExploreViewModel()
     
     override func viewDidLoad() {
@@ -41,7 +50,7 @@ class ExploreViewController: UIViewController {
                     arrivalsSection
                 }
                 .with {
-                    $0.collectionView.contentInset.top = 50
+                    $0.collectionView.contentInset.top = 60
                     $0.collectionView.showsVerticalScrollIndicator = false
                 }
                 
@@ -188,25 +197,17 @@ class ExploreViewController: UIViewController {
     
     private var headerOverlay: View {
         ZStackView {
-            // Background blur behind header
             BlurView(style: .dark)
-            
             HStackView {
                 LabelView("Explore")
-                    .font(.systemFont(ofSize: 22, weight: .semibold))
+                    .font(.systemFont(ofSize: 32, weight: .semibold))
                     .color(.white)
-                
                 SpacerView()
-                
-                // Profile Button
-                ZStackView {
-                    ImageView(url: URL(string: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop")!)
-                        .contentMode(.scaleAspectFill)
-                        .clipsToBounds(true)
-                }
-                .size(width: 32, height: 32)
-                .cornerRadius(16)
-                .border(color: UIColor(white: 1.0, alpha: 0.1), lineWidth: 1)
+                ImageView(UIImage(systemName: "magnifyingglass"))
+                    .tintColor(.white)
+                    .size(width: 24, height: 24)
+                    .contentMode(.scaleAspectFit)
+                    .onTapGesture { [weak self] _ in self?.showSearch() }
             }
             .padding(insets: .init(top: 12, left: 24, bottom: 12, right: 24))
         }
@@ -220,30 +221,16 @@ class ExploreViewController: UIViewController {
 // MARK: - Navigation
 
 extension ExploreViewController {
-    private func showDetail(for idString: String) {
-        guard let id = Int(idString) else { return }
-        
-        let dummyMovie = Movie(id: id, title: "", overview: "", releaseDate: nil, posterPath: nil, backdropPath: nil, voteAverage: 0, genreIds: nil)
-        let detailVC = MovieDetailViewController(movie: dummyMovie)
-        detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+    private func showDetail(for id: String) {
+        onAction?(.movieSelected(id))
     }
     
-    private func showMovieList(for exploreGenre: ExploreGenre) {
-        guard let id = Int(exploreGenre.id) else { return }
-        let selectedGenre = Genre(id: id, name: exploreGenre.name)
-        let allGenres = viewModel.genres.map { Genre(id: Int($0.id) ?? 0, name: $0.name) }
-        
-        let listViewModel = MovieListViewModel(
-            title: exploreGenre.name,
-            sectionType: .categories,
-            genres: allGenres,
-            selectedGenre: selectedGenre
-        )
-        
-        let vc = MovieListViewController(viewModel: listViewModel)
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
+    private func showMovieList(for genre: ExploreGenre) {
+        onAction?(.genreSelected(genre))
+    }
+    
+    private func showSearch() {
+        onAction?(.searchSelected)
     }
 }
 

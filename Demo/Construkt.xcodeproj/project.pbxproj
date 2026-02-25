@@ -11,7 +11,7 @@
 		041DEA9A2F2E2F1500267715 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 04B9BF282F2C9ED9006EB671 /* Factory */; };
 		041DEA9B2F2E2F1500267715 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 04B9BF292F2C9ED9006EB671 /* RxCocoa */; };
 		042A397E2F4C4FA3001DC0CA /* ConstruktKit in Frameworks */ = {isa = PBXBuildFile; productRef = 042A397D2F4C4FA3001DC0CA /* ConstruktKit */; };
-		04976E292F4F129D00DFCE92 /* ma-ios-common in Frameworks */ = {isa = PBXBuildFile; productRef = 04976E282F4F129D00DFCE92 /* ma-ios-common */; };
+		04976E3E2F4F3E5600DFCE92 /* ma-ios-common in Frameworks */ = {isa = PBXBuildFile; productRef = 04976E3D2F4F3E5600DFCE92 /* ma-ios-common */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,7 +48,7 @@
 				041DEA9A2F2E2F1500267715 /* Factory in Frameworks */,
 				042A397E2F4C4FA3001DC0CA /* ConstruktKit in Frameworks */,
 				041DEA992F2E2F1500267715 /* RxSwift in Frameworks */,
-				04976E292F4F129D00DFCE92 /* ma-ios-common in Frameworks */,
+				04976E3E2F4F3E5600DFCE92 /* ma-ios-common in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,7 +95,7 @@
 				04B9BF282F2C9ED9006EB671 /* Factory */,
 				04B9BF292F2C9ED9006EB671 /* RxCocoa */,
 				042A397D2F4C4FA3001DC0CA /* ConstruktKit */,
-				04976E282F4F129D00DFCE92 /* ma-ios-common */,
+				04976E3D2F4F3E5600DFCE92 /* ma-ios-common */,
 			);
 			productName = Construkt;
 			productReference = 95DB7F4C2EB70976003FE2F7 /* Construkt.app */;
@@ -129,7 +129,7 @@
 				04B9BF252F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				04B9BF272F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "Factory" */,
 				042A397C2F4C4FA3001DC0CA /* XCLocalSwiftPackageReference "../../Construkt" */,
-				04976E272F4F129D00DFCE92 /* XCRemoteSwiftPackageReference "ma-ios-common" */,
+				04976E3C2F4F3E5600DFCE92 /* XCLocalSwiftPackageReference "../../ma-ios-common" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 95DB7F4D2EB70976003FE2F7 /* Products */;
@@ -367,17 +367,13 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../Construkt;
 		};
+		04976E3C2F4F3E5600DFCE92 /* XCLocalSwiftPackageReference "../../ma-ios-common" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../ma-ios-common";
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		04976E272F4F129D00DFCE92 /* XCRemoteSwiftPackageReference "ma-ios-common" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:MainActorDev/ma-ios-common.git";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		04B9BF252F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -401,9 +397,8 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = ConstruktKit;
 		};
-		04976E282F4F129D00DFCE92 /* ma-ios-common */ = {
+		04976E3D2F4F3E5600DFCE92 /* ma-ios-common */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 04976E272F4F129D00DFCE92 /* XCRemoteSwiftPackageReference "ma-ios-common" */;
 			productName = "ma-ios-common";
 		};
 		04B9BF262F2C9ED9006EB671 /* RxSwift */ = {

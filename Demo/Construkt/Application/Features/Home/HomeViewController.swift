@@ -11,6 +11,14 @@ import ConstruktKit
 
 class HomeViewController: UIViewController {
     
+    public enum Action {
+        case movieSelected(Movie)
+        case listSelected(HomeSection, Genre?)
+        case searchSelected
+    }
+    
+    public var onAction: ((Action) -> Void)?
+    
     private let viewModel = MovieViewModel()
     private weak var cachedCollectionView: UICollectionView?
     
@@ -66,11 +74,11 @@ class HomeViewController: UIViewController {
                     self?.navBarBackgroundView = view
                 },
                 onSearchTap: { [weak self] in
-                    let searchVC = SearchViewController()
-                    self?.navigationController?.pushViewController(searchVC, animated: true)
+                    self?.onAction?(.searchSelected)
                 }
             )
         }
+        .margins(bottom: 100)
     }
     
     // MARK: - Sections
@@ -217,36 +225,14 @@ class HomeViewController: UIViewController {
 
 extension HomeViewController {
     private func showDetail(for movie: Movie) {
-        let detailVC = MovieDetailViewController(movie: movie)
-        navigationController?.pushViewController(detailVC, animated: true)
+        onAction?(.movieSelected(movie))
     }
     
     private func showMovieList(
         for section: HomeSection,
         selectedGenre: Genre? = nil
     ) {
-        let title: String
-        switch section {
-        case .categories:
-            if let selectedGenre {
-                title = selectedGenre.name
-            } else {
-                title = "Genre"
-            }
-        case .popular: title = "Popular Movies"
-        case .upcoming: title = "Upcoming Movies"
-        case .topRated: title = "Top Rated Movies"
-        default: title = "Movies"
-        }
-        
-        let viewModel = MovieListViewModel(
-            title: title,
-            sectionType: section,
-            genres: viewModel.currentGenres,
-            selectedGenre: selectedGenre
-        )
-        let vc = MovieListViewController(viewModel: viewModel)
-        navigationController?.pushViewController(vc, animated: true)
+        onAction?(.listSelected(section, selectedGenre))
     }
 }
 

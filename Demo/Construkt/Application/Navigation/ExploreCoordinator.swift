@@ -11,8 +11,26 @@ public final class ExploreCoordinator: BaseCoordinator {
     }
     
     public func start() {
-        let exploreScreen = factory.makeScreen(for: .explore)
-        router.setRoot(exploreScreen, animated: false, onPop: nil)
+        guard let exploreVC = factory.makeScreen(for: .explore) as? ExploreViewController else { return }
+        
+        exploreVC.onAction = { [weak self] action in
+            guard let self = self else { return }
+            switch action {
+            case .movieSelected(let id):
+                let screen = self.factory.makeScreen(for: .movieDetail(movieId: id))
+                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+                
+            case .genreSelected(let genre):
+                guard let genreId = Int(genre.id) else { return }
+                let screen = self.factory.makeScreen(for: .movieList(title: genre.name, sectionTypeRaw: "categories", genreId: genreId, genreName: genre.name))
+                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+            case .searchSelected:
+                let screen = factory.makeScreen(for: .search)
+                router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+            }
+        }
+        
+        router.setRoot(exploreVC, animated: false, onPop: nil)
     }
     
     public override func rootViewController() -> UIViewController {

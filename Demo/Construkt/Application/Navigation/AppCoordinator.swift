@@ -3,12 +3,10 @@ import ma_ios_common
 
 @MainActor
 public final class AppCoordinator: BaseCoordinator {
-    private let window: UIWindow
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
     
-    public init(window: UIWindow, router: RouterProtocol, factory: ScreenFactoryProtocol) {
-        self.window = window
+    public init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
         self.factory = factory
         super.init(router: router)
     }
@@ -44,8 +42,9 @@ public final class AppCoordinator: BaseCoordinator {
         }
         tabBarController.tabBar.tintColor = .white
         tabBarController.tabBar.unselectedItemTintColor = .gray
-        
-        window.rootViewController = tabBarController
-        window.makeKeyAndVisible()
+    }
+    
+    public override func rootViewController() -> UIViewController {
+        tabBarController
     }
 }
