@@ -4,6 +4,7 @@
 - [Overview](#overview)
   - [Why Construkt?](#why-construkt)
 - [Installation](#installation)
+  - [Agentic Coding with Construkt](#agentic-coding-with-construkt)
 - [Views and Composition](#views-and-composition)
 - [State Management & Reactive Data Flow](#state-management--reactive-data-flow)
   - [The Reactive Primitives](#the-reactive-primitives)
@@ -59,6 +60,13 @@ dependencies: [
     .package(url: "https://github.com/MainActor-dev/Construkt.git", from: "1.0.0")
 ]
 ```
+
+### Agentic Coding with Construkt
+
+If you are using AI coding assistants (like Antigravity, Cursor, Windsurf, or GitHub Copilot), you can use the provided `SKILL.md` file to help your agent write high-quality Construkt code.
+
+Simply inform your agent to read the `SKILL.md` file at the root of the repository. This file contains comprehensive guidelines, component references, and best practices for writing declarative UIKit with Construkt.
+
 
 ---
 
