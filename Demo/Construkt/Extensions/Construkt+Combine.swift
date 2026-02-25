@@ -28,6 +28,22 @@ extension Publisher where Failure == Never {
     }
 }
 
+#if swift(>=5.10)
+extension AnyPublisher: @retroactive ViewBinding where Failure == Never {
+    public typealias Value = Output
+}
+
+extension CurrentValueSubject: @retroactive ViewBinding where Failure == Never {
+    public typealias Value = Output
+}
+
+extension CurrentValueSubject: @retroactive MutableViewBinding where Failure == Never {
+}
+
+extension Published.Publisher: @retroactive ViewBinding where Failure == Never {
+    public typealias Value = Output
+}
+#else
 extension AnyPublisher: ViewBinding where Failure == Never {
     public typealias Value = Output
 }
@@ -37,15 +53,12 @@ extension CurrentValueSubject: ViewBinding where Failure == Never {
 }
 
 extension CurrentValueSubject: MutableViewBinding where Failure == Never {
-    public var value: Output {
-        get { return self.value }
-        set { self.send(newValue) }
-    }
 }
 
 extension Published.Publisher: ViewBinding where Failure == Never {
     public typealias Value = Output
 }
+#endif
 
 private final class CombineAdapterCancellable: AnyCancellableLifecycle {
     let cancellable: AnyCancellable

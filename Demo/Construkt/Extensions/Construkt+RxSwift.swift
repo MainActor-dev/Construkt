@@ -33,6 +33,25 @@ extension ObservableType {
     }
 }
 
+#if swift(>=5.10)
+extension Observable: @retroactive ViewBinding {
+    public typealias Value = Element
+}
+
+extension BehaviorRelay: @retroactive MutableViewBinding {
+    public typealias Value = Element
+    
+    public var value: Element {
+        get {
+            var current: Element!
+            let disposable = self.asObservable().subscribe(onNext: { current = $0 })
+            disposable.dispose()
+            return current
+        }
+        set { self.accept(newValue) }
+    }
+}
+#else
 extension Observable: ViewBinding {
     public typealias Value = Element
 }
@@ -41,10 +60,16 @@ extension BehaviorRelay: MutableViewBinding {
     public typealias Value = Element
     
     public var value: Element {
-        get { return self.value }
+        get {
+            var current: Element!
+            let disposable = self.asObservable().subscribe(onNext: { current = $0 })
+            disposable.dispose()
+            return current
+        }
         set { self.accept(newValue) }
     }
 }
+#endif
 
 private final class RxAdapterCancellable: AnyCancellableLifecycle {
     let disposable: Disposable
