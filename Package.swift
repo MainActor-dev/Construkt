@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Construkt",
-    platforms: [.iOS(.v16)],
+    platforms: [.iOS(.v14)],
     products: [
         .library(name: "ConstruktKit", targets: ["ConstruktKit"]),
     ],
