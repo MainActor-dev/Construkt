@@ -40,6 +40,15 @@ public extension UIImageView {
             return
         }
         
+        // Target size for downsampling based on the view's current bounds.
+        // If bounds are zero, fallback to a sensible max thumbnail dimension (e.g. 500pt).
+        let screenScale = UIScreen.main.scale
+        var targetSize = self.bounds.size
+        if targetSize.width == 0 || targetSize.height == 0 {
+            targetSize = CGSize(width: 300, height: 500) // Fallback for auto-layout cells not yet sized
+        }
+        let maxPixelDimension = max(targetSize.width, targetSize.height) * screenScale
+        
         // Download
         let task = Task { [weak self] in
             do {
@@ -48,8 +57,11 @@ public extension UIImageView {
                 // Check for cancellation
                 try Task.checkCancellation()
                 
-                if let image = UIImage(data: data) {
-                    imageCache.setObject(image, forKey: urlString)
+                if let image = Self.downsample(data: data, to: maxPixelDimension) {
+                    
+                    // Calculate memory cost: pixels Wide * pixels High * 4 bytes per pixel (RGBA)
+                    let cost = Int(image.size.width * image.scale) * Int(image.size.height * image.scale) * 4
+                    imageCache.setObject(image, forKey: urlString, cost: cost)
                     
                     await MainActor.run { [weak self] in
                         guard let self = self else { return }
@@ -68,5 +80,24 @@ public extension UIImageView {
         }
         
         objc_setAssociatedObject(self, &currentTaskKey, task, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
+    
+    // MARK: - Memory Optimization
+    
+    /// Downsamples image data to a target pixel dimension, avoiding massive memory spikes 
+    /// caused by decoding full-resolution remote images into RAM.
+    private static func downsample(data: Data, to maxPixelDimension: CGFloat) -> UIImage? {
+        let options = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let source = CGImageSourceCreateWithData(data as CFData, options) else { return nil }
+        
+        let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxPixelDimension
+        ] as CFDictionary
+        
+        guard let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, downsampleOptions) else { return nil }
+        return UIImage(cgImage: cgImage)
     }
 }

@@ -145,9 +145,9 @@ class ExploreViewController: UIViewController {
         }
         .layout {
             .list(itemHeight: .estimated(80))
-                .spacing(8)
-                .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
-                .supplementaryHeader(height: .estimated(60))
+            .spacing(8)
+            .insets(top: 0, leading: 24, bottom: 24, trailing: 24)
+            .supplementaryHeader(height: .estimated(60))
         }
     }
     

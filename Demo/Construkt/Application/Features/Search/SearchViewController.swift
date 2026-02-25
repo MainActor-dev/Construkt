@@ -60,17 +60,10 @@ public class SearchViewController: UIViewController {
                         .skeleton(count: 8, when: viewModel.isLoadingObservable) {
                             MovieSearchRow(movie: .placeholder)
                         }
-                        .layout { _ in
-                            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
-                            let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                            
-                            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(120))
-                            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                            
-                            let section = NSCollectionLayoutSection(group: group)
-                            section.interGroupSpacing = 16
-                            section.contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
-                            return section
+                        .layout {
+                            .list(itemHeight: .absolute(120))
+                            .spacing(16)
+                            .insets(.init(v: 16, h: 15))
                         }
                     }
                     .backgroundColor(.clear)
