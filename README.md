@@ -1,5 +1,25 @@
 # Construkt: A Declarative UIKit Framework
 
+## Table of Contents
+- [Overview](#overview)
+  - [Why Construkt?](#why-construkt)
+- [Installation](#installation)
+- [Views and Composition](#views-and-composition)
+- [State Management & Reactive Data Flow](#state-management--reactive-data-flow)
+  - [The Reactive Primitives](#the-reactive-primitives)
+  - [Binding to Views](#binding-to-views)
+  - [Native Operators](#native-operators)
+  - [Combine & RxSwift Integration](#combine--rxswift-integration)
+  - [Included UI Components](#included-ui-components)
+- [Modern Collection and Table Views](#modern-collection-and-table-views)
+  - [Table Views](#table-views)
+  - [Dynamic Collection Views](#dynamic-collection-views)
+  - [Static Collection Views](#static-collection-views)
+  - [Skeleton Loading States](#skeleton-loading-states)
+- [Advanced View Structure](#advanced-view-structure)
+- [Author](#author)
+- [License](#license)
+
 ## Overview
 
 Construkt lets you build UIKit-based user interfaces using a modern, declarative syntax identical to **SwiftUI**. 
