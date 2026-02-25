@@ -152,12 +152,11 @@ class MovieListViewController: UIViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
-    private func scrollToFilter(_ id: Int) {
+    private func scrollToFilter(_ id: Int) {        
         guard let wrapper = filterCollectionViewWrapper,
-              let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource else { return }
-        
-        if dataSource.snapshot().numberOfItems == 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+              let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource,
+              dataSource.snapshot().numberOfItems > 0 else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.scrollToFilter(id)
             }
             return
@@ -165,6 +164,7 @@ class MovieListViewController: UIViewController {
         
         let searchKey = CellController(id: id)
         if let indexPath = dataSource.indexPath(for: searchKey) {
+            wrapper.collectionView.layoutIfNeeded()
             wrapper.collectionView.scrollToItem(
                 at: indexPath,
                 at: .centeredHorizontally,

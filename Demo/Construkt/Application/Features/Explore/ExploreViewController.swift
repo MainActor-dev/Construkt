@@ -14,7 +14,7 @@ class ExploreViewController: UIViewController {
     
     public enum Action {
         case movieSelected(String)
-        case genreSelected(ExploreGenre)
+        case genreSelected(selected: ExploreGenre, all: [ExploreGenre])
         case searchSelected
     }
     
@@ -226,7 +226,7 @@ extension ExploreViewController {
     }
     
     private func showMovieList(for genre: ExploreGenre) {
-        onAction?(.genreSelected(genre))
+        onAction?(.genreSelected(selected: genre, all: viewModel.allGenres))
     }
     
     private func showSearch() {

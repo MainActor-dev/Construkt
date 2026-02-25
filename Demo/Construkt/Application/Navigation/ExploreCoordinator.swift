@@ -2,16 +2,16 @@ import UIKit
 import ma_ios_common
 
 @MainActor
-public final class ExploreCoordinator: BaseCoordinator {
+final class ExploreCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
     
-    public init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
         self.factory = factory
         super.init(router: router)
     }
     
-    public func start() {
-        guard let exploreVC = factory.makeScreen(for: .explore) as? ExploreViewController else { return }
+    func start() {
+        let exploreVC = factory.makeExploreViewController()
         
         exploreVC.onAction = { [weak self] action in
             guard let self = self else { return }
@@ -20,9 +20,15 @@ public final class ExploreCoordinator: BaseCoordinator {
                 let screen = self.factory.makeScreen(for: .movieDetail(movieId: id))
                 self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
                 
-            case .genreSelected(let genre):
-                guard let genreId = Int(genre.id) else { return }
-                let screen = self.factory.makeScreen(for: .movieList(title: genre.name, sectionTypeRaw: "categories", genreId: genreId, genreName: genre.name))
+            case .genreSelected(let selected, let all):
+                guard let genreId = Int(selected.id) else { return }
+                
+                let allGenres = all.compactMap {
+                    guard let id = Int($0.id) else { return nil as Genre? }
+                    return Genre(id: id, name: $0.name)
+                }
+                
+                let screen = self.factory.makeScreen(for: .movieList(title: selected.name, sectionTypeRaw: "categories", genreId: genreId, genreName: selected.name, allGenres: allGenres))
                 self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
             case .searchSelected:
                 let screen = factory.makeScreen(for: .search)
@@ -33,7 +39,7 @@ public final class ExploreCoordinator: BaseCoordinator {
         router.setRoot(exploreVC, animated: false, onPop: nil)
     }
     
-    public override func rootViewController() -> UIViewController {
+    override func rootViewController() -> UIViewController {
         return router.navigationController
     }
 }

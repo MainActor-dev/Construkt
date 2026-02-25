@@ -2,17 +2,18 @@ import UIKit
 import ma_ios_common
 
 @MainActor
-public final class HomeCoordinator: BaseCoordinator {
+final class HomeCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
     
-    public init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    var onSwitchToExplore: (() -> Void)?
+    
+    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
         self.factory = factory
         super.init(router: router)
     }
     
-    public func start() {
-        guard let homeVC = factory.makeScreen(for: .home) as? HomeViewController else { return }
-        
+    func start() {
+        let homeVC = factory.makeHomeViewController()
         homeVC.onAction = { [weak self] action in
             guard let self = self else { return }
             switch action {
@@ -20,7 +21,7 @@ public final class HomeCoordinator: BaseCoordinator {
                 let screen = self.factory.makeScreen(for: .movieDetail(movieId: String(movie.id)))
                 self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
                 
-            case .listSelected(let section, let genre):
+            case .listSelected(let section, let genre, let allGenres):
                 let title: String
                 switch section {
                 case .categories: title = genre?.name ?? "Genre"
@@ -29,19 +30,18 @@ public final class HomeCoordinator: BaseCoordinator {
                 case .topRated: title = "Top Rated Movies"
                 default: title = "Movies"
                 }
-                let screen = self.factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: section.rawValue, genreId: genre?.id, genreName: genre?.name))
+                let screen = self.factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: section.rawValue, genreId: genre?.id, genreName: genre?.name, allGenres: allGenres))
                 self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
                 
             case .searchSelected:
-                let screen = self.factory.makeScreen(for: .search)
-                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
+                self.onSwitchToExplore?()
             }
         }
         
         router.setRoot(homeVC, animated: false, onPop: nil)
     }
     
-    public override func rootViewController() -> UIViewController {
+    override func rootViewController() -> UIViewController {
         return router.navigationController
     }
 }

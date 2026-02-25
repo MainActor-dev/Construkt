@@ -13,7 +13,7 @@ class HomeViewController: UIViewController {
     
     public enum Action {
         case movieSelected(Movie)
-        case listSelected(HomeSection, Genre?)
+        case listSelected(HomeSection, Genre?, [Genre]?)
         case searchSelected
     }
     
@@ -232,7 +232,7 @@ extension HomeViewController {
         for section: HomeSection,
         selectedGenre: Genre? = nil
     ) {
-        onAction?(.listSelected(section, selectedGenre))
+        onAction?(.listSelected(section, selectedGenre, viewModel.currentGenres))
     }
 }
 
