@@ -4,7 +4,9 @@
 - [Overview](#overview)
   - [Why Construkt?](#why-construkt)
 - [Installation](#installation)
+  - [Agentic Coding with Construkt](#agentic-coding-with-construkt)
 - [Views and Composition](#views-and-composition)
+  - [Custom Components](#custom-components)
 - [State Management & Reactive Data Flow](#state-management--reactive-data-flow)
   - [The Reactive Primitives](#the-reactive-primitives)
   - [Binding to Views](#binding-to-views)
@@ -51,7 +53,7 @@ While SwiftUI is the future, many modern apps still maintain extensive UIKit cod
 Construkt is distributed as a Swift Package and requires **Xcode 16+** and **Swift 6** (with backwards compatibility for Swift 5.9 language modes).
 
 **Minimum SDK Requirements:**
-- iOS 16.0+
+- iOS 14.0+
 
 ```swift
 // Package.swift
@@ -60,6 +62,13 @@ dependencies: [
 ]
 ```
 
+### Agentic Coding with Construkt
+
+If you are using AI coding assistants (like Antigravity, Cursor, Windsurf, or GitHub Copilot), you can use the provided `SKILL.md` file to help your agent write high-quality Construkt code.
+
+Simply inform your agent to read the `SKILL.md` file at the root of the repository. This file contains comprehensive guidelines, component references, and best practices for writing declarative UIKit with Construkt.
+
+
 ---
 
 ## Views and Composition
@@ -67,35 +76,68 @@ dependencies: [
 In Construkt, screens are composed of views inside views using familiar structuring. 
 
 ```swift
-struct DetailCardView: ViewBuilder {    
-
-    let user: User
-
+struct PosterCell: ViewBuilder {
+    let movie: Movie
+    
     var body: View {
-        StandardCardView {
-            VStackView {
-                LabeledPhotoView(photo: user.$photo, name: user.name)
-                    .height(250)
+        VStackView(spacing: 8) {
+            ImageView(url: movie.posterURL)
+                .skeletonable(true)
+                .contentMode(.scaleAspectFill)
+                .backgroundColor(.darkGray)
+                .cornerRadius(8)
+                .clipsToBounds(true)
+                .height(180)
+            
+            VStackView(spacing: 4) {
+                LabelView(movie.title)
+                    .font(.systemFont(ofSize: 14, weight: .semibold))
+                    .color(.white)
+                    .numberOfLines(1)
+                    .skeletonable(true)
                 
-                VStackView {
-                    NameValueView(name: "Email", value: user.email)
-                    NameValueView(name: "Phone", value: user.phone)
-                    SpacerView()
-                    ButtonView("Contact")
-                        .onTap { _ in print("Tapped") }
-                }
-                .spacing(8)
-                .padding(20)
+                LabelView("Adventure") // Placeholder genre
+                    .font(.systemFont(ofSize: 12))
+                    .color(.gray)
+                    .skeletonable(true)
             }
+            .alignment(.leading)
         }
+        .clipsToBounds(true)
     }
 }
 ```
 
+### Custom Components
+
+Creating reusable components that can accept standard Construkt modifiers (like padding, sizing, etc.) is as simple as defining a struct that conforms to `ModifiableView`.
+
+```swift
+import UIKit
+
+public class _CircleView: UIView {
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = min(bounds.width, bounds.height) / 2
+        clipsToBounds = true
+    }
+}
+
+public struct CircleView: ModifiableView {
+    public let modifiableView = _CircleView()
+    
+    public init() {
+        modifiableView.translatesAutoresizingMaskIntoConstraints = false
+        modifiableView.backgroundColor = .clear
+    }
+}
+```
+
+
 Any Construkt `ViewBuilder` protocol conformance generates an underlying set of standard `UIView` elements by simply calling `.build()`.
 
 ```swift
-let view: UIView = DetailCardView(user: user).build()
+let view: UIView = PosterCell(movie: movie).build()
 ```
 
 This structural approach encourages creating small, testable, highly-reusable interface components exactly like SwiftUI.
@@ -299,12 +341,11 @@ LabelView("Direct UIKit Access")
 
 ## Author
 
-Construkt was originally created by **Michael Long**, a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
-- LinkedIn: [@hmlong](https://www.linkedin.com/in/hmlong/)
-- Medium: [@michaellong](https://medium.com/@michaellong)
+Construkt was originally created by **Michael Long** (Builder), a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
+- Github: [Builder](https://github.com/hmlongco/Builder)
 
 Continued and maintained by **Bayu Kurniawan**.
-- GitHub: [@MainActor-dev](https://github.com/MainActor-dev)
+- GitHub: [@thatswiftdev](https://github.com/thatswiftdev)
 
 ---
 
