@@ -22,7 +22,7 @@ public extension UIImageView {
     
     /// Asynchronously fetches and assigns an image from a given URL, displaying a placeholder 
     /// while loading. Re-requests to a changed URL automatically cancel previous loads.
-    func setImage(from url: URL?, placeholder: UIImage? = nil) {
+    func setImage(from url: URL?, placeholder: UIImage? = nil, animated: Bool = true) {
         // Cancel prior task
         if let existingTask = objc_getAssociatedObject(self, &currentTaskKey) as? Task<Void, Never> {
             existingTask.cancel()
@@ -52,7 +52,14 @@ public extension UIImageView {
                     imageCache.setObject(image, forKey: urlString)
                     
                     await MainActor.run { [weak self] in
-                        self?.image = image
+                        guard let self = self else { return }
+                        if animated {
+                            UIView.transition(with: self, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                                self.image = image
+                            }, completion: nil)
+                        } else {
+                            self.image = image
+                        }
                     }
                 }
             } catch {

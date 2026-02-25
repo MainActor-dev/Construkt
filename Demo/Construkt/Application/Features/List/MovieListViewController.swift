@@ -26,11 +26,6 @@ class MovieListViewController: UIViewController {
         observe()
     }
     
-    deinit {
-        print("MovieListViewController deinit")
-        ImageCache.clear()
-    }
-    
     private func observe() {
         viewModel.$selectedGenre
             .compactMap { $0 }

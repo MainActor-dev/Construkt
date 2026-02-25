@@ -116,17 +116,19 @@ public class SearchViewController: UIViewController {
 // MARK: - Row View
 
 struct MovieSearchRow: ViewBuilder {
+    
     let movie: Movie
-
+    
     var body: View {
         HStackView(spacing: 16) {
-            ImageView(url: movie.posterURL)
-                .contentMode(.scaleAspectFill)
+            ImageView(url: movie.posterURL, placeholder: UIImage(systemName: "film.fill"))
+                .contentMode(movie.posterURL == nil ? .center : .scaleAspectFill)
                 .backgroundColor(.darkGray)
+                .tintColor(.white)
                 .height(120)
+                .contentCompressionResistancePriority(.required, for: .horizontal)
+                .contentHuggingPriority(.required, for: .horizontal)
                 .with { view in
-                    view.setContentCompressionResistancePriority(.required, for: .horizontal)
-                    view.setContentHuggingPriority(.required, for: .horizontal)
                     let aspectConstraint = view.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 80.0/120.0)
                     aspectConstraint.priority = .required
                     aspectConstraint.isActive = true
@@ -146,14 +148,13 @@ struct MovieSearchRow: ViewBuilder {
                     ImageView(UIImage(systemName: "star.fill"))
                         .tintColor(.systemYellow)
                         .size(width: 14, height: 14)
-                        .skeletonable(true)
                     
                     LabelView(String(format: "%.1f", movie.voteAverage))
                         .font(.systemFont(ofSize: 14, weight: .regular))
                         .color(.systemYellow)
-                        .skeletonable(true)
                 }
                 .alignment(.center)
+                .skeletonable(true)
                 
                 SpacerView()
             }
