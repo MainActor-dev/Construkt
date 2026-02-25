@@ -1,0 +1,254 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie App UI - Explore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <style>
+        /* Custom scrollbar hiding for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-neutral-950 text-neutral-400 font-sans antialiased selection:bg-white/20 selection:text-white">
+
+    <!-- Mobile Wrapper -->
+    <div
+        class="mx-auto max-w-md bg-neutral-950 min-h-screen relative shadow-2xl overflow-hidden border-x border-neutral-900">
+
+        <!-- Header -->
+        <header
+            class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 max-w-md mx-auto">
+            <div class="text-xl font-medium tracking-tighter text-white">
+                Explore
+            </div>
+            <button
+                class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&amp;w=200&amp;auto=format&amp;fit=crop"
+                    alt="Profile"
+                    class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+            </button>
+        </header>
+
+        <!-- Main Content -->
+        <main class="pt-20 pb-24 px-6">
+
+            <!-- Search Bar -->
+            <div class="relative group z-10">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                </div>
+                <div
+                    class="relative flex items-center bg-neutral-900/80 border border-neutral-800 rounded-xl focus-within:border-neutral-600 focus-within:ring-1 focus-within:ring-neutral-600 transition-all shadow-sm overflow-hidden">
+                    <div class="pl-4 text-neutral-500">
+                        <iconify-icon icon="solar:magnifer-linear" width="20" stroke-width="1.5"></iconify-icon>
+                    </div>
+                    <input type="text" placeholder="Movies, shows, actors..."
+                        class="w-full bg-transparent border-none text-sm text-white placeholder-neutral-600 px-3 py-3.5 focus:outline-none font-medium tracking-tight">
+                    <button class="pr-4 text-neutral-500 hover:text-white transition-colors">
+                        <iconify-icon icon="solar:tuning-linear" width="20" stroke-width="1.5"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Browse by Genre (Grid) -->
+            <section class="mt-10">
+                <div class="flex justify-between items-end mb-4">
+                    <h2 class="text-lg font-medium text-white tracking-tight">Browse Genres</h2>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Action -->
+                    <div class="relative h-24 rounded-xl overflow-hidden cursor-pointer group border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1552083375-1447ce886485?q=80&amp;w=400&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent">
+                        </div>
+                        <span
+                            class="absolute bottom-3 left-3 text-sm font-medium text-white tracking-wide">Action</span>
+                    </div>
+
+                    <!-- Sci-Fi -->
+                    <div class="relative h-24 rounded-xl overflow-hidden cursor-pointer group border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1506318137071-a8bcbf67cc77?q=80&amp;w=400&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent">
+                        </div>
+                        <span
+                            class="absolute bottom-3 left-3 text-sm font-medium text-white tracking-wide">Sci-Fi</span>
+                    </div>
+
+                    <!-- Drama -->
+                    <div class="relative h-24 rounded-xl overflow-hidden cursor-pointer group border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&amp;w=400&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent">
+                        </div>
+                        <span class="absolute bottom-3 left-3 text-sm font-medium text-white tracking-wide">Drama</span>
+                    </div>
+
+                    <!-- Horror -->
+                    <div class="relative h-24 rounded-xl overflow-hidden cursor-pointer group border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&amp;w=400&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/20 to-transparent">
+                        </div>
+                        <span
+                            class="absolute bottom-3 left-3 text-sm font-medium text-white tracking-wide">Horror</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Curated Collections -->
+            <section class="mt-10 -mx-6">
+                <div class="px-6 mb-4">
+                    <h2 class="text-lg font-medium text-white tracking-tight">Curated Collections</h2>
+                    <p class="text-xs text-neutral-500 mt-1">Hand-picked by our editors</p>
+                </div>
+
+                <div class="flex gap-4 overflow-x-auto no-scrollbar px-6 snap-x pb-4">
+                    <!-- Collection 1 -->
+                    <div
+                        class="snap-center shrink-0 w-[240px] h-[140px] relative rounded-xl overflow-hidden border border-white/10 group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&amp;w=600&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/50 to-transparent">
+                        </div>
+                        <div class="absolute inset-0 p-5 flex flex-col justify-center items-start">
+                            <span class="text-[10px] uppercase tracking-widest text-amber-400 font-medium mb-1">Oscar
+                                Winners</span>
+                            <h3 class="text-xl font-medium text-white tracking-tight leading-none">
+                                Cinematic<br>Masterpieces</h3>
+                        </div>
+                    </div>
+
+                    <!-- Collection 2 -->
+                    <div
+                        class="snap-center shrink-0 w-[240px] h-[140px] relative rounded-xl overflow-hidden border border-white/10 group cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1512149177596-f817c7ef5d4c?q=80&amp;w=600&amp;auto=format&amp;fit=crop"
+                            class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/50 to-transparent">
+                        </div>
+                        <div class="absolute inset-0 p-5 flex flex-col justify-center items-start">
+                            <span class="text-[10px] uppercase tracking-widest text-teal-400 font-medium mb-1">Staff
+                                Pick</span>
+                            <h3 class="text-xl font-medium text-white tracking-tight leading-none">Indie<br>Favorites
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Arrivals List -->
+            <section class="mt-8">
+                <div class="mb-4 flex justify-between items-end">
+                    <h2 class="text-lg font-medium text-white tracking-tight">Just Arrived</h2>
+                    <a href="#" class="text-xs text-neutral-500 hover:text-white transition-colors">View all</a>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- List Item -->
+                    <div class="flex items-center gap-4 group cursor-pointer rounded-xl transition-colors">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-neutral-800 overflow-hidden relative shrink-0 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&amp;w=200&amp;auto=format&amp;fit=crop"
+                                class="w-full h-full object-cover">
+                            <div
+                                class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-white truncate">Interstellar Voyage</h4>
+                            <p class="text-xs text-neutral-500 mt-0.5">Sci-Fi • Added today</p>
+                        </div>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 transition-colors">
+                            <iconify-icon icon="solar:alt-arrow-right-linear" width="18"></iconify-icon>
+                        </button>
+                    </div>
+
+                    <!-- List Item -->
+                    <div class="flex items-center gap-4 group cursor-pointer rounded-xl transition-colors">
+                        <div
+                            class="w-14 h-14 rounded-lg bg-neutral-800 overflow-hidden relative shrink-0 border border-white/5">
+                            <img src="https://images.unsplash.com/photo-1616530940355-351fabd9524b?q=80&amp;w=200&amp;auto=format&amp;fit=crop"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-white truncate">Neon City</h4>
+                            <p class="text-xs text-neutral-500 mt-0.5">Cyberpunk • Added yesterday</p>
+                        </div>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center rounded-full border border-neutral-800 text-neutral-400 hover:text-white hover:border-neutral-600 transition-colors">
+                            <iconify-icon icon="solar:alt-arrow-right-linear" width="18"></iconify-icon>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav
+            class="fixed bottom-0 w-full max-w-md bg-neutral-950/90 backdrop-blur-xl border-t border-neutral-800/50 pb-safe pt-2 z-50">
+            <div class="flex justify-around items-center h-16">
+                <a href="#"
+                    class="flex flex-col items-center gap-1 text-neutral-500 hover:text-neutral-300 transition-colors group">
+                    <iconify-icon icon="solar:home-smile-linear" width="24" stroke-width="1.5"
+                        class="group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
+                    <span class="text-[10px] font-medium tracking-wide">Home</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-1 text-white group">
+                    <iconify-icon icon="solar:compass-bold" width="24"
+                        class="group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
+                    <span class="text-[10px] font-medium tracking-wide">Explore</span>
+                </a>
+                <a href="#"
+                    class="flex flex-col items-center gap-1 text-neutral-500 hover:text-neutral-300 transition-colors group">
+                    <iconify-icon icon="solar:bookmark-linear" width="24" stroke-width="1.5"
+                        class="group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
+                    <span class="text-[10px] font-medium tracking-wide">Saved</span>
+                </a>
+                <a href="#"
+                    class="flex flex-col items-center gap-1 text-neutral-500 hover:text-neutral-300 transition-colors group">
+                    <iconify-icon icon="solar:user-circle-linear" width="24" stroke-width="1.5"
+                        class="group-hover:-translate-y-0.5 transition-transform"></iconify-icon>
+                    <span class="text-[10px] font-medium tracking-wide">Profile</span>
+                </a>
+            </div>
+            <!-- Safe Area Spacer for iPhone Home Bar -->
+            <div class="h-4 w-full"></div>
+        </nav>
+
+        <!-- Gradients for subtle depth (background) -->
+        <div class="fixed top-0 left-10 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none">
+        </div>
+        <div class="fixed bottom-40 right-0 w-80 h-80 bg-rose-500/5 rounded-full blur-3xl -z-10 pointer-events-none">
+        </div>
+
+    </div>
+
+</body>
+
+</html>

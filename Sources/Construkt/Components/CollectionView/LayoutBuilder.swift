@@ -9,6 +9,10 @@ public struct LayoutBuilder {
     
     // MARK: - Core Expressions
     
+    public static func buildExpression(_ builder: CollectionLayoutSectionBuilder) -> NSCollectionLayoutSection {
+        return builder.section
+    }
+    
     public static func buildExpression(_ section: NSCollectionLayoutSection) -> NSCollectionLayoutSection {
         return section
     }

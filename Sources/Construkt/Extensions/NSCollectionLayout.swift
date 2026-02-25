@@ -24,106 +24,115 @@
 
 import UIKit
 
-extension NSCollectionLayoutItem {
-    /// Generates an item that occupies the entire width and height of its parent container.
-    public static func withEntireSize() -> NSCollectionLayoutItem {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
-        )
-        return NSCollectionLayoutItem(layoutSize: itemSize)
+public struct CollectionLayoutSectionBuilder {
+    public let section: NSCollectionLayoutSection
+    
+    internal init(section: NSCollectionLayoutSection) {
+        self.section = section
     }
     
-    public static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutItem {
-        let itemSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: height
-        )
-        return NSCollectionLayoutItem(layoutSize: itemSize)
-    }
-}
-
-extension NSCollectionLayoutGroup {
-    // MARK: - Vertical Scroll
-    /// Creates a vertical layout group scaling the specified width and height.
-    public static func vertically(
-        width: NSCollectionLayoutDimension,
-        height: NSCollectionLayoutDimension,
-        insets: NSDirectionalEdgeInsets = .zero
-    ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem(layoutSize: .init(
-            widthDimension: width,
-            heightDimension: height
-        ))
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: width,
-            heightDimension: height
-        )
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        group.contentInsets = insets
-        return group
-    }
+    // MARK: - Factory Methods
     
-    public static func vertically(
-        entireWidthWithHeight height: NSCollectionLayoutDimension,
-        insets: NSDirectionalEdgeInsets = .zero
-    ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem.withEntireSize()
-        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: height)
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-        group.contentInsets = insets
-        return group
-    }
-    
-    // MARK: - Horizontal Scroll
-    public static func horizontally(
-        width: NSCollectionLayoutDimension,
-        height: NSCollectionLayoutDimension,
-        insets: NSDirectionalEdgeInsets = .zero
-    ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem(layoutSize: .init(
-            widthDimension: width,
-            heightDimension: height
-        ))
-        let groupSize = NSCollectionLayoutSize(
-            widthDimension: width,
-            heightDimension: height
-        )
+    /// Creates a 1-column list layout.
+    public static func list(
+        itemHeight: NSCollectionLayoutDimension,
+        itemInsets: NSDirectionalEdgeInsets = .zero
+    ) -> CollectionLayoutSectionBuilder {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: itemHeight)
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemInsets
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: itemHeight)
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.contentInsets = insets
-        return group
-    }
-    
-    public static func horizontally(
-        entireWidthWithHeight height: NSCollectionLayoutDimension,
-        insets: NSDirectionalEdgeInsets = .zero
-    ) -> NSCollectionLayoutGroup {
-        let item = NSCollectionLayoutItem.entireWidth(withHeight: height)
-        let groupSize = NSCollectionLayoutSize.entireWidth(withHeight: height)
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        group.contentInsets = insets
-        return group
-    }
-}
-
-extension NSCollectionLayoutSection {
-    public static func layout(
-        group: NSCollectionLayoutGroup,
-        spacing: CGFloat = 0,
-        insets: NSDirectionalEdgeInsets = .zero,
-        decorationItems: [NSCollectionLayoutDecorationItem] = [],
-        supplementaryItems: [NSCollectionLayoutBoundarySupplementaryItem] = [],
-        scrolling: UICollectionLayoutSectionOrthogonalScrollingBehavior? = nil,
-        invalidationHandler: NSCollectionLayoutSectionVisibleItemsInvalidationHandler? = nil
-    ) -> NSCollectionLayoutSection {
+        
         let section = NSCollectionLayoutSection(group: group)
+        return CollectionLayoutSectionBuilder(section: section)
+    }
+    
+    /// Creates a multi-column grid layout.
+    public static func grid(
+        itemHeight: NSCollectionLayoutDimension,
+        columns: Int,
+        itemInsets: NSDirectionalEdgeInsets = .zero
+    ) -> CollectionLayoutSectionBuilder {
+        let fraction = 1.0 / CGFloat(columns)
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(fraction), heightDimension: itemHeight)
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemInsets
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: itemHeight)
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        return CollectionLayoutSectionBuilder(section: section)
+    }
+    
+    /// Creates a horizontally scrolling carousel layout.
+    public static func carousel(
+        itemWidth: NSCollectionLayoutDimension,
+        itemHeight: NSCollectionLayoutDimension,
+        itemInsets: NSDirectionalEdgeInsets = .zero
+    ) -> CollectionLayoutSectionBuilder {
+        let itemSize = NSCollectionLayoutSize(widthDimension: itemWidth, heightDimension: itemHeight)
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = itemInsets
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: itemWidth, heightDimension: itemHeight)
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .continuous
+        return CollectionLayoutSectionBuilder(section: section)
+    }
+    
+    // MARK: - Modifiers
+    
+    @discardableResult
+    public func spacing(_ spacing: CGFloat) -> Self {
         section.interGroupSpacing = spacing
+        return self
+    }
+    
+    @discardableResult
+    public func insets(_ insets: NSDirectionalEdgeInsets) -> Self {
         section.contentInsets = insets
-        section.decorationItems = decorationItems
-        section.boundarySupplementaryItems = supplementaryItems
-        if let scrolling { section.orthogonalScrollingBehavior = scrolling }
-        if let invalidationHandler { section.visibleItemsInvalidationHandler = invalidationHandler }
-        return section
+        return self
+    }
+    
+    @discardableResult
+    public func insets(top: CGFloat = 0, leading: CGFloat = 0, bottom: CGFloat = 0, trailing: CGFloat = 0) -> Self {
+        section.contentInsets = NSDirectionalEdgeInsets(top: top, leading: leading, bottom: bottom, trailing: trailing)
+        return self
+    }
+    
+    @discardableResult
+    public func orthogonalScrolling(_ behavior: UICollectionLayoutSectionOrthogonalScrollingBehavior) -> Self {
+        section.orthogonalScrollingBehavior = behavior
+        return self
+    }
+    
+    @discardableResult
+    public func supplementaryItems(_ items: [NSCollectionLayoutBoundarySupplementaryItem]) -> Self {
+        section.boundarySupplementaryItems = items
+        return self
+    }
+    
+    @discardableResult
+    public func supplementaryHeader(height: NSCollectionLayoutDimension, isSticky: Bool = false) -> Self {
+        let header = NSCollectionLayoutBoundarySupplementaryItem.header(height: height, isSticky: isSticky)
+        var newSupplementaries = section.boundarySupplementaryItems
+        newSupplementaries.append(header)
+        section.boundarySupplementaryItems = newSupplementaries
+        return self
+    }
+    
+    @discardableResult
+    public func supplementaryFooter(height: NSCollectionLayoutDimension, isSticky: Bool = false) -> Self {
+        let footer = NSCollectionLayoutBoundarySupplementaryItem.footer(height: height, isSticky: isSticky)
+        var newSupplementaries = section.boundarySupplementaryItems
+        newSupplementaries.append(footer)
+        section.boundarySupplementaryItems = newSupplementaries
+        return self
     }
 }
 
@@ -168,13 +177,6 @@ extension NSCollectionLayoutSize {
         return NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
             heightDimension: height
-        )
-    }
-    
-    public static func withEntireSize() -> NSCollectionLayoutSize {
-        return NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalHeight(1.0)
         )
     }
 }

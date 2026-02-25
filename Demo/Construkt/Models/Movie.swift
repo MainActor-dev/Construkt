@@ -1,7 +1,7 @@
 import Foundation
 import ConstruktKit
 
-public struct Movie: Decodable, Identifiable, Equatable {
+public struct Movie: Codable, Identifiable, Equatable, Sendable {
     public let id: Int
     public let title: String
     public let overview: String

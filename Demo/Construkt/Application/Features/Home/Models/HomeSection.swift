@@ -13,51 +13,34 @@ enum HomeSection: String, SectionControllerIdentifier {
     var layout: NSCollectionLayoutSection {
         switch self {
         case .hero:
-            return .layout(
-                group: .horizontally(entireWidthWithHeight: .absolute(550)),
-                insets: .init(top: 0, leading: 0, bottom: 16, trailing: 0),
-                scrolling: .groupPagingCentered
-            )
+            return CollectionLayoutSectionBuilder.carousel(itemWidth: .fractionalWidth(1.0), itemHeight: .absolute(500))
+                .insets(top: 0, leading: 0, bottom: 16, trailing: 0)
+                .orthogonalScrolling(.groupPagingCentered)
+                .section
         case .categories:
-            return .layout(
-                group: .horizontally(
-                    width: .estimated(100),
-                    height: .absolute(40)
-                ),
-                spacing: 12,
-                insets: .init(v: 16, h: 16),
-                supplementaryItems: [.header(height: .absolute(40))],
-                scrolling: .continuous
-            )
+            return CollectionLayoutSectionBuilder.carousel(itemWidth: .estimated(100), itemHeight: .absolute(40))
+                .spacing(12)
+                .insets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                .supplementaryHeader(height: .absolute(40))
+                .section
         case .popular:
-            return .layout(
-                group: .horizontally(
-                    width: .absolute(128),
-                    height: .estimated(200)
-                ),
-                spacing: 8,
-                insets: .init(v: 16, h: 16),
-                supplementaryItems: [.header(height: .absolute(30))],
-                scrolling: .continuous
-            )
+            return CollectionLayoutSectionBuilder.carousel(itemWidth: .absolute(128), itemHeight: .estimated(200))
+                .spacing(8)
+                .insets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                .supplementaryHeader(height: .absolute(30))
+                .section
         case .upcoming:
-            return .layout(
-                group: .horizontally(
-                    width: .absolute(280),
-                    height: .absolute(160)
-                ),
-                spacing: 12,
-                insets: .init(v: 16, h: 16),
-                supplementaryItems: [.header(height: .absolute(40))],
-                scrolling: .continuous
-            )
+            return CollectionLayoutSectionBuilder.carousel(itemWidth: .absolute(280), itemHeight: .absolute(160))
+                .spacing(12)
+                .insets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                .supplementaryHeader(height: .absolute(40))
+                .section
         case .topRated:
-            return .layout(
-                group: .vertically(width: .fractionalWidth(1.0), height: .estimated(50)),
-                spacing: 12,
-                insets: .init(v: 16, h: 16),
-                supplementaryItems: [.header(height: .absolute(40))]
-            )
+            return CollectionLayoutSectionBuilder.list(itemHeight: .estimated(50))
+                .spacing(12)
+                .insets(top: 16, leading: 16, bottom: 16, trailing: 16)
+                .supplementaryHeader(height: .absolute(40))
+                .section
         }
     }
 }

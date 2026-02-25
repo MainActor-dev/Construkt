@@ -51,14 +51,14 @@ public struct ImageView: ModifiableView {
     }
 
     /// Initializes an image view with a remote URL, fetching asynchronously.
-    public init(url: URL?, placeholder: UIImage? = nil) {
-        modifiableView.setImage(from: url, placeholder: placeholder)
+    public init(url: URL?, placeholder: UIImage? = nil, animated: Bool = true) {
+        modifiableView.setImage(from: url, placeholder: url == nil ? placeholder : nil, animated: animated)
     }
 
     /// Initializes an image view with a remote URL string, fetching asynchronously.
-    public init(url: String?, placeholder: UIImage? = nil) {
+    public init(url: String?, placeholder: UIImage? = nil, animated: Bool = true) {
         if let urlString = url, let url = URL(string: urlString) {
-            modifiableView.setImage(from: url, placeholder: placeholder)
+            modifiableView.setImage(from: url, placeholder: placeholder, animated: animated)
         } else {
             modifiableView.image = placeholder
         }

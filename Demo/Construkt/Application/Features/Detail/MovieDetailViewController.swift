@@ -21,10 +21,6 @@ final class MovieDetailViewController: UIViewController {
     
     required init?(coder: NSCoder) { nil }
     
-    deinit {
-        ImageCache.clear()
-    }
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()

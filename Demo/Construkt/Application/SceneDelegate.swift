@@ -25,21 +25,26 @@
 
 import UIKit
 import ConstruktKit
+import ma_ios_common
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private lazy var navigationController = NavigationController()
+    private var appCoordinator: AppCoordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        let rootViewController = ComponentsTestViewController()
-        navigationController.setViewControllers([rootViewController], animated: false)
+        let baseRouter = Router(navigationController: UINavigationController())
+        let factory = ScreenFactory()
+        let coordinator = AppCoordinator(router: baseRouter, factory: factory)
+        
+        self.appCoordinator = coordinator
+        coordinator.start()
         
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = navigationController
+        window.rootViewController = coordinator.rootViewController()
         window.makeKeyAndVisible()
         self.window = window
     }
