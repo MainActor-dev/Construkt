@@ -60,6 +60,13 @@ dependencies: [
 ]
 ```
 
+### Agentic Coding with Construkt
+
+If you are using AI coding assistants (like Cursor, Windsurf, or GitHub Copilot), you can use the provided `SKILL.md` file to help your agent write high-quality Construkt code.
+
+Simply inform your agent to read the `SKILL.md` file at the root of the repository. This file contains comprehensive guidelines, component references, and best practices for writing declarative UIKit with Construkt.
+
+
 ---
 
 ## Views and Composition
