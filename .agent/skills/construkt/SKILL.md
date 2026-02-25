@@ -34,6 +34,13 @@ When generating UI, use the Construkt primitives:
 | `ZStack` / `UIView` | `ZStackView { ... }` |
 | `Spacer` / `UIView` | `SpacerView()` |
 | `Circle` / `UIView` | `CircleView()` |
+| `Toggle` / `UISwitch` | `Toggle(isOn: $state)` |
+| `Slider` / `UISlider` | `Slider(value: $value)` |
+| `ProgressView` / `UIProgressView` | `ProgressView(value: 0.5)` |
+| `Stepper` / `UIStepper` | `Stepper(value: $num, in: 0...10)` |
+| `TextEditor` / `UITextView` | `TextEditor(text: $text)` |
+| `LinearGradient` / `CAGradientLayer` | `LinearGradient(colors: [.red, .blue])` |
+| `BlurView` / `UIVisualEffectView` | `BlurView(style: .regular)` |
 | `List` / `UITableView` | `TableView(DynamicItemViewBuilder) { ... }` |
 | `LazyVGrid`/`UICollectionView` | `CollectionView { Section { ... } }` |
 

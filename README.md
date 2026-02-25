@@ -153,6 +153,13 @@ let publisher = CurrentValueSubject<String, Never>("Combine Data")
 LabelView(publisher) // Construkt treats Combine Publishers as native ViewBindings
 ```
 
+### Included UI Components
+
+Construkt provides declarative wrappers for most standard UIKit components:
+- **Text & Controls:** `LabelView`, `ButtonView`, `TextField`, `TextEditor`, `Toggle`, `Slider`, `Stepper`
+- **Layout & Spacing:** `VStackView`, `HStackView`, `ZStackView`, `SpacerView`, `DividerView`
+- **Visual & Indicators:** `ImageView`, `BlurView`, `LinearGradient`, `ProgressView`, `ActivityIndicator`, `CircleView`
+
 ---
 
 ## Modern Collection and Table Views
@@ -246,7 +253,7 @@ ZStackView {
         .contentMode(.scaleAspectFill)
     
     // Auto-calculating overlay gradients
-    LinearGradientView(colors: [.black.withAlphaComponent(0), .black])
+    LinearGradient(colors: [.black.withAlphaComponent(0), .black])
     
     LabelView("Featured Content")
         .color(.white)
