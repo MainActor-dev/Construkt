@@ -52,7 +52,7 @@ While SwiftUI is the future, many modern apps still maintain extensive UIKit cod
 Construkt is distributed as a Swift Package and requires **Xcode 16+** and **Swift 6** (with backwards compatibility for Swift 5.9 language modes).
 
 **Minimum SDK Requirements:**
-- iOS 16.0+
+- iOS 14.0+
 
 ```swift
 // Package.swift
