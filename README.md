@@ -1,5 +1,7 @@
 # Construkt: A Declarative UIKit Framework
 
+![Construkt Hero Banner](construkt_banner.png)
+
 ## Table of Contents
 - [Overview](#overview)
   - [Why Construkt?](#why-construkt)
@@ -20,6 +22,7 @@
   - [Skeleton Loading States](#skeleton-loading-states)
 - [Advanced View Structure](#advanced-view-structure)
 - [Author](#author)
+- [Contribution](#contribution)
 - [License](#license)
 
 ## Overview
@@ -341,11 +344,17 @@ LabelView("Direct UIKit Access")
 
 ## Author
 
-Construkt was originally created by **Michael Long** (Builder), a Lead iOS Software Engineer and a Top 1,000 Technology Writer on Medium.
+Previously, this was **Builder**. Originally created by **Michael Long**.
 - Github: [Builder](https://github.com/hmlongco/Builder)
 
-Continued and maintained by **Bayu Kurniawan**.
+Continued and improved as **Construkt** and maintained by **Bayu Kurniawan**.
 - GitHub: [@thatswiftdev](https://github.com/thatswiftdev)
+
+---
+
+## Contribution
+
+Contributions are welcome! If you have ideas, bug reports, or want to add new features, feel free to open an issue or submit a pull request.
 
 ---
 
