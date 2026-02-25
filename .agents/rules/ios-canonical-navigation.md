@@ -37,6 +37,9 @@ If any input is missing, request it and stop.
 - Deep link requirements (explicitly “NONE” if not needed)
 - Restoration requirements (explicitly “NONE” if not needed)
 
+## Prerequisites
+- **Import "ma-ios-common"**: This library must be imported as a prerequisite before implementing any navigation logic.
+
 ## Execution steps
 Follow these steps in order and produce all outputs.
 
