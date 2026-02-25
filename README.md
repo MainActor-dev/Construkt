@@ -1,5 +1,7 @@
 # Construkt: A Declarative UIKit Framework
 
+![Construkt Hero Banner](construkt_banner.png)
+
 ## Table of Contents
 - [Overview](#overview)
   - [Why Construkt?](#why-construkt)
@@ -352,15 +354,7 @@ Continued and improved as **Construkt** and maintained by **Bayu Kurniawan**.
 
 ## Contribution
 
-Contributions are welcome! If you have ideas, bug reports, or want to add new features, feel free to open an issue or submit a pull request. 
-
-1. Fork the repository.
-2. Create a new branch (`feat/your-feature` or `fix/your-fix`).
-3. Commit your changes.
-4. Push to your branch.
-5. Open a Pull Request.
-
-Please ensure your code follows the existing style and includes tests where appropriate.
+Contributions are welcome! If you have ideas, bug reports, or want to add new features, feel free to open an issue or submit a pull request.
 
 ---
 
