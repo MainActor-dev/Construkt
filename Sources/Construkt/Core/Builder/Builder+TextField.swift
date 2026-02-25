@@ -35,9 +35,8 @@ public struct TextField: ModifiableView {
         $0.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 
-    // lifecycle
-    public init() {
-
+    public init(placeholder text: String?) {
+        modifiableView.placeholder = text
     }
 
     public init(_ text: String?) {
@@ -65,6 +64,12 @@ extension ModifiableView where Base: UITextField {
     @discardableResult
     public func autocapitalizationType(_ type: UITextAutocapitalizationType) -> ViewModifier<Base> {
         ViewModifier(modifiableView, keyPath: \.autocapitalizationType, value: type)
+    }
+    
+    /// Sets the text color
+    @discardableResult
+    public func textColor(_ color: UIColor) -> ViewModifier<Base> {
+        ViewModifier(modifiableView, keyPath: \.textColor, value: color)
     }
 
     /// Sets the autocorrection behavior.
