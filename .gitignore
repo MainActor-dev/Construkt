@@ -19,3 +19,9 @@ Package.resolved
 # CocoaPods
 Pods/
 construkt-ai/
+
+# Repository Cleanups
+.agent/
+.agents/
+ui-references/
+cleanup_branches.sh
