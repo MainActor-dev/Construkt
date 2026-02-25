@@ -106,27 +106,24 @@ struct DetailCardView: ViewBuilder {
 Creating reusable components that can accept standard Construkt modifiers (like padding, sizing, etc.) is as simple as defining a struct that conforms to `ModifiableView`.
 
 ```swift
-struct UserProfileView: ModifiableView {
-    let modifiableView: AnyView
-    
-    init(name: String) {
-        self.modifiableView = HStackView {
-            ImageView(UIImage(systemName: "person.circle"))
-                .size(width: 40, height: 40)
-            
-            VStackView {
-                LabelView(name).font(.headline)
-                LabelView("Online").font(.subheadline).color(.systemGreen)
-            }
-        }
-        .spacing(12)
-        .padding(16)
-        .asAnyView()
+import UIKit
+
+public class _CircleView: UIView {
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = min(bounds.width, bounds.height) / 2
+        clipsToBounds = true
     }
 }
 
-// Usage:
-// UserProfileView(name: "John Doe").backgroundColor(.red)
+public struct CircleView: ModifiableView {
+    public let modifiableView = _CircleView()
+    
+    public init() {
+        modifiableView.translatesAutoresizingMaskIntoConstraints = false
+        modifiableView.backgroundColor = .clear
+    }
+}
 ```
 
 
