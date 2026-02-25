@@ -6,6 +6,7 @@
 - [Installation](#installation)
   - [Agentic Coding with Construkt](#agentic-coding-with-construkt)
 - [Views and Composition](#views-and-composition)
+  - [Custom Components](#custom-components)
 - [State Management & Reactive Data Flow](#state-management--reactive-data-flow)
   - [The Reactive Primitives](#the-reactive-primitives)
   - [Binding to Views](#binding-to-views)
@@ -99,6 +100,31 @@ struct DetailCardView: ViewBuilder {
     }
 }
 ```
+
+### Custom Components
+
+Creating reusable components is as simple as defining a struct that conforms to `ViewBuilder`.
+
+```swift
+struct UserProfileView: ViewBuilder {
+    let name: String
+    
+    var body: View {
+        HStackView {
+            ImageView(UIImage(systemName: "person.circle"))
+                .size(width: 40, height: 40)
+            
+            VStackView {
+                LabelView(name).font(.headline)
+                LabelView("Online").font(.subheadline).color(.systemGreen)
+            }
+        }
+        .spacing(12)
+        .padding(16)
+    }
+}
+```
+
 
 Any Construkt `ViewBuilder` protocol conformance generates an underlying set of standard `UIView` elements by simply calling `.build()`.
 
