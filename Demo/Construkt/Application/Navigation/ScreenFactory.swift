@@ -6,6 +6,7 @@ protocol ScreenFactoryProtocol {
     func makeScreen(for route: AppRoute) -> Presentable
     func makeHomeViewController() -> HomeViewController
     func makeExploreViewController() -> ExploreViewController
+    func makeProfileViewController() -> UIViewController
 }
 
 @MainActor
@@ -48,5 +49,9 @@ final class ScreenFactory: ScreenFactoryProtocol {
     
     func makeExploreViewController() -> ExploreViewController {
         return ExploreViewController()
+    }
+    
+    func makeProfileViewController() -> UIViewController {
+        return ProfileViewController()
     }
 }
