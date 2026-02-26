@@ -11,6 +11,9 @@ xcuserdata/
 # macOS
 .DS_Store
 
+# CLI tools
+/xcbuddy
+
 # Swift Package Manager
 .build/
 Packages/
