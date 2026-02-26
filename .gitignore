@@ -10,9 +10,7 @@ xcuserdata/
 
 # macOS
 .DS_Store
-
-# CLI tools
-/xcbuddy
+.gitignore
 
 # Swift Package Manager
 .build/
