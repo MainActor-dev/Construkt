@@ -473,10 +473,7 @@ var body: View {
 ### 3. Common AI Hallucinations
 When generating ConstruktKit code, AI often hallucinates SwiftUI equivalents. If a file fails to build, check for these common mistakes first:
 
-*   **Wrong Shape Modifiers:** Never use `.clipShape()`. Use `.cornerRadius(radius).clipsToBounds(true)`.
-*   **Wrong Spacers:** `SpacerView` *does not* take a width or height parameter (e.g., `SpacerView(width: 40)` is an error). Instead, use `SpacerView().size(width: 40, height: 40)` or `FixedSpacerView(width: 40)`/`FixedSpacerView(40)`.
-*   **Wrong Alignment:** `HStackView` and `VStackView` modifiers are `.alignment(...)` and `.distribution(...)`. Modifiers like `.frame(alignment:)` do not exist.
-*   **Wrong Padding:** Avoid using `.padding(10)` or `.padding(.vertical, 10)`. Always use the strict parameters: `.padding(top:left:bottom:right:)`, `.padding(h:v:)`, or `.padding(insets:)`.
-*   **Wrong Stroke/Border:** Use `.border(color: UIColor, lineWidth: 1)` instead of `.stroke()` or `.border(color:, width:)`.
-*   **Missing View Returns:** Helper functions must explicitly return `View` or be marked with `@ViewBuilder`. You cannot return opaque SwiftUI-like types such as `some View`.
-*   **Right View Injection:** If components take a `rightView` or `iconView`, ensure the parameter type is resolved cleanly. If it expects `View?`, do not pass a trailing closure block without explicitly wrapping it in a container (like `ZStackView` or `ContainerView`) or passing it as a variable.
+1. Non-existent components (e.g. using `Text` instead of `LabelView` or `Spacer` instead of `SpacerView`)
+2. Non-existent modifiers (e.g. using `.clipShape()` instead of `.cornerRadius().clipsToBounds(true)`)
+3. Wrong modifier signatures (e.g. wrong padding parameters or `.border` arguments)
+4. Wrong component initializer signatures (e.g. `SpacerView(width:)` instead of `FixedSpacerView(width:)`)
