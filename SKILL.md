@@ -425,3 +425,55 @@ ZStackView { ... }.hideKeyboardOnBackgroundTap()
 3. **Never write `setupConstraints()` or use `translatesAutoresizingMaskIntoConstraints = false`.**
 4. **Never create generic constraint arrays.** 
 5. **Never write `UICollectionViewDataSource` logic.** Use `CollectionView` ResultBuilders.
+
+---
+
+## 🐛 Troubleshooting & Debugging Compiler Errors
+
+Because ConstruktKit relies heavily on Swift Result Builders (`@ViewBuilder`), certain compilation errors can be opaque and misleading. When the Swift compiler fails to type-check a large nested view hierarchy, it usually points to the parent container instead of the exact line causing the issue.
+
+### 1. Handling "Opaque" Error Messages
+If you see either of the following errors pointing to a `VStackView`, `HStackView`, `ZStackView`, or `CollectionView`:
+*   `"extra trailing closure passed in call"`
+*   `"initializer 'init(_:)' requires the types '(() -> ()).Value' and '[any View]' be equivalent"`
+
+**DO NOT** assume the structure itself is wrong. This almost always means there is a **type mismatch** or an **invalid modifier** deeply nested inside that container block. The Swift compiler ran out of time or inference capabilities and gave up at the top level.
+
+### 2. Isolation Strategy (How to find the real error)
+To find the actual line causing the bug, you **MUST isolate the components**.
+
+Extract inner views from the failing stack into local `let` variables or separate computed properties (`var myView: View { ... }`). By doing this, you force the Swift compiler to evaluate each piece independently. The compiler will immediately highlight the exact variable definition that contains the typo or invalid modifier.
+
+**Example of an obscure error:**
+```swift
+var body: View {
+    VStackView { // ERROR: "extra trailing closure passed in call"
+        LabelView("Title")
+        ImageView(myImage)
+            .clipShape(.circle) // This is the real bug (SwiftUI modifier, not Construkt)
+    }
+}
+```
+
+**How to isolate it:**
+```swift
+var body: View {
+    let titleLab = LabelView("Title")
+    
+    // The compiler will now correctly flag THIS exact line:
+    let image = ImageView(myImage).clipShape(.circle) 
+    
+    return VStackView {
+        titleLab
+        image
+    }
+}
+```
+
+### 3. Common AI Hallucinations
+When generating ConstruktKit code, AI often hallucinates SwiftUI equivalents. If a file fails to build, check for these common mistakes first:
+
+1. Non-existent components (e.g. using `Text` instead of `LabelView` or `Spacer` instead of `SpacerView`)
+2. Non-existent modifiers (e.g. using `.clipShape()` instead of `.cornerRadius().clipsToBounds(true)`)
+3. Wrong modifier signatures (e.g. wrong padding parameters or `.border` arguments)
+4. Wrong component initializer signatures (e.g. `SpacerView(width:)` instead of `FixedSpacerView(width:)`)

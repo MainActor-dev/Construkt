@@ -5,6 +5,7 @@ import ma_ios_common
 enum AppTab: Int {
     case home = 0
     case explore = 1
+    case profile = 2
 }
 
 @MainActor
@@ -39,7 +40,16 @@ final class AppCoordinator: BaseCoordinator {
         exploreCoordinator.start()
         exploreNav.tabBarItem = UITabBarItem(title: "Explore", image: UIImage(systemName: "magnifyingglass"), selectedImage: UIImage(systemName: "text.magnifyingglass"))
         
-        tabBarController.viewControllers = [homeNav, exploreNav]
+        let profileNav = NavigationController()
+        let profileRouter = Router(navigationController: profileNav)
+        let profileCoordinator = ProfileCoordinator(router: profileRouter, factory: factory)
+        addChild(profileCoordinator)
+        
+        // Setup Profile Tab
+        profileCoordinator.start()
+        profileNav.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.crop.circle"), selectedImage: UIImage(systemName: "person.crop.circle.fill"))
+        
+        tabBarController.viewControllers = [homeNav, exploreNav, profileNav]
         
         // Styling TabBar roughly (can refine later with custom subclass)
         let appearance = UITabBarAppearance()
