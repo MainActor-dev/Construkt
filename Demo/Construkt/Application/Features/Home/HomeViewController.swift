@@ -153,6 +153,7 @@ class HomeViewController: UIViewController {
         .layout { _ in
             HomeSection.popular.layout
         }
+        .decorationItem(.background(color: UIColor("#000033"), insets: NSDirectionalEdgeInsets(v: 0, h: 16)))
         .skeleton(
             count: 4,
             when: viewModel.isPopularSectionLoading,
@@ -215,6 +216,7 @@ class HomeViewController: UIViewController {
         .layout { _ in
             HomeSection.topRated.layout
         }
+        .decorationItem(.background(color: UIColor("#220000"), insets: NSDirectionalEdgeInsets(v: 16, h: 16)))
         .skeleton(count: 3, when: viewModel.isTopRatedLoading) {
             TopRatedCell(index: 0, movie: .placeholder)
         }

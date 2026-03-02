@@ -135,16 +135,16 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                 
                 // O(1) Lookup
                 if let sectionController = self.currentSectionMap[sect],
-                   let layout = sectionController.layoutProvider?(sect) {
+                   let sectionLayout = sectionController.layoutProvider?(sect) {
                     
                     // Hide empty sections logic
                     if self.dataSource.snapshot().numberOfItems(inSection: sectionController) == 0 {
-                       layout.contentInsets = .zero
-                       layout.decorationItems = []
-                       layout.boundarySupplementaryItems = []
+                        sectionLayout.contentInsets = .zero
+                        sectionLayout.decorationItems = []
+                        sectionLayout.boundarySupplementaryItems = []
                     } else {
                         // Filter hidden or missing headers/footers
-                        layout.boundarySupplementaryItems = layout.boundarySupplementaryItems.filter { item in
+                        sectionLayout.boundarySupplementaryItems = sectionLayout.boundarySupplementaryItems.filter { item in
                             if item.elementKind == UICollectionView.elementKindSectionHeader {
                                 return sectionController.header != nil && !(sectionController.header?.isHidden ?? false)
                             } else if item.elementKind == UICollectionView.elementKindSectionFooter {
@@ -154,9 +154,27 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                         }
                     }
                     
-                    return layout
+                    return sectionLayout
                 }
+                
                 return nil
+            }
+            
+            // Extract all unique background decoration element kinds from active layouts
+            var backgroundKinds = Set(["background"]) // Default always registered
+            for section in sections {
+                if let sectLayout = section.layoutProvider?(section.identifier.uniqueId) {
+                    sectLayout.decorationItems.forEach { item in
+                        if item.elementKind.hasPrefix("background") {
+                            backgroundKinds.insert(item.elementKind)
+                        }
+                    }
+                }
+            }
+            
+            // Register all variations dynamically
+            for kind in backgroundKinds {
+                layout.register(CollectionBackgroundReusableView.self, forDecorationViewOfKind: kind)
             }
             
             collectionView.setCollectionViewLayout(layout, animated: false)

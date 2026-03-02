@@ -134,6 +134,19 @@ public struct CollectionLayoutSectionBuilder {
         section.boundarySupplementaryItems = newSupplementaries
         return self
     }
+    @discardableResult
+    public func decorationItems(_ items: [NSCollectionLayoutDecorationItem]) -> Self {
+        section.decorationItems = items
+        return self
+    }
+    
+    @discardableResult
+    public func decorationItem(_ item: NSCollectionLayoutDecorationItem) -> Self {
+        var newDecorations = section.decorationItems
+        newDecorations.append(item)
+        section.decorationItems = newDecorations
+        return self
+    }
 }
 
 extension NSCollectionLayoutBoundarySupplementaryItem {
@@ -165,8 +178,16 @@ extension NSCollectionLayoutBoundarySupplementaryItem {
 }
 
 extension NSCollectionLayoutDecorationItem {
-    public static func background(insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
-        let background = NSCollectionLayoutDecorationItem.background(elementKind: "background")
+    public static func background(color: UIColor? = nil, insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
+        let kindString: String
+        if let color = color {
+            let hexStr = color.toHexString(includeAlpha: true)
+            kindString = "background_\(hexStr)"
+        } else {
+            kindString = "background" // Uses default configured in CollectionBackgroundReusableView
+        }
+        
+        let background = NSCollectionLayoutDecorationItem.background(elementKind: kindString)
         background.contentInsets = insets
         return background
     }
