@@ -221,15 +221,7 @@ public struct Section: SectionObservable {
     
     // MARK: Initializers
     
-    /// Standard initializer with a builder block (Static)
-    public init(
-        id: SectionControllerIdentifier,
-        @CellResultBuilder content: () -> [CellController]
-    ) {
-        let cells = content()
-        let section = SectionController(identifier: id, cells: cells, layoutProvider: nil)
-        self.binding = .just([section])
-    }
+    // Standard initializer handled cleanly by @SectionContentBuilder without ambiguity
     
     /// Static Data-binding initializer
     public init<T>(
