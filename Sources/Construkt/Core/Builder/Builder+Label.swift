@@ -112,6 +112,12 @@ extension ModifiableView where Base: UILabel {
         }
     }
 
+@discardableResult
+    public func attributedText(_ attributedText: NSAttributedString?) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) {
+            $0.attributedText = attributedText
+        }
+    }
 }
 
 
@@ -136,7 +142,6 @@ extension ModifiableView where Base: UILabel {
     public func text<Binding:ViewBinding>(bind binding: Binding) -> ViewModifier<Base> where Binding.Value == String? {
         ViewModifier(modifiableView, binding: binding, keyPath: \.text)
     }
-
 }
 
 
