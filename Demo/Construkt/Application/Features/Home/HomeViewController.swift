@@ -95,11 +95,11 @@ class HomeViewController: UIViewController {
             me.showDetail(for: movie)
         }
         .layout { [weak self] _ in
-            HomeSection.hero.layout.then { layout in
-                layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
-                    self?.handleHeroScroll(items: items, offset: offset, env: env)
-                }
+            let layout = HomeSection.hero.layout
+            layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
+                self?.handleHeroScroll(items: items, offset: offset, env: env)
             }
+            return layout
         }
         .skeleton(count: 1, when: viewModel.isNowPlayingLoading) {
             Modified(HeroContentView()) { $0.configure(with: .placeholder) }
