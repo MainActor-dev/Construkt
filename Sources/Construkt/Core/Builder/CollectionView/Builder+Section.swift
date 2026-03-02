@@ -427,6 +427,42 @@ public struct Section: SectionObservable {
          return Section(binding: improved)
      }
     
+    /// Adds decoration items to the section's layout.
+    public func decorationItems(_ items: [NSCollectionLayoutDecorationItem]) -> Section {
+        let improved = binding.map { sections in
+            sections.map { section in
+                var copy = section
+                let originalProvider = section.layoutProvider
+                copy.layoutProvider = { env in
+                    guard let layout = originalProvider?(env) else { return nil }
+                    layout.decorationItems = items
+                    return layout
+                }
+                return copy
+            }
+        }
+        return Section(binding: improved)
+    }
+    
+    /// Appends a single decoration item to the section's layout.
+    public func decorationItem(_ item: NSCollectionLayoutDecorationItem) -> Section {
+        let improved = binding.map { sections in
+            sections.map { section in
+                var copy = section
+                let originalProvider = section.layoutProvider
+                copy.layoutProvider = { env in
+                    guard let layout = originalProvider?(env) else { return nil }
+                    var newDecorations = layout.decorationItems
+                    newDecorations.append(item)
+                    layout.decorationItems = newDecorations
+                    return layout
+                }
+                return copy
+            }
+        }
+        return Section(binding: improved)
+    }
+    
     /// Imposes an automated animated "Skeleton mode" replacing layout components with shimmer placeholder items.
     /// Dictated dynamically by resolving a binding boolean argument `when:`.
     public func skeleton<C, B>(
