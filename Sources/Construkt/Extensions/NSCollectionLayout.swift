@@ -177,21 +177,6 @@ extension NSCollectionLayoutBoundarySupplementaryItem {
     }
 }
 
-extension NSCollectionLayoutDecorationItem {
-    public static func background(color: UIColor? = nil, insets: NSDirectionalEdgeInsets = .zero) -> NSCollectionLayoutDecorationItem {
-        let kindString: String
-        if let color = color {
-            let hexStr = color.toHexString(includeAlpha: true)
-            kindString = "background_\(hexStr)"
-        } else {
-            kindString = "background" // Uses default configured in CollectionBackgroundReusableView
-        }
-        
-        let background = NSCollectionLayoutDecorationItem.background(elementKind: kindString)
-        background.contentInsets = insets
-        return background
-    }
-}
 
 extension NSCollectionLayoutSize {
     public static func entireWidth(withHeight height: NSCollectionLayoutDimension) -> NSCollectionLayoutSize {

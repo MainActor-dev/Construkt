@@ -150,6 +150,12 @@ class HomeViewController: UIViewController {
         .onSelect(on: self) { (me, movie: Movie) in
             me.showDetail(for: movie)
         }
+        .backgroundDecoration(id: "popular_bg") {
+            LinearGradient(colors: [
+                UIColor.black.withAlphaComponent(0.3),
+                UIColor.white.withAlphaComponent(0.2)
+            ])
+        }
         .layout { _ in
             HomeSection.popular.layout
         }

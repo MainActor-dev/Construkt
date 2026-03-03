@@ -424,11 +424,8 @@ public struct Section: SectionObservable {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
-                let originalProvider = section.layoutProvider
-                copy.layoutProvider = { env in
-                    guard let layout = originalProvider?(env) else { return nil }
-                    layout.decorationItems = items
-                    return layout
+                copy.layoutModifiers.append { layout in
+                    layout.decorationItems.append(contentsOf: items)
                 }
                 return copy
             }
@@ -441,14 +438,34 @@ public struct Section: SectionObservable {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
-                let originalProvider = section.layoutProvider
-                copy.layoutProvider = { env in
-                    guard let layout = originalProvider?(env) else { return nil }
-                    var newDecorations = layout.decorationItems
-                    newDecorations.append(item)
-                    layout.decorationItems = newDecorations
-                    return layout
+                copy.layoutModifiers.append { layout in
+                    layout.decorationItems.append(item)
                 }
+                return copy
+            }
+        }
+        return Section(binding: improved)
+    }
+    
+    /// Appends a custom declarative background view dynamically bound to this specific section's lifecycle.
+    public func backgroundDecoration(id: String? = nil, insets: NSDirectionalEdgeInsets = .zero, zIndex: Int? = nil, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> Section {
+        let improved = binding.map { sections in
+            sections.map { section in
+                var copy = section
+                let parsedId = id ?? section.identifier.uniqueId
+                let bgId = parsedId.hasPrefix("custom_bg_") ? parsedId : "custom_bg_\(parsedId)"
+                
+                // 1. Store the declarative view provider securely in the section's memory
+                copy.decorationProviders[bgId] = content
+                
+                // 2. Queue the layout modification to inject the decoration item geometry
+                copy.layoutModifiers.append { layout in
+                    let background = NSCollectionLayoutDecorationItem.background(elementKind: bgId)
+                    background.contentInsets = insets
+                    if let zIndex { background.zIndex = zIndex }
+                    layout.decorationItems.append(background)
+                }
+                
                 return copy
             }
         }

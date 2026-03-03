@@ -121,12 +121,19 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         ])
     }
     
+    /// Provides responder hierarchy access to the internal representation of a section.
+    public func sectionController(for sectionIndex: Int) -> SectionController? {
+        guard let identifier = dataSource.sectionIdentifier(at: sectionIndex) else { return nil }
+        return currentSectionMap[identifier]
+    }
+    
     func update(sections: [SectionController]) {
         // Update the cached section map before applying data
         currentSectionMap = Dictionary(
             uniqueKeysWithValues: sections.map { ($0.identifier.uniqueId, $0) }
         )
         
+        let activeLayout: UICollectionViewLayout
         if !hasInitializedLayout {
             // Create layout once — the provider closure reads from currentSectionMap
             let layout = UICollectionViewCompositionalLayout { [weak self] index, _ in
@@ -136,6 +143,9 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                 // O(1) Lookup
                 if let sectionController = self.currentSectionMap[sect],
                    let sectionLayout = sectionController.layoutProvider?(sect) {
+                    
+                    // Apply any layout modifiers (e.g. from .decorationItem used out of order)
+                    sectionController.layoutModifiers.forEach { $0(sectionLayout) }
                     
                     // Hide empty sections logic
                     if self.dataSource.snapshot().numberOfItems(inSection: sectionController) == 0 {
@@ -159,26 +169,30 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
                 
                 return nil
             }
-            
-            // Extract all unique background decoration element kinds from active layouts
-            var backgroundKinds = Set(["background"]) // Default always registered
-            for section in sections {
-                if let sectLayout = section.layoutProvider?(section.identifier.uniqueId) {
-                    sectLayout.decorationItems.forEach { item in
-                        if item.elementKind.hasPrefix("background") {
-                            backgroundKinds.insert(item.elementKind)
-                        }
+            collectionView.setCollectionViewLayout(layout, animated: false)
+            hasInitializedLayout = true
+            activeLayout = layout
+        } else {
+            activeLayout = collectionView.collectionViewLayout
+        }
+        
+        // Extract all unique background decoration element kinds from active layouts
+        var customBackgroundKinds = Set<String>()
+        
+        for section in sections {
+            if let sectLayout = section.layoutProvider?(section.identifier.uniqueId) {
+                section.layoutModifiers.forEach { $0(sectLayout) }
+                sectLayout.decorationItems.forEach { item in
+                    if item.elementKind.hasPrefix("custom_bg_") {
+                        customBackgroundKinds.insert(item.elementKind)
                     }
                 }
             }
-            
-            // Register all variations dynamically
-            for kind in backgroundKinds {
-                layout.register(CollectionBackgroundReusableView.self, forDecorationViewOfKind: kind)
-            }
-            
-            collectionView.setCollectionViewLayout(layout, animated: false)
-            hasInitializedLayout = true
+        }
+        
+        // Register all variations dynamically (ignores already registered safely)
+        for kind in customBackgroundKinds {
+            activeLayout.register(CustomBackgroundReusableView.self, forDecorationViewOfKind: kind)
         }
         
         // Apply data changes (smart incremental diffing)
