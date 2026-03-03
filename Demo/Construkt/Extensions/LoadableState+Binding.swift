@@ -1,6 +1,26 @@
 import Foundation
 import ConstruktKit
 
+// MARK: - Protocol-Oriented Property Bridging
+
+public extension ViewBinding where Value: LoadableStateProtocol {
+    
+    /// Projects the `isLoading` state directly as a boolean binding.
+    var isLoading: AnyViewBinding<Bool> {
+        return map { $0.isLoading }
+    }
+    
+    /// Projects the `loadedValue` directly as an optional binding.
+    var loadedValue: AnyViewBinding<Value.StateType?> {
+        return map { $0.loadedValue }
+    }
+    
+    /// Projects the `error` message directly as an optional string binding.
+    var error: AnyViewBinding<String?> {
+        return map { $0.error }
+    }
+}
+
 // MARK: - LoadableState ViewBinding Operators
 
 public extension ViewBinding {

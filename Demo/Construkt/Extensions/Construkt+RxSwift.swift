@@ -88,7 +88,7 @@ extension Disposable {
         cancelBag.insert(RxAdapterCancellable(self))
     }
 }
-
+ 
 public extension ViewBinding {
     /// Bridges Construkt agnostic ViewBindings into RxSwift Observables.
     func asObservable() -> Observable<Value> {

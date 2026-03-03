@@ -133,7 +133,7 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
                     id: id,
                     model: wrapper,
                     registration: registration,
-                    contentHash: (model as? AnyHashable),
+                    contentHash: (model as? AnyHashable) ?? AnyHashable(UUID()),
                     didSelect: { wrapper in
                         onSelect?(wrapper.model)
                     }
