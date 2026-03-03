@@ -23,7 +23,7 @@ public struct Slider: ModifiableView {
     
     public func value<Binding: MutableViewBinding>(_ binding: Binding) -> Self where Binding.Value == Float {
         // Initial setup
-        modifiableView.value = binding.value
+        modifiableView.value = binding.wrappedValue
         
         // Two-way reactive sync
         binding.observe(on: .main) { [weak modifiableView] newValue in
@@ -35,7 +35,7 @@ public struct Slider: ModifiableView {
         modifiableView.addAction(UIAction { action in
             guard let view = action.sender as? _SliderView else { return }
             var bound = binding
-            bound.value = view.value
+            bound.wrappedValue = view.value
         }, for: .valueChanged)
         
         return self

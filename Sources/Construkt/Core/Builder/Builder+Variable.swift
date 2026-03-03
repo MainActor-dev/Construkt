@@ -34,8 +34,8 @@ public struct Variable<T> {
     private let property: Property<T>
 
     public var wrappedValue: T {
-        get { property.value }
-        set { property.value = newValue }
+        get { property.wrappedValue }
+        set { property.wrappedValue = newValue }
     }
 
     public var projectedValue: Property<T> {
@@ -49,11 +49,6 @@ public struct Variable<T> {
 
 extension Variable: MutableViewBinding {
     public typealias Value = T
-    
-    public var value: T {
-        get { property.value }
-        set { property.value = newValue }
-    }
     
     public func observe(on queue: DispatchQueue?, _ handler: @escaping (T) -> Void) -> AnyCancellableLifecycle {
         return property.observe(on: queue, handler)

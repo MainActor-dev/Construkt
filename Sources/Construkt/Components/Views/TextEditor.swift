@@ -30,7 +30,7 @@ public struct TextEditor: ModifiableView {
     
     public func text<Binding: MutableViewBinding>(_ binding: Binding) -> Self where Binding.Value == String {
         // Initial setup
-        modifiableView.text = binding.value
+        modifiableView.text = binding.wrappedValue
         
         // Two-way reactive sync
         binding.observe(on: .main) { [weak modifiableView] newText in
@@ -42,7 +42,7 @@ public struct TextEditor: ModifiableView {
         let observer = NotificationCenter.default.addObserver(forName: UITextView.textDidChangeNotification, object: modifiableView, queue: .main) { [weak modifiableView] _ in
             guard let view = modifiableView else { return }
             var bound = binding
-            bound.value = view.text ?? ""
+            bound.wrappedValue = view.text ?? ""
         }
         
         let cancellable = NotificationCancellable(observer: observer)

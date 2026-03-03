@@ -141,9 +141,9 @@ extension ModifiableView where Base: UITextField {
             
             textField.addAction(UIAction { [weak textField] _ in
                 let newText = textField?.text ?? ""
-                if binding.value != newText {
+                if binding.wrappedValue != newText {
                     var mutableBinding = binding
-                    mutableBinding.value = newText
+                    mutableBinding.wrappedValue = newText
                 }
             }, for: .editingChanged)
         }
@@ -158,9 +158,9 @@ extension ModifiableView where Base: UITextField {
             
             textField.addAction(UIAction { [weak textField] _ in
                 let newText = textField?.text ?? ""
-                if binding.value != newText {
+                if binding.wrappedValue != newText {
                     var mutableBinding = binding
-                    mutableBinding.value = newText
+                    mutableBinding.wrappedValue = newText
                 }
             }, for: .editingChanged)
         }

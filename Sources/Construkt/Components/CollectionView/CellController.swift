@@ -66,7 +66,16 @@ public struct CellController: Hashable {
     ) {
         self.id = id
         self.model = model
-        self.contentHash = contentHash
+        
+        if let explicitHash = contentHash {
+            self.contentHash = explicitHash
+        } else if let hashableModel = model as? AnyHashable {
+            self.contentHash = hashableModel
+        } else {
+            // Force reload on every snapshot pass if not Hashable
+            self.contentHash = UUID()
+        }
+        
         self.makeCell = { collectionView, indexPath in
             collectionView.dequeueConfiguredReusableCell(
                 using: registration,

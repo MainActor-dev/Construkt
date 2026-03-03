@@ -38,6 +38,10 @@ extension CurrentValueSubject: @retroactive ViewBinding where Failure == Never {
 }
 
 extension CurrentValueSubject: @retroactive MutableViewBinding where Failure == Never {
+    public var wrappedValue: Output {
+        get { value }
+        set { value = newValue }
+    }
 }
 
 extension Published.Publisher: @retroactive ViewBinding where Failure == Never {
@@ -53,6 +57,10 @@ extension CurrentValueSubject: ViewBinding where Failure == Never {
 }
 
 extension CurrentValueSubject: MutableViewBinding where Failure == Never {
+    public var wrappedValue: Output {
+        get { value }
+        set { value = newValue }
+    }
 }
 
 extension Published.Publisher: ViewBinding where Failure == Never {

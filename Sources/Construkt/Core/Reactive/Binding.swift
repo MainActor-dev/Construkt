@@ -31,7 +31,7 @@ public protocol ViewBinding {
 /// A reactive binding that also supports mutation, enabling two-way data flow (e.g. TextFields, Switches).
 public protocol MutableViewBinding: ViewBinding {
     /// The modifiable current value of this binding. Setting it usually broadcasts the new value.
-    var value: Value { get set }
+    var wrappedValue: Value { get set }
 }
 
 public extension ViewBinding {
