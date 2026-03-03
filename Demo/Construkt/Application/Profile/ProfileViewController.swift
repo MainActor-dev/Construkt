@@ -11,6 +11,7 @@ enum ProfileSection: String, SectionControllerIdentifier {
     var uniqueId: String { rawValue }
 }
 
+/// Demonstrate static CollectionView sections
 class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -44,7 +45,7 @@ class ProfileViewController: UIViewController {
         }
         .layout {
             .list(itemHeight: .estimated(200))
-            .insets(top: 80, leading: 24, bottom: 0, trailing: 24)
+            .insets(top: 80, leading: 24, bottom: 32, trailing: 24)
         }
     }
     
@@ -56,31 +57,129 @@ class ProfileViewController: UIViewController {
         }
         .layout {
             .list(itemHeight: .estimated(80))
-            .insets(top: 24, leading: 24, bottom: 0, trailing: 24)
+            .insets(top: 0, leading: 24, bottom: 32, trailing: 24)
         }
     }
     
     private var generalSettingsSection: Section {
         Section(id: ProfileSection.general) {
-            Cell("general", id: "general") { item in
-                ProfileGeneralSettingsSection()
+            Header {
+                LabelView("GENERAL")
+                    .color(UIColor("#737373"))
+                    .font(.systemFont(ofSize: 12, weight: .medium))
+            }
+            
+            Cell("downloads", id: "downloads") { item in
+                ProfileSettingsRow(
+                    icon: "arrow.down.circle",
+                    title: "Downloads",
+                    rightView: HStackView {
+                        VStackView {
+                            LabelView("4.2 GB")
+                                .color(UIColor("#737373"))
+                                .font(.systemFont(ofSize: 10, weight: .regular))
+                                .alignment(.right)
+                            LabelView("used")
+                                .color(UIColor("#525252"))
+                                .font(.systemFont(ofSize: 10, weight: .regular))
+                                .alignment(.right)
+                        }
+                        .spacing(0)
+                        
+                        ImageView(UIImage(systemName: "chevron.right"))
+                            .tintColor(UIColor("#525252"))
+                    }
+                    .spacing(8),
+                    isLast: false
+                )
+            }
+            
+            Cell("notifications", id: "notifications") { item in
+                ProfileSettingsToggle(icon: "bell", title: "Notifications", isOn: true, isLast: false)
+            }
+            
+            Cell("darkMode", id: "darkMode") { item in
+                ProfileSettingsToggle(icon: "moon", title: "Dark Mode", isOn: false, isLast: true)
+            }
+        }
+        .onSelect { (item: String) in
+            switch item {
+            case "downloads": print("Downloads tapped")
+            case "notifications": print("Notifications tapped")
+            case "darkMode": print("Dark Mode tapped")
+            default: break
             }
         }
         .layout {
-            .list(itemHeight: .estimated(200))
-            .insets(top: 24, leading: 24, bottom: 0, trailing: 24)
+            .list(itemHeight: .estimated(56))
+            .insets(.init(v: 24, h: 24))
+            .supplementaryHeader(height: .estimated(30))
+        }
+        .backgroundDecoration(id: "general", insets: .init(top: 32, leading: 24, bottom: 24, trailing: 24)) {
+            ContainerView()
+                .backgroundColor(UIColor(white: 0.1, alpha: 0.3))
+                .cornerRadius(16)
+                .border(color: UIColor(white: 1, alpha: 0.05), lineWidth: 1)
         }
     }
     
     private var accountSettingsSection: Section {
         Section(id: ProfileSection.account) {
-            Cell("account", id: "account") { item in
-                ProfileAccountSettingsSection()
+            Header {
+                LabelView("ACCOUNT")
+                    .color(UIColor("#737373"))
+                    .font(.systemFont(ofSize: 12, weight: .medium))
+            }
+            
+            Cell("payment", id: "payment") { item in
+                ProfileSettingsRow(
+                    icon: "creditcard",
+                    title: "Payment Methods",
+                    rightView: ImageView(UIImage(systemName: "chevron.right"))
+                        .tintColor(UIColor("#525252")),
+                    isLast: false
+                )
+            }
+            
+            Cell("security", id: "security") { item in
+                ProfileSettingsRow(
+                    icon: "exclamationmark.shield",
+                    title: "Security",
+                    rightView: ImageView(UIImage(systemName: "chevron.right"))
+                        .tintColor(UIColor("#525252")),
+                    isLast: false
+                )
+            }
+            
+            Cell("logout", id: "logout") { item in
+                ProfileSettingsRow(
+                    icon: "rectangle.portrait.and.arrow.right",
+                    title: "Log Out",
+                    titleColor: UIColor("#f43f5e"),
+                    iconColor: UIColor("#f43f5e").withAlphaComponent(0.8),
+                    rightView: nil,
+                    isLast: true
+                )
+            }
+        }
+        .onSelect { (item: String) in
+            switch item {
+            case "payment": print("Payment Methods tapped")
+            case "security": print("Security tapped")
+            case "logout": print("Log Out tapped")
+            default: break
             }
         }
         .layout {
-            .list(itemHeight: .estimated(200))
-            .insets(top: 24, leading: 24, bottom: 0, trailing: 24)
+            .list(itemHeight: .estimated(56))
+            .insets(.init(v: 24, h: 24))
+            .supplementaryHeader(height: .estimated(30))
+        }
+        .backgroundDecoration(id: "account", insets: .init(top: 32, leading: 24, bottom: 24, trailing: 24)) {
+            ContainerView()
+                .backgroundColor(UIColor(white: 0.1, alpha: 0.3))
+                .cornerRadius(16)
+                .border(color: UIColor(white: 1, alpha: 0.05), lineWidth: 1)
         }
     }
     
@@ -92,7 +191,7 @@ class ProfileViewController: UIViewController {
         }
         .layout {
             .list(itemHeight: .estimated(40))
-            .insets(top: 24, leading: 24, bottom: 100, trailing: 24)
+            .insets(top: 0, leading: 24, bottom: 100, trailing: 24)
         }
     }
 }
