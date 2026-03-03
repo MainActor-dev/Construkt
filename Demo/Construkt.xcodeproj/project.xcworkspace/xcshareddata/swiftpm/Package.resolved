@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MainActorDev/Construkt",
       "state" : {
-        "revision" : "379103515b688ee9e65fda60c6e244c494e8c9bf",
-        "version" : "1.1.0"
+        "revision" : "5665240d355c1672c49f1a1a9cfae342a8ba0af4",
+        "version" : "1.1.1"
       }
     },
     {
