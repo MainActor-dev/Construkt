@@ -171,15 +171,15 @@ class HomeViewController: UIViewController {
     private var upcomingSection: Section {
         Section(
             id: HomeSection.upcoming,
-            items: viewModel.upcomingMovies,
+            items: viewModel.upcomingMovies.map { $0.asRenderItems() },
             header: Header {
                 StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
                     self?.showMovieList(for: .upcoming)
                 }
             }
-        ) { movie in
-            Cell(movie, id: "upcoming-\(movie.id)") { movie in
-                UpcomingCell(movie: movie)
+        ) { item in
+            Cell(item, id: "upcoming-\(String(describing: item))") { item in
+                UpcomingCell(item: item)
             }
         }
         .onSelect(on: self) { (me, movie: Movie) in
@@ -193,7 +193,7 @@ class HomeViewController: UIViewController {
             when: viewModel.isUpcomingLoading,
             includeSupplementary: true
         ) {
-            UpcomingCell(movie: .placeholder)
+            UpcomingCell(item: .placeholder)
         }
     }
     
