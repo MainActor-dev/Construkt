@@ -183,10 +183,16 @@ public final class HostingCell<Content: View>: UICollectionViewCell {
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        commonInit()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        commonInit()
+    }
+    
+    private func commonInit() {
+        contentView.isUserInteractionEnabled = true
     }
     
     /// Embeds a freshly built `View` hierarchy into the cell's content view.

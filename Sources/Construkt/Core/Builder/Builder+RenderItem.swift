@@ -31,17 +31,17 @@ public extension ModifiableView {
     @discardableResult
     func render<T>(
         for item: RenderItem<T>,
-        onData: (Self, T) -> Void,
-        onPlaceholder: (Self) -> Void
+        onData: (Base, T) -> Void,
+        onPlaceholder: ((Base) -> Void)? = nil
     ) -> ViewModifier<Base> {
         
         switch item {
         case .data(let realData):
-            onData(self, realData)
+            onData(modifiableView, realData)
             return self.skeletonable(false)
             
         case .placeholder:
-            onPlaceholder(self)
+            onPlaceholder?(modifiableView)
             return self.skeletonable(true)
         }
     }
