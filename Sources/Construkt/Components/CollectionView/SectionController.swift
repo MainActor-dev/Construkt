@@ -59,19 +59,25 @@ public struct SectionController {
     public let header: SupplementaryController?
     public let footer: SupplementaryController?
     public var layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
+    public var layoutModifiers: [(NSCollectionLayoutSection) -> Void] = []
+    public var decorationProviders: [String: () -> ViewConvertable] = [:]
     
     public init(
         identifier: SectionControllerIdentifier,
         cells: [CellController],
         header: SupplementaryController? = nil,
         footer: SupplementaryController? = nil,
-        layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
+        layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil,
+        layoutModifiers: [(NSCollectionLayoutSection) -> Void] = [],
+        decorationProviders: [String: () -> ViewConvertable] = [:]
     ) {
         self.identifier = identifier
         self.cells = cells
         self.header = header
         self.footer = footer
         self.layoutProvider = layoutProvider
+        self.layoutModifiers = layoutModifiers
+        self.decorationProviders = decorationProviders
     }
 }
 
