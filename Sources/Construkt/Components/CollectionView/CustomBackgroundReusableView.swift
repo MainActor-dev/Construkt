@@ -11,6 +11,8 @@ import UIKit
 public class CustomBackgroundReusableView: UICollectionReusableView {
     
     private var hostedView: UIView?
+    private var pendingKind: String?
+    private var pendingSectionIndex: Int?
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,24 +32,36 @@ public class CustomBackgroundReusableView: UICollectionReusableView {
     public override func apply(_ layoutAttributes: UICollectionViewLayoutAttributes) {
         super.apply(layoutAttributes)
         
-        guard let kind = layoutAttributes.representedElementKind else { return }
+        self.pendingKind = layoutAttributes.representedElementKind
+        self.pendingSectionIndex = layoutAttributes.indexPath.section
         
+        setupViewIfNeeded()
+    }
+    
+    public override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        setupViewIfNeeded()
+    }
+    
+    private func setupViewIfNeeded() {
         // Ensure lazy instantiation of the hierarchy once per reusable instance
-        if hostedView == nil {
-            // Dynamic Traversal: Extract the provider natively from the underlying Section model
-            var responder: UIResponder? = self
-            while responder != nil {
-                if let wrapper = responder as? CollectionViewWrapperView {
-                    if let sectionController = wrapper.sectionController(for: layoutAttributes.indexPath.section),
-                       let provider = sectionController.decorationProviders[kind] {
-                        
-                        let view = provider().asViews().first?.build() ?? UIView()
-                        host(view)
-                    }
-                    break
+        guard hostedView == nil,
+              let kind = pendingKind,
+              let sectionIndex = pendingSectionIndex else { return }
+        
+        // Dynamic Traversal: Extract the provider natively from the underlying Section model
+        var responder: UIResponder? = self
+        while responder != nil {
+            if let wrapper = responder as? CollectionViewWrapperView {
+                if let sectionController = wrapper.sectionController(for: sectionIndex),
+                   let provider = sectionController.decorationProviders[kind] {
+                    
+                    let view = provider().asViews().first?.build() ?? UIView()
+                    host(view)
                 }
-                responder = responder?.next
+                break
             }
+            responder = responder?.next
         }
     }
     
