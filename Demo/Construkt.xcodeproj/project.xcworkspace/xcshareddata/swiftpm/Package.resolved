@@ -1,5 +1,5 @@
 {
-  "originHash" : "b25f46b3bf935605e0c1a2341521991240a1c2e9ae1e5ec843e048ce3ec15704",
+  "originHash" : "7b534436a39b4e2ffa8da049aed7206a88f832892e6ffefcc67f6525fe11a660",
   "pins" : [
     {
       "identity" : "construkt",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/MainActorDev/Construkt",
       "state" : {
         "branch" : "main",
-        "revision" : "6d211685e78c6f40f820bdc539f822405617b6fa"
+        "revision" : "134c228c85ff7313ee819400fda14f6a613a2027"
       }
     },
     {
