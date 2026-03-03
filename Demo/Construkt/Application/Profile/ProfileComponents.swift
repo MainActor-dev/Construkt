@@ -128,7 +128,6 @@ struct ProfileSettingsRow: ViewBuilder {
     var iconColor: UIColor = UIColor("#A3A3A3")
     var rightView: View? = nil
     var isLast: Bool
-    let action: () -> Void
     
     var body: View {
         let row = HStackView {
@@ -149,7 +148,6 @@ struct ProfileSettingsRow: ViewBuilder {
         }
         .spacing(12)
         .padding(insets: UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
-        .onTapGesture { _ in action() }
         .alignment(.center)
         
         if !isLast {
@@ -182,108 +180,8 @@ struct ProfileSettingsToggle: ViewBuilder {
             icon: icon,
             title: title,
             rightView: toggleUI,
-            isLast: isLast,
-            action: { print("Toggle tapped: \(title)") }
+            isLast: isLast
         )
-    }
-}
-
-// MARK: - General Settings Section
-struct ProfileGeneralSettingsSection: ViewBuilder {
-    var body: View {
-        VStackView {
-            LabelView("GENERAL")
-                .color(UIColor("#737373")) // neutral-500
-                .font(.systemFont(ofSize: 12, weight: .medium))
-                .padding(top: 0, left: 4, bottom: 0, right: 0)
-            
-            VStackView {
-                ProfileSettingsRow(
-                    icon: "arrow.down.circle",
-                    title: "Downloads",
-                    rightView: HStackView {
-                        VStackView {
-                            LabelView("4.2 GB")
-                                .color(UIColor("#737373"))
-                                .font(.systemFont(ofSize: 10, weight: .regular))
-                                .alignment(.right)
-                            LabelView("used")
-                                .color(UIColor("#525252"))
-                                .font(.systemFont(ofSize: 10, weight: .regular))
-                                .alignment(.right)
-                        }
-                        .spacing(0)
-                        
-                        ImageView(UIImage(systemName: "chevron.right"))
-                            .tintColor(UIColor("#525252"))
-                    }
-                    .spacing(8),
-                    isLast: false,
-                    action: { print("Downloads tapped") }
-                )
-                
-                ProfileSettingsToggle(icon: "bell", title: "Notifications", isOn: true, isLast: false)
-                ProfileSettingsToggle(icon: "moon", title: "Dark Mode", isOn: false, isLast: true)
-            }
-            .spacing(0)
-            .backgroundColor(UIColor(white: 0.1, alpha: 0.3)) // neutral-900/30
-            .cornerRadius(16)
-            .border(color: UIColor(white: 1, alpha: 0.05), lineWidth: 1)
-        }
-        .spacing(8)
-    }
-}
-
-// MARK: - Account Settings Section
-struct ProfileAccountSettingsSection: ViewBuilder {
-    var body: View {
-        let row1 = ProfileSettingsRow(
-            icon: "creditcard",
-            title: "Payment Methods",
-            rightView: ImageView(UIImage(systemName: "chevron.right"))
-                .tintColor(UIColor("#525252")),
-            isLast: false,
-            action: { print("Payment Methods tapped") }
-        )
-        
-        let row2 = ProfileSettingsRow(
-            icon: "exclamationmark.shield",
-            title: "Security",
-            rightView: ImageView(UIImage(systemName: "chevron.right"))
-                .tintColor(UIColor("#525252")),
-            isLast: false,
-            action: { print("Security tapped") }
-        )
-        
-        let row3 = ProfileSettingsRow(
-            icon: "rectangle.portrait.and.arrow.right",
-            title: "Log Out",
-            titleColor: UIColor("#f43f5e"), // rose-500
-            iconColor: UIColor("#f43f5e").withAlphaComponent(0.8), // rose-500/80
-            rightView: nil,
-            isLast: true,
-            action: { print("Log Out tapped") }
-        )
-        
-        let stack = VStackView {
-            row1
-            row2
-            row3
-        }
-        .spacing(0)
-        .backgroundColor(UIColor(white: 0.1, alpha: 0.3)) // neutral-900/30
-        .cornerRadius(16)
-        .border(color: UIColor(white: 1, alpha: 0.05), lineWidth: 1)
-        
-        return VStackView {
-            LabelView("ACCOUNT")
-                .color(UIColor("#737373")) // neutral-500
-                .font(.systemFont(ofSize: 12, weight: .medium))
-                .padding(top: 0, left: 4, bottom: 0, right: 0)
-            
-            stack
-        }
-        .spacing(8)
     }
 }
 

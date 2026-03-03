@@ -36,6 +36,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
+        let window = UIWindow(windowScene: windowScene)
+        self.window = window
+        
+        // Show the launch screen first
+        let launchVC = LaunchViewController()
+        window.rootViewController = launchVC
+        window.makeKeyAndVisible()
+        
+        launchVC.onFinished = { [weak self] in
+            self?.transitionToMainApp()
+        }
+    }
+    
+    private func transitionToMainApp() {
         let baseRouter = Router(navigationController: UINavigationController())
         let factory = ScreenFactory()
         let coordinator = AppCoordinator(router: baseRouter, factory: factory)
@@ -43,10 +57,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.appCoordinator = coordinator
         coordinator.start()
         
-        let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = coordinator.rootViewController()
-        window.makeKeyAndVisible()
-        self.window = window
+        let mainVC = coordinator.rootViewController()
+        
+        // Crossfade transition
+        UIView.transition(
+            with: window!,
+            duration: 0.4,
+            options: .transitionCrossDissolve,
+            animations: {
+                self.window?.rootViewController = mainVC
+            }
+        )
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
