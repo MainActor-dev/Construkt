@@ -24,7 +24,7 @@ public struct Stepper: ModifiableView {
     
     public func value<Binding: MutableViewBinding>(_ binding: Binding) -> Self where Binding.Value == Double {
         // Initial setup
-        modifiableView.value = binding.value
+        modifiableView.value = binding.wrappedValue
         
         // Two-way reactive sync
         binding.observe(on: .main) { [weak modifiableView] newValue in
@@ -36,7 +36,7 @@ public struct Stepper: ModifiableView {
         modifiableView.addAction(UIAction { action in
             guard let view = action.sender as? _StepperView else { return }
             var bound = binding
-            bound.value = view.value
+            bound.wrappedValue = view.value
         }, for: .valueChanged)
         
         return self

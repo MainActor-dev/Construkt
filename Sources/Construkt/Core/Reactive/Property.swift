@@ -22,7 +22,7 @@ public final class Property<T>: MutableViewBinding {
     }
     
     /// The current value. Setting this property synchronously broadcasts the new value to all active observers.
-    public var value: T {
+    public var wrappedValue: T {
         get {
             lock.lock()
             defer { lock.unlock() }

@@ -41,7 +41,7 @@ extension Observable: @retroactive ViewBinding {
 extension BehaviorRelay: @retroactive MutableViewBinding {
     public typealias Value = Element
     
-    public var value: Element {
+    public var wrappedValue: Element {
         get {
             var current: Element!
             let disposable = self.asObservable().subscribe(onNext: { current = $0 })
@@ -59,7 +59,7 @@ extension Observable: ViewBinding {
 extension BehaviorRelay: MutableViewBinding {
     public typealias Value = Element
     
-    public var value: Element {
+    public var wrappedValue: Element {
         get {
             var current: Element!
             let disposable = self.asObservable().subscribe(onNext: { current = $0 })
@@ -89,9 +89,9 @@ extension Disposable {
     }
 }
 
-extension ViewBinding {
+public extension ViewBinding {
     /// Bridges Construkt agnostic ViewBindings into RxSwift Observables.
-    public func asObservable() -> Observable<Value> {
+    func asObservable() -> Observable<Value> {
         if let obs = self as? Observable<Value> { return obs }
         return Observable.create { observer in
             let lifecycle = self.observe(on: nil) { value in

@@ -68,9 +68,9 @@ extension ModifiableView where Base: UISwitch {
             }.store(in: switchView.cancelBag)
             
             switchView.addAction(UIAction { [weak switchView] _ in
-                if let isOn = switchView?.isOn, isOn != binding.value {
+                if let isOn = switchView?.isOn, isOn != binding.wrappedValue {
                     var mutableBinding = binding
-                    mutableBinding.value = isOn
+                    mutableBinding.wrappedValue = isOn
                 }
             }, for: .valueChanged)
         }

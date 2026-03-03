@@ -21,7 +21,7 @@ public struct Toggle: ModifiableView {
     
     public func isOn<Binding: MutableViewBinding>(_ binding: Binding) -> Self where Binding.Value == Bool {
         // Initial setup
-        modifiableView.isOn = binding.value
+        modifiableView.isOn = binding.wrappedValue
         
         // Two-way reactive sync
         binding.observe(on: .main) { [weak modifiableView] newValue in
@@ -33,7 +33,7 @@ public struct Toggle: ModifiableView {
         modifiableView.addAction(UIAction { action in
             guard let view = action.sender as? _ToggleView else { return }
             var bound = binding
-            bound.value = view.isOn
+            bound.wrappedValue = view.isOn
         }, for: .valueChanged)
         
         return self

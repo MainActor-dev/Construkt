@@ -101,6 +101,7 @@ private final class CompoundCancellable: AnyCancellableLifecycle {
 public extension ViewBinding {
     
     /// Transforms the emitted values using the provided closure.
+    @_disfavoredOverload
     func map<U>(_ transform: @escaping (Value) -> U) -> AnyViewBinding<U> {
         return AnyViewBinding<U> { queue, handler in
             return self.observe(on: queue) { value in
@@ -110,6 +111,7 @@ public extension ViewBinding {
     }
     
     /// Transforms and filters emitted values, only forwarding non-nil results.
+    @_disfavoredOverload
     func compactMap<U>(_ transform: @escaping (Value) -> U?) -> AnyViewBinding<U> {
         return AnyViewBinding<U> { queue, handler in
             return self.observe(on: queue) { value in
@@ -129,6 +131,7 @@ public extension ViewBinding {
     
     
     /// Only forwards values matching the given predicate.
+    @_disfavoredOverload
     func filter(_ predicate: @escaping (Value) -> Bool) -> AnyViewBinding<Value> {
         return AnyViewBinding<Value> { queue, handler in
             return self.observe(on: queue) { value in
@@ -140,6 +143,7 @@ public extension ViewBinding {
     }
     
     /// Accumulates values using the provided closure, emitting the running result.
+    @_disfavoredOverload
     func scan<Result>(_ initial: Result, _ accumulator: @escaping (Result, Value) -> Result) -> AnyViewBinding<Result> {
         return AnyViewBinding<Result> { queue, handler in
             let lock = NSLock()
@@ -156,6 +160,7 @@ public extension ViewBinding {
     }
     
     /// Skips the first `count` values, forwarding only subsequent ones.
+    @_disfavoredOverload
     func skip(_ count: Int) -> AnyViewBinding<Value> {
         return AnyViewBinding<Value> { queue, handler in
             let lock = NSLock()
@@ -175,6 +180,7 @@ public extension ViewBinding {
     }
     
     /// Waits until values stop arriving for the specified duration before forwarding the latest.
+    @_disfavoredOverload
     func debounce(for interval: TimeInterval, on scheduler: DispatchQueue = .main) -> AnyViewBinding<Value> {
         return AnyViewBinding<Value> { queue, handler in
             let lock = NSLock()
@@ -200,6 +206,7 @@ public extension ViewBinding {
     /// Rate-limits emissions to at most one per interval.
     /// - Parameter latest: If `true`, emits the most recent value at the end of each window.
     ///   If `false`, emits the first value and suppresses the rest until the window expires.
+    @_disfavoredOverload
     func throttle(for interval: TimeInterval, latest: Bool = true, on scheduler: DispatchQueue = .main) -> AnyViewBinding<Value> {
         return AnyViewBinding<Value> { queue, handler in
             let lock = NSLock()
@@ -262,6 +269,7 @@ public extension ViewBinding {
     }
     
     /// Merges emissions from this binding and another binding of the same type into a single stream.
+    @_disfavoredOverload
     func merge<B: ViewBinding>(with other: B) -> AnyViewBinding<Value> where B.Value == Value {
         return AnyViewBinding<Value> { queue, handler in
             let tokenA = self.observe(on: queue, handler)
@@ -300,6 +308,7 @@ public extension ViewBinding {
 public extension ViewBinding where Value: Equatable {
     
     /// Filters out consecutive duplicate values from being emitted.
+    @_disfavoredOverload
     func distinctUntilChanged() -> AnyViewBinding<Value> {
         return removeDuplicates(by: ==)
     }
