@@ -25,18 +25,18 @@
 import UIKit
 
 /// A protocol defining a unique identity for a collection view section, used by diffable data sources.
-public protocol SectionControllerIdentifier {
+public protocol SectionConfigIdentifier {
     var uniqueId: String { get }
 }
 
-extension SectionControllerIdentifier where Self == DefaultSectionIdentifier {
+extension SectionConfigIdentifier where Self == DefaultSectionIdentifier {
     public static var defaultIdentifier: DefaultSectionIdentifier {
         return DefaultSectionIdentifier()
     }
 }
 
 /// Best used when you only have one section and don't care about the `uniqueId`
-public struct DefaultSectionIdentifier: SectionControllerIdentifier {
+public struct DefaultSectionIdentifier: SectionConfigIdentifier {
     public let uniqueId: String
     
     public init() {
@@ -50,12 +50,12 @@ public struct DefaultSectionIdentifier: SectionControllerIdentifier {
 
 /// A container that coordinates the components of a single `UICollectionView` section,
 /// including its cells, supplementary views (header/footer), and layout definitions.
-public struct SectionController {
+public struct SectionConfig {
     
-    public typealias Identifier = SectionControllerIdentifier
+    public typealias Identifier = SectionConfigIdentifier
     
-    public let identifier: SectionControllerIdentifier
-    public let cells: [CellController]
+    public let identifier: SectionConfigIdentifier
+    public let cells: [CellConfig]
     public let header: SupplementaryController?
     public let footer: SupplementaryController?
     public var layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil
@@ -63,8 +63,8 @@ public struct SectionController {
     public var decorationProviders: [String: () -> ViewConvertable] = [:]
     
     public init(
-        identifier: SectionControllerIdentifier,
-        cells: [CellController],
+        identifier: SectionConfigIdentifier,
+        cells: [CellConfig],
         header: SupplementaryController? = nil,
         footer: SupplementaryController? = nil,
         layoutProvider: ((String) -> NSCollectionLayoutSection?)? = nil,
@@ -81,24 +81,24 @@ public struct SectionController {
     }
 }
 
-extension SectionController: Equatable {
+extension SectionConfig: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.identifier.uniqueId == rhs.identifier.uniqueId
     }
 }
 
-extension SectionController: Hashable {
+extension SectionConfig: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(identifier.uniqueId)
     }
 }
 
-extension [SectionController] {
-    public func section(identifier: SectionControllerIdentifier) -> SectionController? {
+extension [SectionConfig] {
+    public func section(identifier: SectionConfigIdentifier) -> SectionConfig? {
         return first(where: { $0.identifier.uniqueId == identifier.uniqueId })
     }
     
-    public func sectionIndex(identifier: SectionControllerIdentifier) -> Int? {
+    public func sectionIndex(identifier: SectionConfigIdentifier) -> Int? {
         return firstIndex(where: { $0.identifier.uniqueId == identifier.uniqueId })
     }
 }

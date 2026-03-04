@@ -257,12 +257,12 @@ struct MainUsersTableView: ViewBuilder {
 
 ### Dynamic Collection Views
 
-`CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `Section`-based `ResultBuilder` syntax.
+`CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `AnySection`-based `ResultBuilder` syntax.
 
 ```swift
 CollectionView {
-    Section(id: "trending", items: movies, header: Header { LabelView("Trending Now").font(.title1) }) { movie in
-        Cell(movie, id: movie.id) { movieData in
+    AnySection(id: "trending", items: movies, header: Header { LabelView("Trending Now").font(.title1) }) { movie in
+        AnyCell(movie, id: movie.id) { movieData in
             MoviePosterCell(movie: movieData)
         }
     }
@@ -275,15 +275,15 @@ CollectionView {
 
 ### Static Collection Views
 
-You can also build statically-defined declarative collections (e.g., Settings menus) by listing explicit `Cell` components within a `Section`:
+You can also build statically-defined declarative collections (e.g., Settings menus) by listing explicit `AnyCell` components within a `AnySection`:
 
 ```swift
 CollectionView {
-    Section(id: "settings", header: Header { LabelView("General") }) {
-        Cell("Notifications", id: "notifications") { title in
+    AnySection(id: "settings", header: Header { LabelView("General") }) {
+        AnyCell("Notifications", id: "notifications") { title in
             SettingsRowView(title: title)
         }
-        Cell("Privacy", id: "privacy") { title in
+        AnyCell("Privacy", id: "privacy") { title in
             SettingsRowView(title: title)
         }
     }
@@ -294,8 +294,8 @@ CollectionView {
 Building sophisticated loading UIs is built-in natively:
 
 ```swift
-Section(id: "popular", items: movies) { movie in
-    Cell(movie, id: movie.id) { movieData in 
+AnySection(id: "popular", items: movies) { movie in
+    AnyCell(movie, id: movie.id) { movieData in 
         MoviePosterCell(movie: movieData) 
     }
 }

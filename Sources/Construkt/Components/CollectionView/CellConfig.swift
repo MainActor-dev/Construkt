@@ -28,7 +28,7 @@ public protocol CellContentWrapper {
     var originalModel: Any { get }
 }
 
-public enum CellControllerState: Equatable {
+public enum CellConfigState: Equatable {
     public typealias Total_Shimmer = Int
     case loading(Total_Shimmer)
     case loaded
@@ -36,7 +36,7 @@ public enum CellControllerState: Equatable {
 
 /// A type-erased wrapper that encapsulates everything required to dequeue, configure, and
 /// interact with a `UICollectionViewCell` within the Construkt collection architecture.
-public struct CellController: Hashable {
+public struct CellConfig: Hashable {
     
     public let id: AnyHashable
     public let model: Any
@@ -46,7 +46,7 @@ public struct CellController: Hashable {
     private let onPrefetch: (() -> Void)?
     private let onCancelPrefetch: (() -> Void)?
 
-    /// Initializes a `CellController` mapping a specific `UICollectionViewCell` subclass to its backing `Model`.
+    /// Initializes a `CellConfig` mapping a specific `UICollectionViewCell` subclass to its backing `Model`.
     /// - Parameters:
     ///   - id: A unique identifier for diffable data source hashing.
     ///   - model: The underlying data driving the cell.
@@ -100,7 +100,7 @@ public struct CellController: Hashable {
         self.id = id
         self.model = ()
         self.contentHash = nil
-        self.makeCell = { _, _ in fatalError("CellController initialized with 'init(id:)' is for lookup only and cannot be used for display.") }
+        self.makeCell = { _, _ in fatalError("CellConfig initialized with 'init(id:)' is for lookup only and cannot be used for display.") }
         self.onSelect = nil
         self.onPrefetch = nil
         self.onCancelPrefetch = nil
@@ -125,7 +125,7 @@ public struct CellController: Hashable {
         self.onCancelPrefetch = onCancelPrefetch
     }
     
-    public func withSelection(_ handler: @escaping () -> Void) -> CellController {
+    public func withSelection(_ handler: @escaping () -> Void) -> CellConfig {
         // Chain with existing execution if needed, or just replace?
         // Usually modifiers replace or append. Let's append to existing to be safe.
         let current = self.onSelect
@@ -134,7 +134,7 @@ public struct CellController: Hashable {
             handler()
         }
         
-        return CellController(
+        return CellConfig(
             id: id,
             model: model,
             contentHash: contentHash,
@@ -145,7 +145,7 @@ public struct CellController: Hashable {
         )
     }
 
-    public static func == (lhs: CellController, rhs: CellController) -> Bool {
+    public static func == (lhs: CellConfig, rhs: CellConfig) -> Bool {
         lhs.id == rhs.id
     }
     

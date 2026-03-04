@@ -15,7 +15,7 @@ Whenever a user asks you to build a UI component, screen, or apply styling in th
 2. **SwiftUI Syntax**: The syntax mirrors SwiftUI perfectly. Use `VStackView`, `HStackView`, `ZStackView`, `LabelView`, `ButtonView`, `ImageView`, etc.
 3. **No Auto Layout**: Never write `NSLayoutConstraint` code. Layout is handled entirely by Spacers, padding, height/width modifiers, and Stack alignments.
 4. **State Management**: Construkt uses reactive bindings via `@Variable` (a wrapper around `Property<T>`) and `Signal<T>`. Bind to UI using the `$` prefix (e.g., `.text(bind: $title)`).
-5. **Collection Views**: Never write `UICollectionViewDataSource` or delegate boilerplate. Use `CollectionView` with `Section` builders.
+5. **Collection Views**: Never write `UICollectionViewDataSource` or delegate boilerplate. Use `CollectionView` with `AnySection` builders.
 
 ---
 
@@ -123,16 +123,16 @@ VStackView {
 For lists, **always** use Construkt's declarative `CollectionView`. Never manually create Data Sources.
 
 ### 1. Dynamic Collections
-When binding to an array or an Rx `@Variable` array, provide the `items:` parameter to a `Section` constructor, and yield `Cell(...)` instances.
+When binding to an array or an Rx `@Variable` array, provide the `items:` parameter to a `AnySection` constructor, and yield `Cell(...)` instances.
 
 ```swift
 CollectionView {
-    Section(
+    AnySection(
         id: "movies_section", 
         items: viewModel.movies, // or $viewModel.movies
         header: Header { LabelView("Trending Now").font(.title1).padding(h: 16) }
     ) { movie in
-        Cell(movie, id: movie.id) { movieData in
+        AnyCell(movie, id: movie.id) { movieData in
             MoviePosterCell(movie: movieData)
         }
     }
@@ -147,15 +147,15 @@ CollectionView {
 ```
 
 ### 2. Static Collections
-You can build statically-defined declarative collections (e.g., Settings menus) by listing explicit `Cell` components within a `Section`:
+You can build statically-defined declarative collections (e.g., Settings menus) by listing explicit `AnyCell` components within a `AnySection`:
 
 ```swift
 CollectionView {
-    Section(id: "settings_section", header: Header { LabelView("General") }) {
-        Cell("Notifications", id: "notifications") { title in
+    AnySection(id: "settings_section", header: Header { LabelView("General") }) {
+        AnyCell("Notifications", id: "notifications") { title in
             SettingsRowView(title: title)
         }
-        Cell("Privacy", id: "privacy") { title in
+        AnyCell("Privacy", id: "privacy") { title in
             SettingsRowView(title: title)
         }
     }
@@ -166,11 +166,11 @@ CollectionView {
 ```
 
 ### 3. Shimmer Loading States
-Construkt supports natively swapping an entire `Section` with shimmer placeholders during load times. Use the `.shimmer(count:when:...)` modifier directly on the Section:
+Construkt supports natively swapping an entire `AnySection` with shimmer placeholders during load times. Use the `.shimmer(count:when:...)` modifier directly on the Section:
 
 ```swift
-Section(id: "popular", items: viewModel.popularMovies) { movie in
-    Cell(movie, id: movie.id) { movie in 
+AnySection(id: "popular", items: viewModel.popularMovies) { movie in
+    AnyCell(movie, id: movie.id) { movie in 
         MoviePosterCell(movie: movie)
     }
 }

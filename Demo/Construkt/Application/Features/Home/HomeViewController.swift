@@ -83,9 +83,9 @@ class HomeViewController: UIViewController {
     
     // MARK: - Sections
     
-    private var heroSection: Section {
-        Section(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
-            Cell(movie, id: "hero-\(movie.id)") { movie in
+    private var heroSection: AnySection {
+        AnySection(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
+            AnyCell(movie, id: "hero-\(movie.id)") { movie in
                 Modified(HeroContentView()) { view in
                     view.configure(with: movie)
                 }
@@ -106,15 +106,15 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private var genresSection: Section {
-        Section(
+    private var genresSection: AnySection {
+        AnySection(
             id: HomeSection.categories,
             items: viewModel.genres,
             header: Header {
                 StandardHeader(title: "Genres", actionTitle: nil)
             }
         ) { genre in
-            Cell(genre, id: "genre-\(genre.id)") { genre in
+            AnyCell(genre, id: "genre-\(genre.id)") { genre in
                 GenresCell(id: genre.id, genre: genre)
             }
         }
@@ -133,8 +133,8 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private var popularSection: Section {
-        Section(
+    private var popularSection: AnySection {
+        AnySection(
             id: HomeSection.popular,
             items: viewModel.popularSectionMovies,
             header: Header {
@@ -143,7 +143,7 @@ class HomeViewController: UIViewController {
                 }
             }
         ) { movie in
-            Cell(movie, id: "popular-\(movie.id)") { movie in
+            AnyCell(movie, id: "popular-\(movie.id)") { movie in
                 PosterCell(movie: movie)
             }
         }
@@ -168,8 +168,8 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private var upcomingSection: Section {
-        Section(
+    private var upcomingSection: AnySection {
+        AnySection(
             id: HomeSection.upcoming,
             items: viewModel.upcomingMovies.map { $0.asRenderItems() },
             header: Header {
@@ -178,7 +178,7 @@ class HomeViewController: UIViewController {
                 }
             }
         ) { item in
-            Cell(item, id: "upcoming-\(String(describing: item))") { item in
+            AnyCell(item, id: "upcoming-\(String(describing: item))") { item in
                 UpcomingCell(item: item)
             }
         }
@@ -197,8 +197,8 @@ class HomeViewController: UIViewController {
         }
     }
     
-    private var topRatedSection: Section {
-        Section(
+    private var topRatedSection: AnySection {
+        AnySection(
             id: HomeSection.topRated,
             items: viewModel.topRatedMovies.map { Array($0.enumerated()) },
             header: Header {
@@ -206,9 +206,9 @@ class HomeViewController: UIViewController {
             }
         ) { (index, movie) in
             if index == 5 {
-                Cell("This is an ad") { text in AdsCell(text: text) }
+                AnyCell("This is an ad") { text in AdsCell(text: text) }
             }
-            Cell(movie, id: "top-\(movie.id)") { movie in
+            AnyCell(movie, id: "top-\(movie.id)") { movie in
                 TopRatedCell(index: index + 1, movie: movie)
             }
         }

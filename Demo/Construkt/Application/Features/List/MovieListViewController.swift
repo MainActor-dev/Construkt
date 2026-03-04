@@ -1,7 +1,7 @@
 import UIKit
 import ConstruktKit
 
-enum MovieListSection: String, SectionControllerIdentifier {
+enum MovieListSection: String, SectionConfigIdentifier {
     case filter
     case grid
     
@@ -69,12 +69,12 @@ class MovieListViewController: UIViewController {
         )
     }
     
-    private var filterSection: Section {
-        Section(
+    private var filterSection: AnySection {
+        AnySection(
             id: MovieListSection.filter,
             items: viewModel.filterItemsObservable
         ) { item in
-            Cell(item, id: item.id) { item in
+            AnyCell(item, id: item.id) { item in
                 GenresCell(
                     id: item.id,
                     genre: Genre(id: item.id, name: item.title),
@@ -95,8 +95,8 @@ class MovieListViewController: UIViewController {
         }
     }
     
-    private var gridSection: Section {
-        Section(
+    private var gridSection: AnySection {
+        AnySection(
             id:  MovieListSection.grid,
             items: viewModel.moviesObservable.map { Array($0.enumerated()) },
             footer: Footer { [viewModel] in
@@ -110,7 +110,7 @@ class MovieListViewController: UIViewController {
                 }
             }
         ) { index, movie in
-            Cell(movie, id: "movie-\(movie.id)-\(index)") { movie in
+            AnyCell(movie, id: "movie-\(movie.id)-\(index)") { movie in
                 MovieGridCell(movie: movie)
             }
         }
@@ -145,7 +145,7 @@ class MovieListViewController: UIViewController {
             return
         }
         
-        let searchKey = CellController(id: id)
+        let searchKey = CellConfig(id: id)
         if let indexPath = dataSource.indexPath(for: searchKey) {
             wrapper.collectionView.layoutIfNeeded()
             wrapper.collectionView.scrollToItem(

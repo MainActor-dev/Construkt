@@ -26,7 +26,7 @@
 import UIKit
 
 /// A generic `UICollectionReusableView` designed to host Construkt declaratory `View` types,
-/// typically utilized as headers and footers within `SectionController`s.
+/// typically utilized as headers and footers within `SectionConfig`s.
 public final class HostingReusableView<Content: View>: UICollectionReusableView {
     
     private var hostedView: UIView?

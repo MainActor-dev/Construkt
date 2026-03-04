@@ -27,8 +27,8 @@ import UIKit
 private typealias CollectionDelegate = UICollectionViewDelegate & UICollectionViewDataSourcePrefetching
 
 /// An internal adapter that conforms to `UICollectionViewDelegate` and `UICollectionViewDataSourcePrefetching`,
-/// bridging user interactions and prefetching events from the collection view directly to the corresponding `CellController`.
-public final class CellControllerAdapter: NSObject, CollectionDelegate {
+/// bridging user interactions and prefetching events from the collection view directly to the corresponding `CellConfig`.
+public final class CellConfigAdapter: NSObject, CollectionDelegate {
 
     private weak var dataSource: CollectionDiffableDataSource?
     
@@ -37,7 +37,7 @@ public final class CellControllerAdapter: NSObject, CollectionDelegate {
         super.init()
     }
    
-    private func item(at indexPath: IndexPath) -> CellController? {
+    private func item(at indexPath: IndexPath) -> CellConfig? {
         dataSource?.itemIdentifier(for: indexPath)
     }
 
@@ -56,7 +56,7 @@ public final class CellControllerAdapter: NSObject, CollectionDelegate {
     }
     
     deinit {
-        print("CellControllerAdapter deinit")
+        print("CellConfigAdapter deinit")
     }
 }
 

@@ -48,8 +48,8 @@ public class SearchViewController: UIViewController {
 
                     // List
                     CollectionView {
-                        Section(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
-                            Cell(movie, id: movie.id) { movie in
+                        AnySection(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
+                            AnyCell(movie, id: movie.id) { movie in
                                 MovieSearchRow(movie: movie)
                             }
                         }
@@ -160,7 +160,7 @@ struct MovieSearchRow: ViewBuilder {
     }
 }
 
-enum SearchSection: String, SectionControllerIdentifier {
+enum SearchSection: String, SectionConfigIdentifier {
     case results
     
     var uniqueId: String { rawValue }

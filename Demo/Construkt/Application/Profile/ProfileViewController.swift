@@ -1,7 +1,7 @@
 import UIKit
 import ConstruktKit
 
-enum ProfileSection: String, SectionControllerIdentifier {
+enum ProfileSection: String, SectionConfigIdentifier {
     case hero
     case premium
     case general
@@ -37,9 +37,9 @@ class ProfileViewController: UIViewController {
     
     // MARK: - Sections
     
-    private var heroSection: Section {
-        Section(id: ProfileSection.hero) {
-            Cell("hero", id: "hero") { item in
+    private var heroSection: AnySection {
+        AnySection(id: ProfileSection.hero) {
+            AnyCell("hero", id: "hero") { item in
                 ProfileHeroSection()
             }
         }
@@ -49,9 +49,9 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    private var premiumSection: Section {
-        Section(id: ProfileSection.premium) {
-            Cell("premium", id: "premium") { item in
+    private var premiumSection: AnySection {
+        AnySection(id: ProfileSection.premium) {
+            AnyCell("premium", id: "premium") { item in
                 ProfilePremiumBanner()
             }
         }
@@ -61,15 +61,15 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    private var generalSettingsSection: Section {
-        Section(id: ProfileSection.general) {
+    private var generalSettingsSection: AnySection {
+        AnySection(id: ProfileSection.general) {
             Header {
                 LabelView("GENERAL")
                     .color(UIColor("#737373"))
                     .font(.systemFont(ofSize: 12, weight: .medium))
             }
             
-            Cell("downloads", id: "downloads") { item in
+            AnyCell("downloads", id: "downloads") { item in
                 ProfileSettingsRow(
                     icon: "arrow.down.circle",
                     title: "Downloads",
@@ -94,11 +94,11 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            Cell("notifications", id: "notifications") { item in
+            AnyCell("notifications", id: "notifications") { item in
                 ProfileSettingsToggle(icon: "bell", title: "Notifications", isOn: true, isLast: false)
             }
             
-            Cell("darkMode", id: "darkMode") { item in
+            AnyCell("darkMode", id: "darkMode") { item in
                 ProfileSettingsToggle(icon: "moon", title: "Dark Mode", isOn: false, isLast: true)
             }
         }
@@ -123,15 +123,15 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    private var accountSettingsSection: Section {
-        Section(id: ProfileSection.account) {
+    private var accountSettingsSection: AnySection {
+        AnySection(id: ProfileSection.account) {
             Header {
                 LabelView("ACCOUNT")
                     .color(UIColor("#737373"))
                     .font(.systemFont(ofSize: 12, weight: .medium))
             }
             
-            Cell("payment", id: "payment") { item in
+            AnyCell("payment", id: "payment") { item in
                 ProfileSettingsRow(
                     icon: "creditcard",
                     title: "Payment Methods",
@@ -141,7 +141,7 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            Cell("security", id: "security") { item in
+            AnyCell("security", id: "security") { item in
                 ProfileSettingsRow(
                     icon: "exclamationmark.shield",
                     title: "Security",
@@ -151,7 +151,7 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            Cell("logout", id: "logout") { item in
+            AnyCell("logout", id: "logout") { item in
                 ProfileSettingsRow(
                     icon: "rectangle.portrait.and.arrow.right",
                     title: "Log Out",
@@ -183,9 +183,9 @@ class ProfileViewController: UIViewController {
         }
     }
     
-    private var versionSection: Section {
-        Section(id: ProfileSection.version) {
-            Cell("version", id: "version") { item in
+    private var versionSection: AnySection {
+        AnySection(id: ProfileSection.version) {
+            AnyCell("version", id: "version") { item in
                 ProfileVersionInfo()
             }
         }
