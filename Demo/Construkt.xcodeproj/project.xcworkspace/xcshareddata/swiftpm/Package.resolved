@@ -1,6 +1,15 @@
 {
-  "originHash" : "06ce1e3a93bc28c2362d9837a3e77f6d37d5d26c69747b80267395217d42e7b8",
+  "originHash" : "7b534436a39b4e2ffa8da049aed7206a88f832892e6ffefcc67f6525fe11a660",
   "pins" : [
+    {
+      "identity" : "construkt",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MainActorDev/Construkt",
+      "state" : {
+        "revision" : "96d96da839c70797234580fe302d568559c76359",
+        "version" : "1.1.2"
+      }
+    },
     {
       "identity" : "factory",
       "kind" : "remoteSourceControl",
