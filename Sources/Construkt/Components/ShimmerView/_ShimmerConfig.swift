@@ -25,13 +25,13 @@
 import UIKit
 
 /// The visual styling and animation configuration for the shimmer effect.
-public struct SkeletonConfig: Equatable {
+public struct _ShimmerConfig: Equatable {
     /// Supported directions for the shimmer gradient sweep.
     public enum Direction {
         case leftToRight, rightToLeft, topToBottom, bottomToTop
     }
 
-    /// Base (background) color of the skeleton.
+    /// Base (background) color of the shimmer.
     public var background: UIColor
     /// Highlight color of the moving sheen.
     public var highlight: UIColor

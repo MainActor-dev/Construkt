@@ -25,36 +25,36 @@
 import UIKit
 import ObjectiveC.runtime
 
-/// A core protocol enabling shimmer/skeleton loading states on constrained views.
-public protocol SkeletonView {
-    func setAnimatedSkeletonView(_ isShowing: Bool)
+/// A core protocol enabling shimmer/shimmer loading states on constrained views.
+public protocol _ShimmerView {
+    func setAnimatedShimmerView(_ isShowing: Bool)
 }
 
-/// An optional protocol views can adopt if they wish to monitor whether the skeleton is actively displaying.
-public protocol SkeletonDisplayableStatus {
-    var isSkeletonShowing: Bool { get set }
+/// An optional protocol views can adopt if they wish to monitor whether the shimmer is actively displaying.
+public protocol _ShimmerDisplayableStatus {
+    var isShimmerShowing: Bool { get set }
 }
 
-extension SkeletonView where Self: UIView {
+extension _ShimmerView where Self: UIView {
     
-    private func setSkeletonStatus(isShowing: Bool) {
-        if var view = self as? SkeletonDisplayableStatus {
-            view.isSkeletonShowing = isShowing
+    private func setShimmerStatus(isShowing: Bool) {
+        if var view = self as? _ShimmerDisplayableStatus {
+            view.isShimmerShowing = isShowing
         }
     }
     
-    public func setAnimatedSkeletonView(_ isShowing: Bool) {
+    public func setAnimatedShimmerView(_ isShowing: Bool) {
         isShowing ? _startShimmer(in: self) : _stopShimmer(in: self)
     }
     
     /// Start shimmering on this view with the given configuration.
-    private func startShimmer(_ config: SkeletonConfig = SkeletonConfig()) {
-        if let layer = shimmerLayer as? SkeletonLayer {
+    private func startShimmer(_ config: _ShimmerConfig = _ShimmerConfig()) {
+        if let layer = shimmerLayer as? _ShimmerLayer {
             layer.apply(config: config)
             layer.start()
             return
         }
-        let layer = SkeletonLayer()
+        let layer = _ShimmerLayer()
         layer.apply(config: config)
         layer.frame = bounds
         layer.masksToBounds = true
@@ -75,14 +75,14 @@ extension SkeletonView where Self: UIView {
         layer.start()
     }
 
-    private func updateShimmer(_ config: SkeletonConfig) {
-        guard let layer = shimmerLayer as? SkeletonLayer else { return }
+    private func updateShimmer(_ config: _ShimmerConfig) {
+        guard let layer = shimmerLayer as? _ShimmerLayer else { return }
         layer.apply(config: config)
         layer.start()
     }
 
     private func stopShimmer() {
-        (shimmerLayer as? SkeletonLayer)?.stop(removeFromSuperlayer: true)
+        (shimmerLayer as? _ShimmerLayer)?.stop(removeFromSuperlayer: true)
         shimmerLayer = nil
         removeLayoutObserverIfNeeded()
     }
@@ -91,46 +91,46 @@ extension SkeletonView where Self: UIView {
     /// Precedence: view.shimmerConfigOverride ?? defaultConfig
     public func _startShimmer(
         in root: UIView,
-        defaultConfig: SkeletonConfig = .init()
+        defaultConfig: _ShimmerConfig = .init()
     ) {
-        for v in skeletonViews(in: root) {
-            v.startShimmer(v.skeletonConfig ?? defaultConfig)
+        for v in shimmerViews(in: root) {
+            v.startShimmer(v.shimmerConfig ?? defaultConfig)
         }
-        setSkeletonStatus(isShowing: true)
+        setShimmerStatus(isShowing: true)
     }
 
     /// Stop shimmer on all matching subviews under `root`.
     public func _stopShimmer(in root: UIView) {
-        for v in skeletonViews(in: root) {
+        for v in shimmerViews(in: root) {
             v.stopShimmer()
         }
-        setSkeletonStatus(isShowing: false)
+        setShimmerStatus(isShowing: false)
     }
 
     /// Recursive finder that returns only the desired subclasses.
-    public func skeletonViews(in view: UIView) -> [UIView] {
+    public func shimmerViews(in view: UIView) -> [UIView] {
         var results: [UIView] = []
         for sub in view.subviews {
-            if sub.isSkeletonable { results.append(sub) }
-            results += skeletonViews(in: sub)
+            if sub.isShimmerable { results.append(sub) }
+            results += shimmerViews(in: sub)
         }
         return results
     }
 }
 
-extension UIView: SkeletonView {}
+extension UIView: _ShimmerView {}
 
 private var shimmerOverrideKey: UInt8 = 0
 private var shimmerableKey: UInt8 = 0
 
 public extension UIView {
     /// Set this per view instance to give it a unique shimmer look.
-    var skeletonConfig: SkeletonConfig? {
-        get { objc_getAssociatedObject(self, &shimmerOverrideKey) as? SkeletonConfig }
+    var shimmerConfig: _ShimmerConfig? {
+        get { objc_getAssociatedObject(self, &shimmerOverrideKey) as? _ShimmerConfig }
         set { objc_setAssociatedObject(self, &shimmerOverrideKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
-    var isSkeletonable: Bool {
+    var isShimmerable: Bool {
         get { (objc_getAssociatedObject(self, &shimmerableKey) as? Bool ?? false) }
         set { objc_setAssociatedObject(self, &shimmerableKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }

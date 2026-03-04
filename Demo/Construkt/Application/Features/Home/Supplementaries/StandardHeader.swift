@@ -11,7 +11,7 @@ struct StandardHeader: ViewBuilder {
             LabelView(title)
                 .font(.systemFont(ofSize: 18, weight: .semibold))
                 .color(.white)
-                .skeletonable(true)
+                .shimmerable(true)
             
             SpacerView()
             
@@ -19,7 +19,7 @@ struct StandardHeader: ViewBuilder {
                 ButtonView(action) { _ in onAction?() }
                     .font(.systemFont(ofSize: 14))
                     .color(.lightGray)
-                    .skeletonable(true)
+                    .shimmerable(true)
             }
         }
         .alignment(.center)

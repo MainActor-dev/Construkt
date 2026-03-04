@@ -19,7 +19,7 @@
   - [Table Views](#table-views)
   - [Dynamic Collection Views](#dynamic-collection-views)
   - [Static Collection Views](#static-collection-views)
-  - [Skeleton Loading States](#skeleton-loading-states)
+  - [Shimmer Loading States](#shimmer-loading-states)
 - [Advanced View Structure](#advanced-view-structure)
 - [Author](#author)
 - [Contribution](#contribution)
@@ -85,7 +85,7 @@ struct PosterCell: ViewBuilder {
     var body: View {
         VStackView(spacing: 8) {
             ImageView(url: movie.posterURL)
-                .skeletonable(true)
+                .shimmerable(true)
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
                 .cornerRadius(8)
@@ -97,12 +97,12 @@ struct PosterCell: ViewBuilder {
                     .font(.systemFont(ofSize: 14, weight: .semibold))
                     .color(.white)
                     .numberOfLines(1)
-                    .skeletonable(true)
+                    .shimmerable(true)
                 
                 LabelView("Adventure") // Placeholder genre
                     .font(.systemFont(ofSize: 12))
                     .color(.gray)
-                    .skeletonable(true)
+                    .shimmerable(true)
             }
             .alignment(.leading)
         }
@@ -290,7 +290,7 @@ CollectionView {
 }
 ```
 
-### Skeleton Loading States
+### Shimmer Loading States
 Building sophisticated loading UIs is built-in natively:
 
 ```swift
@@ -299,12 +299,12 @@ Section(id: "popular", items: movies) { movie in
         MoviePosterCell(movie: movieData) 
     }
 }
-.skeleton(count: 5, when: $viewModel.isLoading) {
+.shimmer(count: 5, when: $viewModel.isLoading) {
     MoviePosterCell(movie: .placeholder)
 }
 ```
 
-When `isLoading` is true, Construkt automatically generates 5 skeleton placeholder geometries based on your ViewBuilder structure and animates a shimmer gradient across them. When the data loads, it cross-dissolves them back to your actual fetched data natively.
+When `isLoading` is true, Construkt automatically generates 5 shimmer placeholder geometries based on your ViewBuilder structure and animates a shimmer gradient across them. When the data loads, it cross-dissolves them back to your actual fetched data natively.
 
 ---
 

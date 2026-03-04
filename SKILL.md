@@ -165,8 +165,8 @@ CollectionView {
 }
 ```
 
-### 3. Skeleton Loading States
-Construkt supports natively swapping an entire `Section` with skeleton placeholders during load times. Use the `.skeleton(count:when:...)` modifier directly on the Section:
+### 3. Shimmer Loading States
+Construkt supports natively swapping an entire `Section` with shimmer placeholders during load times. Use the `.shimmer(count:when:...)` modifier directly on the Section:
 
 ```swift
 Section(id: "popular", items: viewModel.popularMovies) { movie in
@@ -174,8 +174,8 @@ Section(id: "popular", items: viewModel.popularMovies) { movie in
         MoviePosterCell(movie: movie)
     }
 }
-.skeleton(count: 5, when: $viewModel.isLoading) {
-    MoviePosterCell(movie: .placeholder) // Create geometry for skeleton
+.shimmer(count: 5, when: $viewModel.isLoading) {
+    MoviePosterCell(movie: .placeholder) // Create geometry for shimmer
 }
 ```
 

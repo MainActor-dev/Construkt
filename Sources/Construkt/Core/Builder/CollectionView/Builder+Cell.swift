@@ -87,7 +87,7 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
     private let id: AnyHashable
     private let configure: (C, Model) -> Void
     private var onSelect: ((Model) -> Void)?
-    private var skeletonCount: Int?
+    private var shimmerCount: Int?
     
     public init(
         _ model: Model?,
@@ -116,10 +116,10 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
         return copy
     }
     
-    /// Specifies how many animated skeleton copies of this cell should be shown when in a loading state.
-    public func skeleton(count: Int) -> Cell {
+    /// Specifies how many animated shimmer copies of this cell should be shown when in a loading state.
+    public func shimmer(count: Int) -> Cell {
         var copy = self
-        copy.skeletonCount = count
+        copy.shimmerCount = count
         return copy
     }
     
@@ -139,8 +139,8 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
                     }
                 )
              ]
-        } else if let count = skeletonCount {
-            return Skeleton<C>.create(count: count, identifier: "skeleton_\(id)")
+        } else if let count = shimmerCount {
+            return _Shimmer<C>.create(count: count, identifier: "shimmer_\(id)")
         }
         return []
     }

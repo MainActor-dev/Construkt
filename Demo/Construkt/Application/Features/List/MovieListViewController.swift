@@ -117,7 +117,7 @@ class MovieListViewController: UIViewController {
         .onSelect(on: self) { (self, movie: Movie) in
             self.showDetail(for: movie)
         }
-        .skeleton(count: 8, when: viewModel.$isLoading) {
+        .shimmer(count: 8, when: viewModel.$isLoading) {
             MovieGridCell(movie: .placeholder)
         }
         .layout { _ in

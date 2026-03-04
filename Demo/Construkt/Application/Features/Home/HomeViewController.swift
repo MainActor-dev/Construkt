@@ -101,7 +101,7 @@ class HomeViewController: UIViewController {
             }
             return layout
         }
-        .skeleton(count: 1, when: viewModel.isNowPlayingLoading) {
+        .shimmer(count: 1, when: viewModel.isNowPlayingLoading) {
             Modified(HeroContentView()) { $0.configure(with: .placeholder) }
         }
     }
@@ -121,7 +121,7 @@ class HomeViewController: UIViewController {
         .onSelect(on: self) { (self, genre: Genre) in
             self.showMovieList(for: .categories, selectedGenre: genre)
         }
-        .skeleton(
+        .shimmer(
             count: 6,
             when: viewModel.isLoadingGenres,
             includeSupplementary: true
@@ -159,7 +159,7 @@ class HomeViewController: UIViewController {
         .layout { _ in
             HomeSection.popular.layout
         }
-        .skeleton(
+        .shimmer(
             count: 4,
             when: viewModel.isPopularSectionLoading,
             includeSupplementary: true
@@ -188,7 +188,7 @@ class HomeViewController: UIViewController {
         .layout { _ in
             HomeSection.upcoming.layout
         }
-        .skeleton(
+        .shimmer(
             count: 2,
             when: viewModel.isUpcomingLoading,
             includeSupplementary: true
@@ -221,7 +221,7 @@ class HomeViewController: UIViewController {
         .layout { _ in
             HomeSection.topRated.layout
         }
-        .skeleton(count: 3, when: viewModel.isTopRatedLoading) {
+        .shimmer(count: 3, when: viewModel.isTopRatedLoading) {
             TopRatedCell(index: 0, movie: .placeholder)
         }
     }

@@ -73,14 +73,14 @@ class SupplementaryRegistrationCache {
 }
     
 extension SupplementaryController {
-    internal func asSkeleton() -> SupplementaryController {
+    internal func as_Shimmer() -> SupplementaryController {
         var copy = self
-        // Ensure skeleton has a different ID to force section reload
+        // Ensure shimmer has a different ID to force section reload
         copy.id = UUID()
         let originalDequeue = self.dequeue
         copy.dequeue = { collectionView, indexPath in
             let view = originalDequeue(collectionView, indexPath)
-            view.setAnimatedSkeletonView(true)
+            view.setAnimatedShimmerView(true)
             return view
         }
         return copy

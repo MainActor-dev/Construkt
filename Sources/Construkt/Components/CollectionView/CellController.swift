@@ -29,8 +29,8 @@ public protocol CellContentWrapper {
 }
 
 public enum CellControllerState: Equatable {
-    public typealias TotalSkeleton = Int
-    case loading(TotalSkeleton)
+    public typealias Total_Shimmer = Int
+    case loading(Total_Shimmer)
     case loaded
 }
 

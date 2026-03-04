@@ -19,7 +19,7 @@ struct MovieGridCell: ViewBuilder {
                 .backgroundColor(.darkGray)
                 .cornerRadius(8)
                 .clipsToBounds(true)
-                .skeletonable(true)
+                .shimmerable(true)
             
            ratingBadge
         }
@@ -47,7 +47,7 @@ struct MovieGridCell: ViewBuilder {
         .width(max: 50)
         .height(30)
         .cornerRadius(8)
-        .skeletonable(true, bgColor: UIColor("#EEEEEE"))
+        .shimmerable(true, bgColor: UIColor("#EEEEEE"))
     }
     
     private var titleLabel: View {
@@ -55,7 +55,7 @@ struct MovieGridCell: ViewBuilder {
             .font(.systemFont(ofSize: 14, weight: .semibold))
             .color(.white)
             .numberOfLines(1)
-            .skeletonable(true)
+            .shimmerable(true)
     }
     
     private var metadataLabel: View {
@@ -63,7 +63,7 @@ struct MovieGridCell: ViewBuilder {
             .font(.systemFont(ofSize: 12))
             .color(.gray)
             .numberOfLines(1)
-            .skeletonable(true)
+            .shimmerable(true)
     }
     
     private var metadataString: String {

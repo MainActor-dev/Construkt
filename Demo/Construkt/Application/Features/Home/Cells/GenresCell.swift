@@ -19,6 +19,6 @@ struct GenresCell: ViewBuilder {
         .backgroundColor(UIColor(white: 1.0, alpha: isSelected ? 1.0 : 0.1))
         .cornerRadius(20)
         .border(color: UIColor(white: 1.0, alpha: 0.2), lineWidth: 1)
-        .skeletonable(true)
+        .shimmerable(true)
     }
 }

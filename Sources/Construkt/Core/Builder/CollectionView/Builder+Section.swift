@@ -59,7 +59,7 @@ public struct Header: SectionComponent {
             elementKind: UICollectionView.elementKindSectionHeader,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
-            view.setAnimatedSkeletonView(false)
+            view.setAnimatedShimmerView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }
@@ -89,7 +89,7 @@ public struct Footer: SectionComponent {
             elementKind: UICollectionView.elementKindSectionFooter,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
-            view.setAnimatedSkeletonView(false)
+            view.setAnimatedShimmerView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }
@@ -472,30 +472,30 @@ public struct Section: SectionObservable {
         return Section(binding: improved)
     }
     
-    /// Imposes an automated animated "Skeleton mode" replacing layout components with shimmer placeholder items.
+    /// Imposes an automated animated "_Shimmer mode" replacing layout components with shimmer placeholder items.
     /// Dictated dynamically by resolving a binding boolean argument `when:`.
-    public func skeleton<C, B>(
+    public func shimmer<C, B>(
         _ type: C.Type,
         count: Int,
-        when skeletonBinding: B,
+        when shimmerBinding: B,
         includeSuppmentary: Bool = false,
         hideSupplementary: Bool = false,
         configure: ((C) -> Void)? = nil
     ) -> Section where C: UICollectionViewCell, B: ViewBinding, B.Value == Bool {
         
-        let combined = AnyViewBinding<([SectionController], Bool)>.combineLatest(binding, skeletonBinding)
+        let combined = AnyViewBinding<([SectionController], Bool)>.combineLatest(binding, shimmerBinding)
             .map { (sections, isLoading) -> [SectionController] in
                 if isLoading {
                     return sections.map { section in
                          var header = hideSupplementary ? nil : section.header
-                         if includeSuppmentary { header = header?.asSkeleton() }
+                         if includeSuppmentary { header = header?.as_Shimmer() }
                          
                          var footer = hideSupplementary ? nil : section.footer
-                         if includeSuppmentary { footer = footer?.asSkeleton() }
+                         if includeSuppmentary { footer = footer?.as_Shimmer() }
                          
                          return SectionController(
                             identifier: section.identifier,
-                            cells: Skeleton<C>.create(count: count, configure: configure),
+                            cells: _Shimmer<C>.create(count: count, configure: configure),
                             header: header,
                             footer: footer,
                             layoutProvider: section.layoutProvider
@@ -509,15 +509,15 @@ public struct Section: SectionObservable {
         return Section(binding: combined)
     }
     
-    /// Imposes an automated declarative "Skeleton mode" loading block via `HostingCell` replacing the current section layout.
-    public func skeleton<Content: View, B: ViewBinding>(
+    /// Imposes an automated declarative "_Shimmer mode" loading block via `HostingCell` replacing the current section layout.
+    public func shimmer<Content: View, B: ViewBinding>(
         count: Int,
         when binding: B,
         includeSupplementary: Bool = false,
         hideSupplementary: Bool = false,
         placeholder: @escaping () -> Content
     ) -> Section where B.Value == Bool {
-        return skeleton(
+        return shimmer(
             HostingCell<Content>.self,
             count: count,
             when: binding,
