@@ -24,17 +24,17 @@
 
 import UIKit
 
-public typealias CellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
+public typealias AnyCellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
 
 /// A type alias for a diffable data source snapshot mapping `SectionConfig` sections to `CellConfig` items.
-public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionConfig, CellConfig>
+public typealias AnyCollectionSnapshot = NSDiffableDataSourceSnapshot<SectionConfig, CellConfig>
 
 /// A type alias for a `UICollectionViewDiffableDataSource` driven by `SectionConfig` and `CellConfig`.
-public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionConfig, CellConfig>
+public typealias AnyCollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionConfig, CellConfig>
 
-public extension CollectionDiffableDataSource {
+public extension AnyCollectionDiffableDataSource {
     func display(_ sections: [SectionConfig], completion: (() -> Void)? = nil) {
-        var newSnapshot = CollectionSnapshot()
+        var newSnapshot = AnyCollectionSnapshot()
         
         // 1. Build the new structure
         for section in sections {
@@ -126,7 +126,7 @@ public extension CollectionDiffableDataSource {
     
     /// Builds a lookup of [CellConfig.id → contentHash] from the current snapshot
     private func buildContentMap(
-        from snapshot: CollectionSnapshot
+        from snapshot: AnyCollectionSnapshot
     ) -> [AnyHashable: AnyHashable] {
         var map: [AnyHashable: AnyHashable] = [:]
         for item in snapshot.itemIdentifiers {

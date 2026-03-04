@@ -63,8 +63,8 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         return refreshControl
     }()
     
-    private lazy var dataSource: CollectionDiffableDataSource = {
-        let ds = CollectionDiffableDataSource(
+    private lazy var dataSource: AnyCollectionDiffableDataSource = {
+        let ds = AnyCollectionDiffableDataSource(
             collectionView: collectionView,
             cellProvider: { (collectionView, index, item) in
                 return item.cell(in: collectionView, at: index)

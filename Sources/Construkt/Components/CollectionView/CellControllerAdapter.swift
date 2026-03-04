@@ -30,9 +30,9 @@ private typealias CollectionDelegate = UICollectionViewDelegate & UICollectionVi
 /// bridging user interactions and prefetching events from the collection view directly to the corresponding `CellConfig`.
 public final class CellConfigAdapter: NSObject, CollectionDelegate {
 
-    private weak var dataSource: CollectionDiffableDataSource?
+    private weak var dataSource: AnyCollectionDiffableDataSource?
     
-    public init(dataSource: CollectionDiffableDataSource) {
+    public init(dataSource: AnyCollectionDiffableDataSource) {
         self.dataSource = dataSource
         super.init()
     }

@@ -42,7 +42,7 @@ public enum _Shimmer<Cell: UICollectionViewCell> {
         return CellConfig(
             id: id,
             model: (),
-            registration: CellRegistration<Cell, Void> { cell, indexPath, item in
+            registration: AnyCellRegistration<Cell, Void> { cell, indexPath, item in
                 configure?(cell)
                 cell.layoutIfNeeded()
                 cell.setAnimatedShimmerView(true)

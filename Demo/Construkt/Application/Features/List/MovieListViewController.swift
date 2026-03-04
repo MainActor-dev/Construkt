@@ -137,7 +137,7 @@ class MovieListViewController: UIViewController {
     
     private func scrollToFilter(_ id: Int) {        
         guard let wrapper = filterCollectionViewWrapper,
-              let dataSource = wrapper.collectionView.dataSource as? CollectionDiffableDataSource,
+              let dataSource = wrapper.collectionView.dataSource as? AnyCollectionDiffableDataSource,
               dataSource.snapshot().numberOfItems > 0 else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.scrollToFilter(id)
