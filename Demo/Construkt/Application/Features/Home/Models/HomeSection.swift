@@ -1,7 +1,7 @@
 import UIKit
 import ConstruktKit
 
-enum HomeSection: String, SectionControllerIdentifier {
+enum HomeSection: String, SectionConfigIdentifier {
     case hero
     case categories
     case popular

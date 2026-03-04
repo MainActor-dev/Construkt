@@ -7,7 +7,7 @@ struct PosterCell: ViewBuilder {
     var body: View {
         VStackView(spacing: 8) {
             ImageView(url: movie.posterURL)
-                .skeletonable(true)
+                .shimmerable(true)
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
                 .cornerRadius(8)
@@ -19,12 +19,12 @@ struct PosterCell: ViewBuilder {
                     .font(.systemFont(ofSize: 14, weight: .semibold))
                     .color(.white)
                     .numberOfLines(1)
-                    .skeletonable(true)
+                    .shimmerable(true)
                 
                 LabelView("Adventure") // Placeholder genre
                     .font(.systemFont(ofSize: 12))
                     .color(.gray)
-                    .skeletonable(true)
+                    .shimmerable(true)
             }
             .alignment(.leading)
         }

@@ -26,7 +26,7 @@ class HeroContentView: UIView {
                     .contentMode(.scaleAspectFill)
                     .backgroundColor(.darkGray)
                     .clipsToBounds(true)
-                    .skeletonable(true)
+                    .shimmerable(true)
                     .reference(&backgroundImageView)
 
                 
@@ -62,7 +62,7 @@ class HeroContentView: UIView {
                                 }
                                 .alignment(.center)
                             }
-                            .skeletonable(true)
+                            .shimmerable(true)
                             .alignment(.center)
                             
                             // Title
@@ -70,14 +70,14 @@ class HeroContentView: UIView {
                                 .font(.systemFont(ofSize: 32, weight: .bold))
                                 .color(.white)
                                 .numberOfLines(2)
-                                .skeletonable(true)
+                                .shimmerable(true)
                                 .reference(&titleLabel)
                             
                             // Metadata
                             LabelView("Sci-Fi  •  2h 15m")
                                 .font(.systemFont(ofSize: 14))
                                 .color(.lightGray)
-                                .skeletonable(true)
+                                .shimmerable(true)
                             
                             // Button
                             ButtonView("Watch Trailer")
@@ -86,7 +86,7 @@ class HeroContentView: UIView {
                                 .backgroundColor(.white)
                                 .cornerRadius(24)
                                 .height(48)
-                                .skeletonable(true)
+                                .shimmerable(true)
                                 .width(CGFloat.greatestFiniteMagnitude)
                         }
                         .alignment(.leading)

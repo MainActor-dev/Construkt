@@ -27,8 +27,8 @@ import UIKit
 import ObjectiveC.runtime
 
 /// An internal `CAGradientLayer` configured to perform the continuous "shimmer" animation across bounds.
-final class SkeletonLayer: CAGradientLayer {
-    private(set) var config: SkeletonConfig = SkeletonConfig()
+final class _ShimmerLayer: CAGradientLayer {
+    private(set) var config: _ShimmerConfig = _ShimmerConfig()
 
     var isAnimating: Bool {
         animation(forKey: Self.animationKey) != nil
@@ -45,7 +45,7 @@ final class SkeletonLayer: CAGradientLayer {
     @available(*, unavailable)
     required init?(coder: NSCoder) { fatalError() }
 
-    func apply(config: SkeletonConfig) {
+    func apply(config: _ShimmerConfig) {
         self.config = config
         cornerRadius = config.cornerRadius
 
@@ -143,14 +143,14 @@ final class SkeletonLayer: CAGradientLayer {
         return (from, to)
     }
 
-    private static func isReverse(_ dir: SkeletonConfig.Direction) -> Bool {
+    private static func isReverse(_ dir: _ShimmerConfig.Direction) -> Bool {
         switch dir {
         case .rightToLeft, .bottomToTop: return true
         default: return false
         }
     }
 
-    private static func startPoint(for dir: SkeletonConfig.Direction) -> CGPoint {
+    private static func startPoint(for dir: _ShimmerConfig.Direction) -> CGPoint {
         switch dir {
         case .leftToRight:  return CGPoint(x: 0.0, y: 0.5)
         case .rightToLeft:  return CGPoint(x: 1.0, y: 0.5)
@@ -158,7 +158,7 @@ final class SkeletonLayer: CAGradientLayer {
         case .bottomToTop:  return CGPoint(x: 0.5, y: 1.0)
         }
     }
-    private static func endPoint(for dir: SkeletonConfig.Direction) -> CGPoint {
+    private static func endPoint(for dir: _ShimmerConfig.Direction) -> CGPoint {
         switch dir {
         case .leftToRight:  return CGPoint(x: 1.0, y: 0.5)
         case .rightToLeft:  return CGPoint(x: 0.0, y: 0.5)
@@ -184,7 +184,7 @@ extension UIView {
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             layer.frame = self.bounds
-            layer.cornerRadius = (layer as? SkeletonLayer)?.config.cornerRadius ?? layer.cornerRadius
+            layer.cornerRadius = (layer as? _ShimmerLayer)?.config.cornerRadius ?? layer.cornerRadius
             CATransaction.commit()
         }
         addObserver(obs)

@@ -34,7 +34,7 @@ public struct CollectionView: ModifiableView {
     public let modifiableView = CollectionViewWrapperView()
     
     /// Initializes a declarative collection view dynamically mapped to a reactive stream of `Section` arrays.
-    public init(@SectionResultBuilder content: () -> AnyViewBinding<[SectionController]>) {
+    public init(@AnySectionResultBuilder content: () -> AnyViewBinding<[SectionConfig]>) {
         let sectionsBinding = content()
         
         sectionsBinding.observe(on: .main) { [weak modifiableView] sections in
@@ -63,8 +63,8 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         return refreshControl
     }()
     
-    private lazy var dataSource: CollectionDiffableDataSource = {
-        let ds = CollectionDiffableDataSource(
+    private lazy var dataSource: AnyCollectionDiffableDataSource = {
+        let ds = AnyCollectionDiffableDataSource(
             collectionView: collectionView,
             cellProvider: { (collectionView, index, item) in
                 return item.cell(in: collectionView, at: index)
@@ -90,12 +90,12 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
         return ds
     }()
     
-    private lazy var adapter: CellControllerAdapter = {
-        return CellControllerAdapter(dataSource: dataSource)
+    private lazy var adapter: CellConfigAdapter = {
+        return CellConfigAdapter(dataSource: dataSource)
     }()
     
     /// Cached section map for O(1) layout provider lookups
-    private var currentSectionMap: [String: SectionController] = [:]
+    private var currentSectionMap: [String: SectionConfig] = [:]
     
     /// Tracks whether the compositional layout has been set up
     private var hasInitializedLayout = false
@@ -122,12 +122,12 @@ public class CollectionViewWrapperView: UIView, UICollectionViewDelegate {
     }
     
     /// Provides responder hierarchy access to the internal representation of a section.
-    public func sectionController(for sectionIndex: Int) -> SectionController? {
+    public func sectionController(for sectionIndex: Int) -> SectionConfig? {
         guard let identifier = dataSource.sectionIdentifier(at: sectionIndex) else { return nil }
         return currentSectionMap[identifier]
     }
     
-    func update(sections: [SectionController]) {
+    func update(sections: [SectionConfig]) {
         // Update the cached section map before applying data
         currentSectionMap = Dictionary(
             uniqueKeysWithValues: sections.map { ($0.identifier.uniqueId, $0) }

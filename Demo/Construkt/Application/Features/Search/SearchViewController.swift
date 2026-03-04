@@ -48,8 +48,8 @@ public class SearchViewController: UIViewController {
 
                     // List
                     CollectionView {
-                        Section(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
-                            Cell(movie, id: movie.id) { movie in
+                        AnySection(id: SearchSection.results, items: viewModel.moviesObservable) { movie in
+                            AnyCell(movie, id: movie.id) { movie in
                                 MovieSearchRow(movie: movie)
                             }
                         }
@@ -57,7 +57,7 @@ public class SearchViewController: UIViewController {
                             let vc = MovieDetailViewController(movie: movie)
                             self.navigationController?.pushViewController(vc, animated: true)
                         }
-                        .skeleton(count: 8, when: viewModel.isLoadingObservable) {
+                        .shimmer(count: 8, when: viewModel.isLoadingObservable) {
                             MovieSearchRow(movie: .placeholder)
                         }
                         .layout {
@@ -128,14 +128,14 @@ struct MovieSearchRow: ViewBuilder {
                 }
                 .cornerRadius(8)
                 .clipsToBounds(true)
-                .skeletonable(true)
+                .shimmerable(true)
 
             VStackView(spacing: 4) {
                 LabelView(movie.title)
                     .font(.systemFont(ofSize: 16, weight: .bold))
                     .color(.white)
                     .numberOfLines(2)
-                    .skeletonable(true)
+                    .shimmerable(true)
                 
                 HStackView(spacing: 4) {
                     ImageView(UIImage(systemName: "star.fill"))
@@ -147,7 +147,7 @@ struct MovieSearchRow: ViewBuilder {
                         .color(.systemYellow)
                 }
                 .alignment(.center)
-                .skeletonable(true)
+                .shimmerable(true)
                 
                 SpacerView()
             }
@@ -160,7 +160,7 @@ struct MovieSearchRow: ViewBuilder {
     }
 }
 
-enum SearchSection: String, SectionControllerIdentifier {
+enum SearchSection: String, SectionConfigIdentifier {
     case results
     
     var uniqueId: String { rawValue }

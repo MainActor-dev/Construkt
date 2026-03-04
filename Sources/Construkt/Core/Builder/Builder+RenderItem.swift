@@ -1,8 +1,8 @@
 import Foundation
 import UIKit
 
-/// Wraps data to allow a clean fallback to a skeleton placeholder state.
-/// This allows declarative views to switch between real data and placeholder skeletons
+/// Wraps data to allow a clean fallback to a shimmer placeholder state.
+/// This allows declarative views to switch between real data and placeholder shimmers
 /// without needing massive mock objects.
 public enum RenderItem<T> {
     case data(T)
@@ -22,12 +22,12 @@ public extension Array {
 
 public extension ModifiableView {
     
-    /// Applies data to a view if available, or configures it as a skeleton placeholder.
+    /// Applies data to a view if available, or configures it as a shimmer placeholder.
     ///
     /// - Parameters:
     ///   - item: The `RenderItem<T>` controlling this view.
     ///   - onData: A closure that configures the view with the real data `T`.
-    ///   - onPlaceholder: A closure that configures the view's dummy shape/text for the skeleton.
+    ///   - onPlaceholder: A closure that configures the view's dummy shape/text for the shimmer.
     @discardableResult
     func render<T>(
         for item: RenderItem<T>,
@@ -38,11 +38,11 @@ public extension ModifiableView {
         switch item {
         case .data(let realData):
             onData(modifiableView, realData)
-            return self.skeletonable(false)
+            return self.shimmerable(false)
             
         case .placeholder:
             onPlaceholder?(modifiableView)
-            return self.skeletonable(true)
+            return self.shimmerable(true)
         }
     }
 }
@@ -55,7 +55,7 @@ public extension ModifiableView where Base: UILabel {
     ///
     /// - Parameters:
     ///   - item: The `RenderItem` driving this view.
-    ///   - placeholder: The dummy text the layout engine should use to size the skeleton box.
+    ///   - placeholder: The dummy text the layout engine should use to size the shimmer box.
     ///   - textMapper: Extracts the real string from the data model.
     @discardableResult
     func render<T>(
@@ -67,11 +67,11 @@ public extension ModifiableView where Base: UILabel {
         switch item {
         case .data(let realData):
             return ViewModifier(modifiableView, keyPath: \.text, value: textMapper(realData))
-                .skeletonable(false)
+                .shimmerable(false)
             
         case .placeholder:
             return ViewModifier(modifiableView, keyPath: \.text, value: placeholder)
-                .skeletonable(true)
+                .shimmerable(true)
         }
     }
 }
@@ -80,7 +80,7 @@ public extension ModifiableView where Base: UILabel {
 
 public extension ModifiableView where Base: UIImageView {
     
-    /// Loads a remote image if data is available, or shows a skeleton placeholder.
+    /// Loads a remote image if data is available, or shows a shimmer placeholder.
     ///
     /// - Parameters:
     ///   - item: The `RenderItem` driving this view.
@@ -96,11 +96,11 @@ public extension ModifiableView where Base: UIImageView {
         switch item {
         case .data(let realData):
             modifiableView.setImage(from: urlMapper(realData), placeholder: placeholder)
-            return self.skeletonable(false)
+            return self.shimmerable(false)
             
         case .placeholder:
             modifiableView.image = placeholder
-            return self.skeletonable(true)
+            return self.shimmerable(true)
         }
     }
 }

@@ -1,7 +1,7 @@
 import UIKit
 import ConstruktKit
 
-enum ExploreSection: String, SectionControllerIdentifier {
+enum ExploreSection: String, SectionConfigIdentifier {
     case search
     case genres
     case collections
@@ -62,9 +62,9 @@ class ExploreViewController: UIViewController {
     
     // MARK: - Sections
     
-    private var searchSection: Section {
-        Section(id: ExploreSection.search, items: ["search_bar"]) { _ in
-            Cell("search_bar", id: "search_bar") { _ in
+    private var searchSection: AnySection {
+        AnySection(id: ExploreSection.search, items: ["search_bar"]) { _ in
+            AnyCell("search_bar", id: "search_bar") { _ in
                 HStackView {
                     ExploreSearchBar(viewModel: self.viewModel)
                 }
@@ -76,15 +76,15 @@ class ExploreViewController: UIViewController {
         }
     }
     
-    private var genresSection: Section {
-        Section(
+    private var genresSection: AnySection {
+        AnySection(
             id: ExploreSection.genres,
             items: viewModel.$genres,
             header: Header {
                 ExploreHeader(title: "Browse Genres", subtitle: nil)
             }
         ) { genre in
-            Cell(genre, id: genre.id) { genre in
+            AnyCell(genre, id: genre.id) { genre in
                 ExploreGenreCard(genre: genre)
             }
         }
@@ -102,15 +102,15 @@ class ExploreViewController: UIViewController {
         }
     }
     
-    private var collectionsSection: Section {
-        Section(
+    private var collectionsSection: AnySection {
+        AnySection(
             id: ExploreSection.collections,
             items: viewModel.$collections,
             header: Header {
                 ExploreHeader(title: "Curated Collections", subtitle: "Hand-picked by our editors")
             }
         ) { collection in
-            Cell(collection, id: collection.id) { collection in
+            AnyCell(collection, id: collection.id) { collection in
                 ExploreCollectionCard(collection: collection)
             }
         }
@@ -128,15 +128,15 @@ class ExploreViewController: UIViewController {
         }
     }
     
-    private var arrivalsSection: Section {
-        Section(
+    private var arrivalsSection: AnySection {
+        AnySection(
             id: ExploreSection.arrivals,
             items: viewModel.$arrivals,
             header: Header {
                 ExploreHeader(title: "Just Arrived", subtitle: "New titles this week")
             }
         ) { arrival in
-            Cell(arrival, id: arrival.id) { arrival in
+            AnyCell(arrival, id: arrival.id) { arrival in
                 ExploreArrivalRow(arrival: arrival)
             }
         }

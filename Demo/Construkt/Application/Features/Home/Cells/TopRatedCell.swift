@@ -30,11 +30,11 @@ struct TopRatedCell: ViewBuilder {
                     .color(UIColor.darkGray.withAlphaComponent(0.5)) // Faded number
                     .alignment(.center)
                     .width(40)
-                    .skeletonable(true)
+                    .shimmerable(true)
                 
                 // Poster
                 ImageView(url: movie.posterURL)
-                    .skeletonable(true)
+                    .shimmerable(true)
                     .contentMode(.scaleAspectFill)
                     .backgroundColor(.darkGray)
                     .clipsToBounds(true)
@@ -48,7 +48,7 @@ struct TopRatedCell: ViewBuilder {
                         .font(.systemFont(ofSize: 16, weight: .semibold))
                         .color(.white)
                         .numberOfLines(2)
-                        .skeletonable(true)
+                        .shimmerable(true)
                     HStackView(spacing: 4) {
                         ImageView(UIImage(systemName: "star.fill"))
                             .tintColor(.systemYellow)
@@ -66,7 +66,7 @@ struct TopRatedCell: ViewBuilder {
                         .alignment(.center)
                     }
                     .alignment(.center)
-                    .skeletonable(true)
+                    .shimmerable(true)
                     SpacerView()
                 }
             }

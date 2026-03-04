@@ -24,17 +24,17 @@
 
 import UIKit
 
-public typealias CellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
+public typealias AnyCellRegistration<Cell: UICollectionViewCell, Item> = UICollectionView.CellRegistration<Cell, Item>
 
-/// A type alias for a diffable data source snapshot mapping `SectionController` sections to `CellController` items.
-public typealias CollectionSnapshot = NSDiffableDataSourceSnapshot<SectionController, CellController>
+/// A type alias for a diffable data source snapshot mapping `SectionConfig` sections to `CellConfig` items.
+public typealias AnyCollectionSnapshot = NSDiffableDataSourceSnapshot<SectionConfig, CellConfig>
 
-/// A type alias for a `UICollectionViewDiffableDataSource` driven by `SectionController` and `CellController`.
-public typealias CollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionController, CellController>
+/// A type alias for a `UICollectionViewDiffableDataSource` driven by `SectionConfig` and `CellConfig`.
+public typealias AnyCollectionDiffableDataSource = UICollectionViewDiffableDataSource<SectionConfig, CellConfig>
 
-public extension CollectionDiffableDataSource {
-    func display(_ sections: [SectionController], completion: (() -> Void)? = nil) {
-        var newSnapshot = CollectionSnapshot()
+public extension AnyCollectionDiffableDataSource {
+    func display(_ sections: [SectionConfig], completion: (() -> Void)? = nil) {
+        var newSnapshot = AnyCollectionSnapshot()
         
         // 1. Build the new structure
         for section in sections {
@@ -59,7 +59,7 @@ public extension CollectionDiffableDataSource {
             }
             
             // 2b. Find sections that need reloading (header/footer changes)
-            // We can't rely on SectionController equality since it only checks uniqueId.
+            // We can't rely on SectionConfig equality since it only checks uniqueId.
             // We need to manually check if the supplementaries changed.
             let oldSectionMap = Dictionary(uniqueKeysWithValues: currentSnapshot.sectionIdentifiers.map { ($0.identifier.uniqueId, $0) })
             
@@ -96,8 +96,8 @@ public extension CollectionDiffableDataSource {
     }
     
     func appendItems(
-        _ items: [CellController],
-        into identifier: SectionControllerIdentifier,
+        _ items: [CellConfig],
+        into identifier: SectionConfigIdentifier,
         animated: Bool = false
     ) {
         let displayedSections = snapshot().sectionIdentifiers
@@ -108,13 +108,13 @@ public extension CollectionDiffableDataSource {
         apply(snapshot, animatingDifferences: animated)
     }
     
-    func deleteItems(_ items: [CellController]) {
+    func deleteItems(_ items: [CellConfig]) {
         var snapshot = snapshot()
         snapshot.deleteItems(items)
         apply(snapshot, animatingDifferences: true)
     }
     
-    func section(at index: Int) -> SectionController? {
+    func section(at index: Int) -> SectionConfig? {
         return snapshot().sectionIdentifiers[safe: index]
     }
     
@@ -124,9 +124,9 @@ public extension CollectionDiffableDataSource {
     
     // MARK: - Private Helpers
     
-    /// Builds a lookup of [CellController.id → contentHash] from the current snapshot
+    /// Builds a lookup of [CellConfig.id → contentHash] from the current snapshot
     private func buildContentMap(
-        from snapshot: CollectionSnapshot
+        from snapshot: AnyCollectionSnapshot
     ) -> [AnyHashable: AnyHashable] {
         var map: [AnyHashable: AnyHashable] = [:]
         for item in snapshot.itemIdentifiers {

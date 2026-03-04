@@ -148,20 +148,20 @@ extension ModifiableView {
         ViewModifier(modifiableView) { $0.isHidden = !isVisible }
     }
     
-    /// Configures the view to support `SkeletonView` loading states.
+    /// Configures the view to support `_ShimmerView` loading states.
     ///
     /// - Parameters:
-    ///   - isSkeletonAble: A boolean enabling skeleton animations on this view.
-    ///   - bgColor: The background color used during the skeleton state.
+    ///   - is_ShimmerAble: A boolean enabling shimmer animations on this view.
+    ///   - bgColor: The background color used during the shimmer state.
     /// - Returns: A modified view wrapper.
     @discardableResult
-    public func skeletonable(
-        _ isSkeletonAble: Bool,
+    public func shimmerable(
+        _ is_ShimmerAble: Bool,
         bgColor: UIColor = UIColor(white: 0.90, alpha: 1.0)
     ) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
-            $0.isSkeletonable = isSkeletonAble
-            $0.skeletonConfig = .init(
+            $0.isShimmerable = is_ShimmerAble
+            $0.shimmerConfig = .init(
                 background: bgColor,
                 pausesOnBackground: false
             )

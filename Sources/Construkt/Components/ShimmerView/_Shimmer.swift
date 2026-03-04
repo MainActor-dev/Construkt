@@ -24,28 +24,28 @@
 //
 import UIKit
 
-/// A namespace for creating placeholder/skeleton variants of a `UICollectionViewCell` 
+/// A namespace for creating placeholder/shimmer variants of a `UICollectionViewCell` 
 /// tailored for loading states.
-public enum Skeleton<Cell: UICollectionViewCell> {
+public enum _Shimmer<Cell: UICollectionViewCell> {
     public static func create(
         count: Int = 1,
         identifier: String = UUID().uuidString,
         configure: ((Cell) -> Void)? = nil
-    ) -> [CellController] {
+    ) -> [CellConfig] {
         guard count >= 1 else { fatalError("Need at least 1 cell controller") }
         return (1...count).map { idx in
             create(id: identifier + "_SHIMMER_" + String(idx), configure: configure)
         }
     }
     
-    public static func create(id: AnyHashable, configure: ((Cell) -> Void)? = nil) -> CellController {
-        return CellController(
+    public static func create(id: AnyHashable, configure: ((Cell) -> Void)? = nil) -> CellConfig {
+        return CellConfig(
             id: id,
             model: (),
-            registration: CellRegistration<Cell, Void> { cell, indexPath, item in
+            registration: AnyCellRegistration<Cell, Void> { cell, indexPath, item in
                 configure?(cell)
                 cell.layoutIfNeeded()
-                cell.setAnimatedSkeletonView(true)
+                cell.setAnimatedShimmerView(true)
             }
         )
     }

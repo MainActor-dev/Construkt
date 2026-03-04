@@ -19,7 +19,7 @@
   - [Table Views](#table-views)
   - [Dynamic Collection Views](#dynamic-collection-views)
   - [Static Collection Views](#static-collection-views)
-  - [Skeleton Loading States](#skeleton-loading-states)
+  - [Shimmer Loading States](#shimmer-loading-states)
 - [Advanced View Structure](#advanced-view-structure)
 - [Author](#author)
 - [Contribution](#contribution)
@@ -85,7 +85,7 @@ struct PosterCell: ViewBuilder {
     var body: View {
         VStackView(spacing: 8) {
             ImageView(url: movie.posterURL)
-                .skeletonable(true)
+                .shimmerable(true)
                 .contentMode(.scaleAspectFill)
                 .backgroundColor(.darkGray)
                 .cornerRadius(8)
@@ -97,12 +97,12 @@ struct PosterCell: ViewBuilder {
                     .font(.systemFont(ofSize: 14, weight: .semibold))
                     .color(.white)
                     .numberOfLines(1)
-                    .skeletonable(true)
+                    .shimmerable(true)
                 
                 LabelView("Adventure") // Placeholder genre
                     .font(.systemFont(ofSize: 12))
                     .color(.gray)
-                    .skeletonable(true)
+                    .shimmerable(true)
             }
             .alignment(.leading)
         }
@@ -257,12 +257,12 @@ struct MainUsersTableView: ViewBuilder {
 
 ### Dynamic Collection Views
 
-`CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `Section`-based `ResultBuilder` syntax.
+`CollectionView` leverages **DiffableDataSources** and supports multi-section layouts with headers, footers, and orthogonal scrolling — all via a `AnySection`-based `ResultBuilder` syntax.
 
 ```swift
 CollectionView {
-    Section(id: "trending", items: movies, header: Header { LabelView("Trending Now").font(.title1) }) { movie in
-        Cell(movie, id: movie.id) { movieData in
+    AnySection(id: "trending", items: movies, header: Header { LabelView("Trending Now").font(.title1) }) { movie in
+        AnyCell(movie, id: movie.id) { movieData in
             MoviePosterCell(movie: movieData)
         }
     }
@@ -275,36 +275,36 @@ CollectionView {
 
 ### Static Collection Views
 
-You can also build statically-defined declarative collections (e.g., Settings menus) by listing explicit `Cell` components within a `Section`:
+You can also build statically-defined declarative collections (e.g., Settings menus) by listing explicit `AnyCell` components within a `AnySection`:
 
 ```swift
 CollectionView {
-    Section(id: "settings", header: Header { LabelView("General") }) {
-        Cell("Notifications", id: "notifications") { title in
+    AnySection(id: "settings", header: Header { LabelView("General") }) {
+        AnyCell("Notifications", id: "notifications") { title in
             SettingsRowView(title: title)
         }
-        Cell("Privacy", id: "privacy") { title in
+        AnyCell("Privacy", id: "privacy") { title in
             SettingsRowView(title: title)
         }
     }
 }
 ```
 
-### Skeleton Loading States
+### Shimmer Loading States
 Building sophisticated loading UIs is built-in natively:
 
 ```swift
-Section(id: "popular", items: movies) { movie in
-    Cell(movie, id: movie.id) { movieData in 
+AnySection(id: "popular", items: movies) { movie in
+    AnyCell(movie, id: movie.id) { movieData in 
         MoviePosterCell(movie: movieData) 
     }
 }
-.skeleton(count: 5, when: $viewModel.isLoading) {
+.shimmer(count: 5, when: $viewModel.isLoading) {
     MoviePosterCell(movie: .placeholder)
 }
 ```
 
-When `isLoading` is true, Construkt automatically generates 5 skeleton placeholder geometries based on your ViewBuilder structure and animates a shimmer gradient across them. When the data loads, it cross-dissolves them back to your actual fetched data natively.
+When `isLoading` is true, Construkt automatically generates 5 shimmer placeholder geometries based on your ViewBuilder structure and animates a shimmer gradient across them. When the data loads, it cross-dissolves them back to your actual fetched data natively.
 
 ---
 

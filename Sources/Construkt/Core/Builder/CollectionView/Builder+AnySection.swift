@@ -27,29 +27,29 @@ import UIKit
 
 // MARK: - Protocols
 
-/// A protocol that identifies types capable of resolving into a reactive binding of `SectionController` arrays.
-public protocol SectionObservable {
+/// A protocol that identifies types capable of resolving into a reactive binding of `SectionConfig` arrays.
+public protocol AnySectionObservable {
     /// Converts the conforming type into a binding of section controllers.
-    func asSectionObservable() -> AnyViewBinding<[SectionController]>
+    func asAnySectionObservable() -> AnyViewBinding<[SectionConfig]>
 }
 
-extension SectionController: SectionObservable {
-    public func asSectionObservable() -> AnyViewBinding<[SectionController]> { .just([self]) }
+extension SectionConfig: AnySectionObservable {
+    public func asAnySectionObservable() -> AnyViewBinding<[SectionConfig]> { .just([self]) }
 }
 
-extension Array: SectionObservable where Element == SectionController {
-    public func asSectionObservable() -> AnyViewBinding<[SectionController]> { .just(self) }
+extension Array: AnySectionObservable where Element == SectionConfig {
+    public func asAnySectionObservable() -> AnyViewBinding<[SectionConfig]> { .just(self) }
 }
 
 /// A marker protocol identifying valid declarative components belonging within a `Section` body.
-public protocol SectionComponent {}
+public protocol AnySectionComponent {}
 
-extension Array: SectionComponent where Element == CellController {}
+extension Array: AnySectionComponent where Element == CellConfig {}
 
 // MARK: - Section Constructs
 
 /// A declarative wrapper defining a supplementary header view for a `Section`.
-public struct Header: SectionComponent {
+public struct Header: AnySectionComponent {
     public let controller: SupplementaryController
     
     /// Initializes the header with a unique ID and a statically structured declarative `View` block.
@@ -59,7 +59,7 @@ public struct Header: SectionComponent {
             elementKind: UICollectionView.elementKindSectionHeader,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
-            view.setAnimatedSkeletonView(false)
+            view.setAnimatedShimmerView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }
@@ -79,7 +79,7 @@ public struct Header: SectionComponent {
 }
 
 /// A declarative wrapper defining a supplementary footer view for a `Section`.
-public struct Footer: SectionComponent {
+public struct Footer: AnySectionComponent {
     public let controller: SupplementaryController
     
     /// Initializes the footer with a unique ID and a statically structured declarative `View` block.
@@ -89,7 +89,7 @@ public struct Footer: SectionComponent {
             elementKind: UICollectionView.elementKindSectionFooter,
             viewType: HostingReusableView<VStackView>.self
         ) { view in
-            view.setAnimatedSkeletonView(false)
+            view.setAnimatedShimmerView(false)
             let views = content().asViews()
             view.host(VStackView(views))
         }
@@ -108,72 +108,72 @@ public struct Footer: SectionComponent {
     }
 }
 
-// Ensure CellController conforms to SectionComponent (via CellConvertible wrapper)
-public struct CellComponent: SectionComponent {
-    let cells: [CellController]
+// Ensure CellConfig conforms to AnySectionComponent (via AnyCellConvertible wrapper)
+public struct CellComponent: AnySectionComponent {
+    let cells: [CellConfig]
 }
 
-extension CellController: SectionComponent {}
+extension CellConfig: AnySectionComponent {}
 
 // MARK: - Section Content Builder
 
-/// An intermediate structure aggregating parsed cells, headers, and footers from a single `SectionContentBuilder`.
-public struct SectionContent {
-    var cells: [CellController] = []
+/// An intermediate structure aggregating parsed cells, headers, and footers from a single `AnyAnySectionContentBuilder`.
+public struct AnySectionContent {
+    var cells: [CellConfig] = []
     var header: SupplementaryController?
     var footer: SupplementaryController?
 }
 
-/// A result builder designed to aggregate headers, footers, and cells into a unified `SectionContent` model.
+/// A result builder designed to aggregate headers, footers, and cells into a unified `AnySectionContent` model.
 @resultBuilder
-public struct SectionContentBuilder {
-    public static func buildBlock(_ components: SectionComponent...) -> SectionContent {
-        var content = SectionContent()
+public struct AnyAnySectionContentBuilder {
+    public static func buildBlock(_ components: AnySectionComponent...) -> AnySectionContent {
+        var content = AnySectionContent()
         for component in components {
             if let header = component as? Header {
                 content.header = header.controller
             } else if let footer = component as? Footer {
                 content.footer = footer.controller
-            } else if let cell = component as? CellController {
+            } else if let cell = component as? CellConfig {
                 content.cells.append(cell)
-            } else if let cellConvertible = component as? CellConvertible {
+            } else if let cellConvertible = component as? AnyCellConvertible {
                 content.cells.append(contentsOf: cellConvertible.asCells())
             }
         }
         return content
     }
     
-    public static func buildExpression(_ expression: CellConvertible) -> SectionComponent {
+    public static func buildExpression(_ expression: AnyCellConvertible) -> AnySectionComponent {
         return expression
     }
     
-    public static func buildExpression(_ expression: Header) -> SectionComponent {
+    public static func buildExpression(_ expression: Header) -> AnySectionComponent {
         return expression
     }
     
-    public static func buildExpression(_ expression: Footer) -> SectionComponent {
+    public static func buildExpression(_ expression: Footer) -> AnySectionComponent {
         return expression
     }
     
-    public static func buildOptional(_ component: SectionComponent?) -> SectionComponent {
+    public static func buildOptional(_ component: AnySectionComponent?) -> AnySectionComponent {
          return component ?? CellComponent(cells: [])
     }
     
-    public static func buildEither(first: SectionComponent) -> SectionComponent {
+    public static func buildEither(first: AnySectionComponent) -> AnySectionComponent {
         return first
     }
 
-    public static func buildEither(second: SectionComponent) -> SectionComponent {
+    public static func buildEither(second: AnySectionComponent) -> AnySectionComponent {
         return second
     }
     
-    public static func buildArray(_ components: [SectionComponent]) -> SectionComponent {
+    public static func buildArray(_ components: [AnySectionComponent]) -> AnySectionComponent {
         // Flatten cells
-        var cells: [CellController] = []
+        var cells: [CellConfig] = []
         components.forEach {
-            if let cell = $0 as? CellController {
+            if let cell = $0 as? CellConfig {
                 cells.append(cell)
-            } else if let convertible = $0 as? CellConvertible {
+            } else if let convertible = $0 as? AnyCellConvertible {
                 cells.append(contentsOf: convertible.asCells())
             }
         }
@@ -184,81 +184,81 @@ public struct SectionContentBuilder {
 // MARK: - Section Result Builder
 /// A robust result builder mapping discrete `Section` definitions into unified binding-powered observables.
 @resultBuilder
-public struct SectionResultBuilder {
-    public static func buildBlock() -> AnyViewBinding<[SectionController]> {
+public struct AnySectionResultBuilder {
+    public static func buildBlock() -> AnyViewBinding<[SectionConfig]> {
         .just([])
     }
     
-    public static func buildBlock(_ components: SectionObservable...) -> AnyViewBinding<[SectionController]> {
-        let bindings = components.map { $0.asSectionObservable() }
+    public static func buildBlock(_ components: AnySectionObservable...) -> AnyViewBinding<[SectionConfig]> {
+        let bindings = components.map { $0.asAnySectionObservable() }
         return combineLatestBindings(bindings)
     }
     
-    public static func buildIf(_ value: SectionObservable?) -> AnyViewBinding<[SectionController]> {
-        value?.asSectionObservable() ?? .just([])
+    public static func buildIf(_ value: AnySectionObservable?) -> AnyViewBinding<[SectionConfig]> {
+        value?.asAnySectionObservable() ?? .just([])
     }
     
-    public static func buildEither(first: SectionObservable) -> AnyViewBinding<[SectionController]> {
-        first.asSectionObservable()
+    public static func buildEither(first: AnySectionObservable) -> AnyViewBinding<[SectionConfig]> {
+        first.asAnySectionObservable()
     }
     
-    public static func buildEither(second: SectionObservable) -> AnyViewBinding<[SectionController]> {
-        second.asSectionObservable()
+    public static func buildEither(second: AnySectionObservable) -> AnyViewBinding<[SectionConfig]> {
+        second.asAnySectionObservable()
     }
     
-    public static func buildArray(_ components: [SectionObservable]) -> AnyViewBinding<[SectionController]> {
-        let bindings = components.map { $0.asSectionObservable() }
+    public static func buildArray(_ components: [AnySectionObservable]) -> AnyViewBinding<[SectionConfig]> {
+        let bindings = components.map { $0.asAnySectionObservable() }
         return combineLatestBindings(bindings)
     }
 }
 
 
 // MARK: - Section
-/// A declarative constructor for generating a `SectionController` via native data bindings 
-/// or static `CellResultBuilder` closures.
-public struct Section: SectionObservable {
-    private let binding: AnyViewBinding<[SectionController]>
+/// A declarative constructor for generating a `SectionConfig` via native data bindings 
+/// or static `AnyCellResultBuilder` closures.
+public struct AnySection: AnySectionObservable {
+    private let binding: AnyViewBinding<[SectionConfig]>
     
     // MARK: Initializers
     
-    // Standard initializer handled cleanly by @SectionContentBuilder without ambiguity
+    // Standard initializer handled cleanly by @AnyAnySectionContentBuilder without ambiguity
     
     /// Static Data-binding initializer
     public init<T>(
-        id: SectionControllerIdentifier,
+        id: SectionConfigIdentifier,
         items: [T],
-        @CellResultBuilder content: (T) -> [CellController]
+        @AnyCellResultBuilder content: (T) -> [CellConfig]
     ) {
         let cells = items.flatMap { content($0) }
-        let section = SectionController(identifier: id, cells: cells, header: nil, footer: nil, layoutProvider: nil)
+        let section = SectionConfig(identifier: id, cells: cells, header: nil, footer: nil, layoutProvider: nil)
         self.binding = .just([section])
     }
     
     /// Reactive Binding initializer
     public init<B: ViewBinding>(
-        id: SectionControllerIdentifier,
+        id: SectionConfigIdentifier,
         binding: B,
-        @CellResultBuilder content: @escaping (B.Value) -> [CellController]
+        @AnyCellResultBuilder content: @escaping (B.Value) -> [CellConfig]
     ) {
         self.binding = binding
             .map { items in
-                return [SectionController(identifier: id, cells: content(items), header: nil, footer: nil, layoutProvider: nil)]
+                return [SectionConfig(identifier: id, cells: content(items), header: nil, footer: nil, layoutProvider: nil)]
             }
     }
     
     /// Reactive Binding with element iteration helper
     public init<B: ViewBinding, Element>(
-        id: SectionControllerIdentifier,
+        id: SectionConfigIdentifier,
         items binding: B,
         header: Header? = nil,
         footer: Footer? = nil,
-        @CellResultBuilder content: @escaping (Element) -> [CellController]
+        @AnyCellResultBuilder content: @escaping (Element) -> [CellConfig]
     ) where B.Value == [Element] {
         self.binding = binding
             .map { items in
                 let cells = items.flatMap { content($0) }
                 return [
-                    SectionController(
+                    SectionConfig(
                         identifier: id,
                         cells: cells,
                         header: header?.controller,
@@ -272,7 +272,7 @@ public struct Section: SectionObservable {
     // MARK: - Actions Modifier
     
     /// Attaches a type-safe selection action that applies uniformly to every item housed dynamically within this section.
-    public func onSelect<T>(_ handler: @escaping (T) -> Void) -> Section {
+    public func onSelect<T>(_ handler: @escaping (T) -> Void) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 let newCells = section.cells.map { cell in
@@ -289,7 +289,7 @@ public struct Section: SectionObservable {
                     }
                 }
                  
-                return SectionController(
+                return SectionConfig(
                     identifier: section.identifier,
                     cells: newCells,
                     header: section.header,
@@ -298,11 +298,11 @@ public struct Section: SectionObservable {
                 )
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Binds an externally injected target reference weakly into every item's tap action dynamically inside this section.
-    public func onSelect<T, Target: AnyObject>(on target: Target, _ handler: @escaping (Target, T) -> Void) -> Section {
+    public func onSelect<T, Target: AnyObject>(on target: Target, _ handler: @escaping (Target, T) -> Void) -> AnySection {
         let improved = binding
             .map { [weak target] sections in
                 guard let target = target else { return sections }
@@ -322,7 +322,7 @@ public struct Section: SectionObservable {
                         }
                     }
                      
-                    return SectionController(
+                    return SectionConfig(
                         identifier: section.identifier,
                         cells: newCells,
                         header: section.header,
@@ -331,16 +331,16 @@ public struct Section: SectionObservable {
                     )
                 }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
 
     /// Builder Initializer with Header/Footer support
     public init(
-        id: SectionControllerIdentifier,
-        @SectionContentBuilder content: () -> SectionContent
+        id: SectionConfigIdentifier,
+        @AnyAnySectionContentBuilder content: () -> AnySectionContent
     ) {
         let sectionContent = content()
-        let section = SectionController(
+        let section = SectionConfig(
             identifier: id, 
             cells: sectionContent.cells, 
             header: sectionContent.header, 
@@ -352,7 +352,7 @@ public struct Section: SectionObservable {
     
     // MARK: Modifiers
     /// Uses a standard closure returning an optional `NSCollectionLayoutSection`, parameterized by environment.
-    public func layout(_ handler: @escaping (String) -> NSCollectionLayoutSection?) -> Section {
+    public func layout(_ handler: @escaping (String) -> NSCollectionLayoutSection?) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -360,11 +360,11 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Uses a declarative `@LayoutBuilder` closure to synthesize the UI layout for this specific section implicitly.
-    public func layout(@LayoutBuilder _ builder: @escaping () -> NSCollectionLayoutSection) -> Section {
+    public func layout(@LayoutBuilder _ builder: @escaping () -> NSCollectionLayoutSection) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -372,11 +372,11 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Uses a declarative `@LayoutBuilder` closure dynamically injected with an environment string identifier.
-    public func layout(@LayoutBuilder _ builder: @escaping (String) -> NSCollectionLayoutSection) -> Section {
+    public func layout(@LayoutBuilder _ builder: @escaping (String) -> NSCollectionLayoutSection) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -384,14 +384,14 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Modifies the structural definition of the section's header by providing an internally injected declarative `Header` block.
-    public func header(_ handler: @escaping () -> Header) -> Section {
+    public func header(_ handler: @escaping () -> Header) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
-                return SectionController(
+                return SectionConfig(
                     identifier: section.identifier,
                     cells: section.cells,
                     header: handler().controller,
@@ -400,14 +400,14 @@ public struct Section: SectionObservable {
                 )
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Modifies the structural definition of the section's footer by providing an internally injected declarative `Footer` block.
-    public func footer(_ handler: @escaping () -> Footer) -> Section {
+    public func footer(_ handler: @escaping () -> Footer) -> AnySection {
         let improved = binding.map { sections in
              sections.map { section in
-                 return SectionController(
+                 return SectionConfig(
                      identifier: section.identifier,
                      cells: section.cells,
                      header: section.header,
@@ -416,11 +416,11 @@ public struct Section: SectionObservable {
                  )
              }
          }
-         return Section(binding: improved)
+         return AnySection(binding: improved)
      }
     
     /// Adds decoration items to the section's layout.
-    public func decorationItems(_ items: [NSCollectionLayoutDecorationItem]) -> Section {
+    public func decorationItems(_ items: [NSCollectionLayoutDecorationItem]) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -430,11 +430,11 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Appends a single decoration item to the section's layout.
-    public func decorationItem(_ item: NSCollectionLayoutDecorationItem) -> Section {
+    public func decorationItem(_ item: NSCollectionLayoutDecorationItem) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -444,11 +444,11 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
     /// Appends a custom declarative background view dynamically bound to this specific section's lifecycle.
-    public func backgroundDecoration(id: String? = nil, insets: NSDirectionalEdgeInsets = .zero, zIndex: Int? = nil, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> Section {
+    public func backgroundDecoration(id: String? = nil, insets: NSDirectionalEdgeInsets = .zero, zIndex: Int? = nil, @ViewResultBuilder _ content: @escaping () -> ViewConvertable) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
                 var copy = section
@@ -469,33 +469,33 @@ public struct Section: SectionObservable {
                 return copy
             }
         }
-        return Section(binding: improved)
+        return AnySection(binding: improved)
     }
     
-    /// Imposes an automated animated "Skeleton mode" replacing layout components with shimmer placeholder items.
+    /// Imposes an automated animated "_Shimmer mode" replacing layout components with shimmer placeholder items.
     /// Dictated dynamically by resolving a binding boolean argument `when:`.
-    public func skeleton<C, B>(
+    public func shimmer<C, B>(
         _ type: C.Type,
         count: Int,
-        when skeletonBinding: B,
+        when shimmerBinding: B,
         includeSuppmentary: Bool = false,
         hideSupplementary: Bool = false,
         configure: ((C) -> Void)? = nil
-    ) -> Section where C: UICollectionViewCell, B: ViewBinding, B.Value == Bool {
+    ) -> AnySection where C: UICollectionViewCell, B: ViewBinding, B.Value == Bool {
         
-        let combined = AnyViewBinding<([SectionController], Bool)>.combineLatest(binding, skeletonBinding)
-            .map { (sections, isLoading) -> [SectionController] in
+        let combined = AnyViewBinding<([SectionConfig], Bool)>.combineLatest(binding, shimmerBinding)
+            .map { (sections, isLoading) -> [SectionConfig] in
                 if isLoading {
                     return sections.map { section in
                          var header = hideSupplementary ? nil : section.header
-                         if includeSuppmentary { header = header?.asSkeleton() }
+                         if includeSuppmentary { header = header?.as_Shimmer() }
                          
                          var footer = hideSupplementary ? nil : section.footer
-                         if includeSuppmentary { footer = footer?.asSkeleton() }
+                         if includeSuppmentary { footer = footer?.as_Shimmer() }
                          
-                         return SectionController(
+                         return SectionConfig(
                             identifier: section.identifier,
-                            cells: Skeleton<C>.create(count: count, configure: configure),
+                            cells: _Shimmer<C>.create(count: count, configure: configure),
                             header: header,
                             footer: footer,
                             layoutProvider: section.layoutProvider
@@ -506,18 +506,18 @@ public struct Section: SectionObservable {
                 }
             }
             
-        return Section(binding: combined)
+        return AnySection(binding: combined)
     }
     
-    /// Imposes an automated declarative "Skeleton mode" loading block via `HostingCell` replacing the current section layout.
-    public func skeleton<Content: View, B: ViewBinding>(
+    /// Imposes an automated declarative "_Shimmer mode" loading block via `HostingCell` replacing the current section layout.
+    public func shimmer<Content: View, B: ViewBinding>(
         count: Int,
         when binding: B,
         includeSupplementary: Bool = false,
         hideSupplementary: Bool = false,
         placeholder: @escaping () -> Content
-    ) -> Section where B.Value == Bool {
-        return skeleton(
+    ) -> AnySection where B.Value == Bool {
+        return shimmer(
             HostingCell<Content>.self,
             count: count,
             when: binding,
@@ -533,12 +533,12 @@ public struct Section: SectionObservable {
     public func emptyState(
         layout: ((String) -> NSCollectionLayoutSection)? = nil,
         @ViewResultBuilder _ content: @escaping () -> ViewConvertable
-    ) -> Section {
-        return Section(binding: binding.map { sections in
+    ) -> AnySection {
+        return AnySection(binding: binding.map { sections in
             sections.map { section in
                 if section.cells.isEmpty {
                     // Create Empty Cell
-                    let emptyCell = CellController(
+                    let emptyCell = CellConfig(
                         id: "empty_\(section.identifier.uniqueId)",
                         model: (),
                         registration: UICollectionView.CellRegistration<HostingCell<UIView>, Void> { cell, _, _ in
@@ -552,14 +552,14 @@ public struct Section: SectionObservable {
                     
                     // Determine Layout
                     let layoutProvider: (String) -> NSCollectionLayoutSection? = { env in
-                        return Section.makeEmptyStateLayout(
+                        return AnySection.makeEmptyStateLayout(
                             env: env,
                             customLayout: layout,
                             section: section
                         )
                     }
                     
-                    return SectionController(
+                    return SectionConfig(
                         identifier: section.identifier,
                         cells: [emptyCell],
                         header: section.header,
@@ -577,7 +577,7 @@ public struct Section: SectionObservable {
     private static func makeEmptyStateLayout(
         env: String,
         customLayout: ((String) -> NSCollectionLayoutSection)?,
-        section: SectionController
+        section: SectionConfig
     ) -> NSCollectionLayoutSection? {
         let sectionLayout: NSCollectionLayoutSection
         if let customLayout = customLayout {
@@ -611,7 +611,7 @@ public struct Section: SectionObservable {
         return sectionLayout
     }
     
-    private static func addStartSupplementaries(to layout: NSCollectionLayoutSection, from section: SectionController) {
+    private static func addStartSupplementaries(to layout: NSCollectionLayoutSection, from section: SectionConfig) {
          var supplementaries = layout.boundarySupplementaryItems
          let hasHeader = supplementaries.contains { $0.elementKind == UICollectionView.elementKindSectionHeader }
          let hasFooter = supplementaries.contains { $0.elementKind == UICollectionView.elementKindSectionFooter }
@@ -639,13 +639,13 @@ public struct Section: SectionObservable {
     }
     
     // Internal init for modifiers
-    private init(binding: AnyViewBinding<[SectionController]>) {
+    private init(binding: AnyViewBinding<[SectionConfig]>) {
         self.binding = binding
     }
 
     // MARK: Convert
     
-    public func asSectionObservable() -> AnyViewBinding<[SectionController]> {
+    public func asAnySectionObservable() -> AnyViewBinding<[SectionConfig]> {
         return binding
     }
 }

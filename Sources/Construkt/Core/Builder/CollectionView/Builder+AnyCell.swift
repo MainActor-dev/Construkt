@@ -27,67 +27,67 @@ import UIKit
 
 // MARK: - Protocols
 
-/// A protocol that identifies types capable of resolving into a collection of `CellController`s.
-public protocol CellConvertible: SectionComponent {
+/// A protocol that identifies types capable of resolving into a collection of `CellConfig`s.
+public protocol AnyCellConvertible: AnySectionComponent {
     /// Converts the conforming type into an array of cell controllers.
-    func asCells() -> [CellController]
+    func asCells() -> [CellConfig]
 }
 
-extension CellController: CellConvertible {
-    public func asCells() -> [CellController] { [self] }
+extension CellConfig: AnyCellConvertible {
+    public func asCells() -> [CellConfig] { [self] }
 }
 
-extension Array: CellConvertible where Element == CellController {
-    public func asCells() -> [CellController] { self }
+extension Array: AnyCellConvertible where Element == CellConfig {
+    public func asCells() -> [CellConfig] { self }
 }
 
 // MARK: - Result Builder
 
-/// A result builder that enables a declarative, SwiftUI-like syntax for generating arrays of `CellController`s.
+/// A result builder that enables a declarative, SwiftUI-like syntax for generating arrays of `CellConfig`s.
 @resultBuilder
-public struct CellResultBuilder {
-    public static func buildBlock() -> [CellController] {
+public struct AnyCellResultBuilder {
+    public static func buildBlock() -> [CellConfig] {
         []
     }
     
-    public static func buildBlock(_ values: CellConvertible...) -> [CellController] {
+    public static func buildBlock(_ values: AnyCellConvertible...) -> [CellConfig] {
         values.flatMap { $0.asCells() }
     }
     
-    public static func buildIf(_ value: CellConvertible?) -> [CellController] {
+    public static func buildIf(_ value: AnyCellConvertible?) -> [CellConfig] {
         value?.asCells() ?? []
     }
     
-    public static func buildEither(first: CellConvertible) -> [CellController] {
+    public static func buildEither(first: AnyCellConvertible) -> [CellConfig] {
         first.asCells()
     }
     
-    public static func buildEither(second: CellConvertible) -> [CellController] {
+    public static func buildEither(second: AnyCellConvertible) -> [CellConfig] {
         second.asCells()
     }
     
-    public static func buildArray(_ components: [[CellController]]) -> [CellController] {
+    public static func buildArray(_ components: [[CellConfig]]) -> [CellConfig] {
         components.flatMap { $0 }
     }
     
-    public static func buildOptional(_ component: CellConvertible?) -> [CellController] {
+    public static func buildOptional(_ component: AnyCellConvertible?) -> [CellConfig] {
         component?.asCells() ?? []
     }
 }
 
 // MARK: - Cell
 
-/// A lightweight declarative wrapper for generating a `CellController` inline.
+/// A lightweight declarative wrapper for generating a `CellConfig` inline.
 ///
 /// It allows configuring cells with closures directly within a section block, eliminating the need
 /// for standard Delegate/DataSource boilerplate.
-public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
+public struct AnyCell<C: UICollectionViewCell, Model>: AnyCellConvertible {
     
     private let model: Model?
     private let id: AnyHashable
     private let configure: (C, Model) -> Void
     private var onSelect: ((Model) -> Void)?
-    private var skeletonCount: Int?
+    private var shimmerCount: Int?
     
     public init(
         _ model: Model?,
@@ -110,26 +110,26 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
     ///
     /// - Parameter handler: A closure providing the cell's underlying generic `Model`.
     /// - Returns: A mutated copy of the `Cell` with the selection attached.
-    public func onSelect(_ handler: @escaping (Model) -> Void) -> Cell {
+    public func onSelect(_ handler: @escaping (Model) -> Void) -> AnyCell {
         var copy = self
         copy.onSelect = handler
         return copy
     }
     
-    /// Specifies how many animated skeleton copies of this cell should be shown when in a loading state.
-    public func skeleton(count: Int) -> Cell {
+    /// Specifies how many animated shimmer copies of this cell should be shown when in a loading state.
+    public func shimmer(count: Int) -> AnyCell {
         var copy = self
-        copy.skeletonCount = count
+        copy.shimmerCount = count
         return copy
     }
     
-    public func asCells() -> [CellController] {
+    public func asCells() -> [CellConfig] {
         if let model = model {
             let wrapper = CellConfigurationWrapper(model: model, configure: configure)
             let registration = RegistrationCache.register(cell: C.self, model: Model.self)
             
              return [
-                CellController(
+                CellConfig(
                     id: id,
                     model: wrapper,
                     registration: registration,
@@ -139,8 +139,8 @@ public struct Cell<C: UICollectionViewCell, Model>: CellConvertible {
                     }
                 )
              ]
-        } else if let count = skeletonCount {
-            return Skeleton<C>.create(count: count, identifier: "skeleton_\(id)")
+        } else if let count = shimmerCount {
+            return _Shimmer<C>.create(count: count, identifier: "shimmer_\(id)")
         }
         return []
     }
@@ -221,7 +221,7 @@ public final class HostingCell<Content: View>: UICollectionViewCell {
     }
 }
 
-public extension Cell {
+public extension AnyCell {
     /// Initializer for hosting a ViewBuilder content directly
     init<Content: View>(
         _ model: Model?,
