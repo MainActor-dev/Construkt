@@ -127,11 +127,30 @@ extension ModifiableView {
         ViewModifier(modifiableView, keyPath: \.isUserInteractionEnabled, value: enabled)
     }
 
+    /// Applies a corner radius to specified corners using `CACornerMask`.
     @discardableResult
     public func roundedCorners(radius: CGFloat, corners: CACornerMask) -> ViewModifier<Base> {
         ViewModifier(modifiableView) {
             $0.layer.maskedCorners = corners
             $0.layer.cornerRadius = radius
+            $0.clipsToBounds = true
+        }
+    }
+    
+    /// Applies a corner radius to specified corners using `UIRectCorner` for easy configuration.
+    @discardableResult
+    public func roundedCorners(_ radius: CGFloat, corners: UIRectCorner) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) {
+            var mask: CACornerMask = []
+            if corners.contains(.topLeft) { mask.insert(.layerMinXMinYCorner) }
+            if corners.contains(.topRight) { mask.insert(.layerMaxXMinYCorner) }
+            if corners.contains(.bottomLeft) { mask.insert(.layerMinXMaxYCorner) }
+            if corners.contains(.bottomRight) { mask.insert(.layerMaxXMaxYCorner) }
+            if corners.contains(.allCorners) { mask = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner] }
+            
+            $0.layer.maskedCorners = mask
+            $0.layer.cornerRadius = radius
+            $0.clipsToBounds = true
         }
     }
     
