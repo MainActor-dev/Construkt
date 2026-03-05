@@ -50,14 +50,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func transitionToMainApp() {
-        let baseRouter = Router(navigationController: UINavigationController())
-        let factory = ScreenFactory()
-        let coordinator = AppCoordinator(router: baseRouter, factory: factory)
-        
-        self.appCoordinator = coordinator
-        coordinator.start()
-        
-        let mainVC = coordinator.rootViewController()
+        let mainVC = DemoViewController()
         
         // Crossfade transition
         UIView.transition(
