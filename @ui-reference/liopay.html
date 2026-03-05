@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LioPay UI Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center min-h-screen">
+    <div class="w-full max-w-[400px] bg-[#F5F6F8] relative flex flex-col shadow-2xl overflow-hidden mx-auto h-screen overflow-y-auto pb-28">
+        
+        <!-- Header Gradient Section -->
+        <div class="bg-gradient-to-b from-[#FF2000] via-[#FF5000] to-[#FE8A00] rounded-b-[2rem] relative z-0">
+            
+            <!-- Safe Area Top / Status Bar -->
+            <div class="flex justify-between items-center px-6 pt-3 text-white text-[15px] font-semibold tracking-wide">
+                <span>9:41</span>
+                <div class="flex items-center space-x-1.5">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M2.5 19.5h19v-1l-19-17v18zm2-2v-10.5l11.5 10.5h-11.5z"/></svg>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-8-8c4.4-4.4 11.6-4.4 16 0l-8 8zm0-11c-2.8 0-5.3 1.1-7 2.9l2.8 2.8c1.1-1.1 2.6-1.8 4.2-1.8s3.1.7 4.2 1.8l2.8-2.8c-1.7-1.8-4.2-2.9-7-2.9z"/></svg>
+                    <svg class="w-6 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-4h-2V8c0-1.1-.9-2-2-2zm0 10H3V8h14v8z"/></svg>
+                </div>
+            </div>
+
+            <!-- Top Nav -->
+            <div class="flex items-center px-4 pt-4 pb-2 text-white">
+                <button class="p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                </button>
+                <h1 class="text-[18px] font-bold flex-1 text-center pr-10">LioPay</h1>
+            </div>
+
+            <!-- Banner Copy and Illustration -->
+            <div class="px-5 pt-3 pb-24 flex justify-between items-start relative">
+                <p class="text-white text-[14px] leading-[1.4] w-[60%] font-medium z-10 text-shadow-sm">
+                    Dompet digital yang beneran ngerti kebutuhan bayar-bayar ongkirmu di aplikasi & agen.
+                </p>
+                <div class="w-[45%] absolute right-[-10px] top-[-10px] z-0 flex justify-end">
+                    <svg width="150" height="130" viewBox="0 0 150 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Simplified illustration for tokens -->
+                        <path d="M110 80C110 91.0457 101.0457 100 90 100H40C28.9543 100 20 91.0457 20 80V50C20 38.9543 28.9543 30 40 30H90C101.0457 30 110 38.9543 110 50V80Z" fill="#F4B400"/>
+                        <path d="M100 40H30C24.4772 40 20 44.4772 20 50V70C20 75.5228 24.4772 80 30 80H100C105.5228 80 110 75.5228 110 70V50C110 44.4772 105.5228 40 100 40Z" fill="#FFC107"/>
+                        <rect x="30" y="45" width="60" height="30" rx="4" fill="#E8F0FE"/>
+                        <rect x="35" y="55" width="20" height="15" rx="2" fill="#34A853"/>
+                        <circle cx="20" cy="20" r="4" fill="#FFFFFF" opacity="0.8"/>
+                        <path d="M120 20L125 15M125 15L130 20M125 15V10" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="130" cy="35" r="2" fill="#FFFFFF"/>
+                        <path d="M85 70L115 50V90L85 110V70Z" fill="#D32F2F"/>
+                        <path d="M65 110C65 115 60 120 50 120C40 120 35 115 35 105C35 95 55 90 65 85V110Z" fill="#FFFFFF"/>
+                        <path d="M120 90C120 95 115 100 105 100C95 100 90 95 90 85C90 75 110 70 120 65V90Z" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Two Big Buttons -->
+        <div class="px-5 -mt-[64px] relative z-10 flex space-x-3">
+            <div class="flex-1 bg-white rounded-[20px] shadow-[0_4px_20px_rgba(255,100,0,0.15)] p-4 flex flex-col items-center justify-center border-[2px] border-white min-h-[110px]">
+                <div class="mb-2">
+                    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="42" height="42" rx="10" fill="#FFF5ED"/>
+                        <rect x="12" y="14" width="18" height="14" rx="2" stroke="#E65C00" stroke-width="2"/>
+                        <path d="M12 18H30" stroke="#E65C00" stroke-width="2"/>
+                        <circle cx="26" cy="24" r="6" fill="#FFB74D" stroke="#fff" stroke-width="2"/>
+                        <path d="M26 22V26" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M24 24H28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <span class="text-[13px] font-bold text-gray-800 tracking-tight leading-tight">Isi LioPay</span>
+                <span class="text-[11px] font-bold text-[#E65C00] leading-tight">hemat s.d 30%</span>
+            </div>
+            
+            <div class="flex-1 bg-white rounded-[20px] shadow-[0_4px_20px_rgba(255,100,0,0.15)] p-4 flex flex-col items-center justify-center border-[2px] border-white min-h-[110px]">
+                <div class="mb-2">
+                    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="42" height="42" rx="10" fill="#FFF5ED"/>
+                        <rect x="14" y="10" width="14" height="22" rx="3" stroke="#E65C00" stroke-width="2"/>
+                        <circle cx="21" cy="28" r="1.5" fill="#E65C00"/>
+                        <path d="M6 21H16" stroke="#FFB74D" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M10 17H16" stroke="#FFB74D" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M16 21L14 19M16 21L14 23" stroke="#FFB74D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span class="text-[13px] font-bold text-gray-800 tracking-tight leading-tight">Bayar cepat</span>
+                <span class="text-[11px] font-bold text-[#E65C00] leading-tight">pakai LioPay</span>
+            </div>
+        </div>
+
+        <div class="px-5 pt-8 pb-10">
+            <!-- Keuntungan pakai LioPay Section -->
+            <h2 class="text-center font-bold text-[16px] mb-4 text-gray-800">Keuntungan pakai LioPay</h2>
+            
+            <div class="bg-white rounded-3xl shadow-sm overflow-hidden px-4 py-2 border border-white">
+                
+                <div class="flex items-start py-4 border-b border-gray-100 last:border-0">
+                    <div class="w-[42px] h-[42px] shrink-0 mr-3 flex items-center justify-center rounded-full bg-white shadow-[0_0_8px_rgba(0,0,0,0.05)] border border-gray-50">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#E65C00" stroke-width="1.5"/>
+                            <text x="12" y="16" fill="#E65C00" font-size="6" font-weight="900" text-anchor="middle">30%</text>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 8L21 6M5 8L3 6" stroke="#E65C00" stroke-width="1.5"/>
+                            <rect x="0" y="8" width="9" height="5" fill="#FF5000" rx="1" transform="rotate(-15)"/>
+                            <text x="4" y="11" fill="white" font-size="2.5" font-weight="bold" transform="rotate(-15)">HINGGA</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[14px] font-bold text-[#D65D0E] mb-0.5 mt-0.5">Diskon voucher hingga 30%</h3>
+                        <p class="text-[12px] text-gray-600 leading-snug">Dapatkan diskon vouchertiap isi saldo.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start py-4 border-b border-gray-100 last:border-0">
+                    <div class="w-[42px] h-[42px] shrink-0 mr-3 flex items-center justify-center rounded-full bg-white shadow-[0_0_8px_rgba(0,0,0,0.05)] border border-gray-50">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 10V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V10M4 10L12 3L20 10M4 10H20" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 21V15H15V21" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="18" r="1.5" fill="#E65C00"/>
+                            <rect x="15" y="5" width="4" height="8" fill="#FFB74D" rx="1"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[14px] font-bold text-[#D65D0E] mb-0.5 mt-0.5">Bayar pakai LioPay di agen</h3>
+                        <p class="text-[12px] text-gray-600 leading-snug tracking-tight">Mau bayar di aplikasi/agen, semua bisa pakai LioPay.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start py-4 border-b border-gray-100 last:border-0">
+                    <div class="w-[42px] h-[42px] shrink-0 mr-3 flex items-center justify-center rounded-full bg-white shadow-[0_0_8px_rgba(0,0,0,0.05)] border border-gray-50">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12" stroke="#E65C00" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M12 3V7M12 3L8 7" stroke="#E65C00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="5" fill="#FF5000"/>
+                            <text x="12" y="14.5" fill="white" font-size="6" font-weight="bold" text-anchor="middle">Rp</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[14px] font-bold text-[#D65D0E] mb-0.5 mt-0.5">Refund Instan</h3>
+                        <p class="text-[12px] text-gray-600 leading-snug">Dana masuk ke LioPay jika pengiriman gagal.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start py-4 border-b border-gray-100 last:border-0">
+                    <div class="w-[42px] h-[42px] shrink-0 mr-3 flex items-center justify-center rounded-full bg-white shadow-[0_0_8px_rgba(0,0,0,0.05)] border border-gray-50">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="7" width="18" height="10" rx="2" stroke="#374151" stroke-width="1.5"/>
+                            <circle cx="12" cy="12" r="3" stroke="#FF5000" stroke-width="1.5"/>
+                            <path d="M19 12H24M24 12L22 10M24 12L22 14" stroke="#FF5000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="5" y="9" width="4" height="2" fill="#FF5000"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[14px] font-bold text-[#D65D0E] mb-0.5 mt-0.5">Bayar ongkir lebih cepat</h3>
+                        <p class="text-[12px] text-gray-600 leading-snug tracking-tight">Tidak perlu pindah aplikasi, pakai LioPay aja!</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Perbedaan LioPay & Parcel Poin -->
+            <h2 class="text-center font-bold text-[16px] mt-8 mb-4 text-gray-800">Perbedaan LioPay & Parcel Poin</h2>
+            
+            <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-white pb-3">
+                <!-- Inner header with orange rounded pill -->
+                <div class="bg-[#FFF4ED] mx-3 mt-3 rounded-full flex relative py-2.5 shadow-inner">
+                    <div class="w-1/2 text-center text-[#D65D0E] font-bold text-[13px] z-10">
+                        LioPay
+                    </div>
+                    <!-- Separator line -->
+                    <div class="absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 w-[1px] h-5 bg-gray-300 z-0"></div>
+                    <div class="w-1/2 text-center text-[#D65D0E] font-bold text-[13px] z-10">
+                        Parcel Poin
+                    </div>
+                </div>
+
+                <!-- Rows -->
+                <div class="px-2 pt-2">
+                    <div class="flex text-center text-[11px] text-[#374151] py-3 border-b border-gray-100 items-center">
+                        <div class="w-1/2 px-2 leading-snug">Didapat dari pembelian voucher & penghasilan COD</div>
+                        <div class="w-1/2 px-2 leading-snug">Didapat dari cashback pengiriman</div>
+                    </div>
+                    <div class="flex text-center text-[11px] text-[#374151] py-3 border-b border-gray-100 items-center">
+                        <div class="w-1/2 px-2 leading-snug">Digunakan untuk bayar ongkir</div>
+                        <div class="w-1/2 px-2 leading-snug">Digunakan untuk bayar ongkir & tukar voucher</div>
+                    </div>
+                    <div class="flex text-center text-[11px] text-[#374151] py-3 border-b border-gray-100 items-center">
+                        <div class="w-1/2 px-2 leading-snug">Bisa dicairkan</div>
+                        <div class="w-1/2 px-2 leading-snug">Tidak bisa dicairkan</div>
+                    </div>
+                    <div class="flex text-center text-[11px] text-[#374151] py-3 items-center">
+                        <div class="w-1/2 px-2 leading-snug">Berlaku selamanya</div>
+                        <div class="w-1/2 px-2 leading-snug">Ada masa berlaku</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Need Help text -->
+            <div class="mt-8 mb-6 text-center">
+                <a href="#" class="text-[#FF0000] font-bold text-[13px] hover:underline">Butuh bantuan?</a>
+            </div>
+            
+            <div class="h-8"></div>
+        </div>
+
+        <!-- Sticky Bottom Button Area -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 pb-8 z-20">
+            <button class="w-full bg-[#FF0000] text-white font-bold text-[15px] py-3.5 rounded-xl shadow-md hover:bg-[#E60000] active:scale-[0.98] transition-all">
+                Isi LioPay sekarang
+            </button>
+        </div>
+
+    </div>
+</body>
+</html>
