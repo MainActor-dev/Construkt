@@ -11,8 +11,6 @@
 		041DEA9A2F2E2F1500267715 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 04B9BF282F2C9ED9006EB671 /* Factory */; };
 		041DEA9B2F2E2F1500267715 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 04B9BF292F2C9ED9006EB671 /* RxCocoa */; };
 		042A397E2F4C4FA3001DC0CA /* ConstruktKit in Frameworks */ = {isa = PBXBuildFile; productRef = 042A397D2F4C4FA3001DC0CA /* ConstruktKit */; };
-		0492F49A2F4FEB6F006CD346 /* ma-ios-common in Frameworks */ = {isa = PBXBuildFile; productRef = 0492F4992F4FEB6F006CD346 /* ma-ios-common */; };
-		04976E3E2F4F3E5600DFCE92 /* ma-ios-common in Frameworks */ = {isa = PBXBuildFile; productRef = 04976E3D2F4F3E5600DFCE92 /* ma-ios-common */; };
 		9511898C2F57B46500AB3D49 /* ConstruktKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9511898B2F57B46500AB3D49 /* ConstruktKit */; };
 		95118AD62F57C18200AB3D49 /* ConstruktKit in Frameworks */ = {isa = PBXBuildFile; productRef = 95118AD52F57C18200AB3D49 /* ConstruktKit */; };
 		95118B7B2F57C25700AB3D49 /* ConstruktKit in Frameworks */ = {isa = PBXBuildFile; productRef = 95118B7A2F57C25700AB3D49 /* ConstruktKit */; };
@@ -59,14 +57,12 @@
 				95118B7B2F57C25700AB3D49 /* ConstruktKit in Frameworks */,
 				9576D5412F56713B006F7C7F /* ConstruktKit in Frameworks */,
 				9576D4982F561D00006F7C7F /* ConstruktKit in Frameworks */,
-				0492F49A2F4FEB6F006CD346 /* ma-ios-common in Frameworks */,
 				041DEA9A2F2E2F1500267715 /* Factory in Frameworks */,
 				95D8330B2F56F339000154B8 /* ConstruktKit in Frameworks */,
 				95D833B32F571556000154B8 /* ConstruktKit in Frameworks */,
 				9576D4922F561536006F7C7F /* ConstruktKit in Frameworks */,
 				042A397E2F4C4FA3001DC0CA /* ConstruktKit in Frameworks */,
 				041DEA992F2E2F1500267715 /* RxSwift in Frameworks */,
-				04976E3E2F4F3E5600DFCE92 /* ma-ios-common in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,8 +109,6 @@
 				04B9BF282F2C9ED9006EB671 /* Factory */,
 				04B9BF292F2C9ED9006EB671 /* RxCocoa */,
 				042A397D2F4C4FA3001DC0CA /* ConstruktKit */,
-				04976E3D2F4F3E5600DFCE92 /* ma-ios-common */,
-				0492F4992F4FEB6F006CD346 /* ma-ios-common */,
 				9576D4912F561536006F7C7F /* ConstruktKit */,
 				9576D4972F561D00006F7C7F /* ConstruktKit */,
 				9576D5402F56713B006F7C7F /* ConstruktKit */,
@@ -155,7 +149,6 @@
 			packageReferences = (
 				04B9BF252F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				04B9BF272F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "Factory" */,
-				0492F4982F4FEB6F006CD346 /* XCRemoteSwiftPackageReference "ma-ios-common" */,
 				95118B792F57C25700AB3D49 /* XCRemoteSwiftPackageReference "Construkt" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -390,14 +383,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		0492F4982F4FEB6F006CD346 /* XCRemoteSwiftPackageReference "ma-ios-common" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/MainActorDev/ma-ios-common";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		04B9BF252F2C9ED9006EB671 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -428,15 +413,6 @@
 		042A397D2F4C4FA3001DC0CA /* ConstruktKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ConstruktKit;
-		};
-		0492F4992F4FEB6F006CD346 /* ma-ios-common */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0492F4982F4FEB6F006CD346 /* XCRemoteSwiftPackageReference "ma-ios-common" */;
-			productName = "ma-ios-common";
-		};
-		04976E3D2F4F3E5600DFCE92 /* ma-ios-common */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "ma-ios-common";
 		};
 		04B9BF262F2C9ED9006EB671 /* RxSwift */ = {
 			isa = XCSwiftPackageProductDependency;

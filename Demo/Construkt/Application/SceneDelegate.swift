@@ -25,8 +25,9 @@
 
 import UIKit
 import ConstruktKit
-import ma_ios_common
 
+
+@available(iOS 15.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -96,6 +97,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+    
+    // MARK: - Deep Links
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        print("🔗 Deep Link Received: \(url.absoluteString)")
+        print("🔗 Coordinator Status: \(String(describing: appCoordinator))")
+        appCoordinator?.handleDeepLink(url)
     }
 }
 

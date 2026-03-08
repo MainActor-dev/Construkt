@@ -1,7 +1,7 @@
 import Foundation
 import ConstruktKit
 
-public struct Genre: Codable, Identifiable, Equatable, Hashable {
+public struct Genre: Codable, Identifiable, Equatable, Hashable, Sendable {
     public let id: Int
     public let name: String
     

@@ -1,6 +1,7 @@
 import UIKit
-import ma_ios_common
 
+
+@available(iOS 15.0, *)
 @MainActor
 final class ExploreCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
@@ -10,7 +11,7 @@ final class ExploreCoordinator: BaseCoordinator {
         super.init(router: router)
     }
     
-    func start() {
+    override func start() {
         let exploreVC = factory.makeExploreViewController()
         
         exploreVC.onAction = { [weak self] action in

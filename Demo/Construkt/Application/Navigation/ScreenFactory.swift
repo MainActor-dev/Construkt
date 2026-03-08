@@ -1,5 +1,5 @@
 import UIKit
-import ma_ios_common
+
 
 @MainActor
 protocol ScreenFactoryProtocol {
@@ -40,6 +40,11 @@ final class ScreenFactory: ScreenFactoryProtocol {
                 selectedGenre: selectedGenre
             )
             return MovieListViewController(viewModel: listViewModel)
+            
+        case .web(let url):
+            let vc = UIViewController()
+            vc.title = url.absoluteString
+            return vc
         }
     }
     

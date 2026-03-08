@@ -1,5 +1,4 @@
 import UIKit
-import ma_ios_common
 
 @MainActor
 enum AppTab: Int {
@@ -8,17 +7,23 @@ enum AppTab: Int {
     case profile = 2
 }
 
+@available(iOS 15.0, *)
 @MainActor
 final class AppCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
+    private let deepLinkMapper: DeepLinkMapper
     
-    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    /// Keep a serializable path for restoration.
+    public private(set) var currentPath: [AppRoute] = []
+    
+    init(router: RouterProtocol, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
         self.factory = factory
+        self.deepLinkMapper = deepLinkMapper
         super.init(router: router)
     }
     
-    func start() {
+    override func start() {
         let homeNav = NavigationController()
         let homeRouter = Router(navigationController: homeNav)
         let homeCoordinator = HomeCoordinator(router: homeRouter, factory: factory)
@@ -65,6 +70,41 @@ final class AppCoordinator: BaseCoordinator {
     
     func switchToTab(_ tab: AppTab) {
         tabBarController.selectedIndex = tab.rawValue
+    }
+    
+    // MARK: Public navigation & deep link API
+    
+    public func open(_ route: AppRoute, animated: Bool = true) {
+        currentPath.append(route)
+        
+        switch route {
+        case .home:
+            switchToTab(.home)
+        case .explore, .search:
+            switchToTab(.explore)
+        case .movieDetail(_), .movieList(_), .web(_):
+            // Defaulting advanced route pushes to Home for this demonstration
+            switchToTab(.home)
+            // childRouter.push(factory.makeScreen(for: route)...)
+        }
+    }
+    
+    public func handleDeepLink(_ url: URL) {
+        guard let route = deepLinkMapper.route(from: url) else { return }
+        open(route)
+    }
+    
+    // MARK: Restoration
+    
+    public func saveRestorationData() -> Data? {
+        try? JSONEncoder().encode(currentPath)
+    }
+    
+    public func restore(from data: Data) {
+        guard let saved = try? JSONDecoder().decode([AppRoute].self, from: data) else { return }
+        // Set the root to the first item (e.g. .home) and manually replay the route pushes.
+        // currentPath = saved
+        // Logic for restoring children navigation controllers stack sequentially.
     }
     
     override func rootViewController() -> UIViewController {

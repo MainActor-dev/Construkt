@@ -1,6 +1,7 @@
 import UIKit
-import ma_ios_common
 
+
+@available(iOS 15.0, *)
 @MainActor
 final class HomeCoordinator: BaseCoordinator {
     private let factory: ScreenFactoryProtocol
@@ -12,7 +13,7 @@ final class HomeCoordinator: BaseCoordinator {
         super.init(router: router)
     }
     
-    func start() {
+    override func start() {
         let homeVC = factory.makeHomeViewController()
         homeVC.onAction = { [weak self] action in
             guard let self = self else { return }
