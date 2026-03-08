@@ -82,10 +82,14 @@ final class AppCoordinator: BaseCoordinator {
             switchToTab(.home)
         case .explore, .search:
             switchToTab(.explore)
-        case .movieDetail(_), .movieList(_), .web(_):
-            // Defaulting advanced route pushes to Home for this demonstration
-            switchToTab(.home)
-            // childRouter.push(factory.makeScreen(for: route)...)
+        case .movieDetail, .movieList, .web:
+            if let selectedNav = activeNavigationController(for: tabBarController) {
+                let proxyRouter = Router(navigationController: selectedNav)
+                let screen = factory.makeScreen(for: route)
+                proxyRouter.push(screen, animated: animated, hideTabBar: true, onPop: nil)
+            } else {
+                switchToTab(.home)
+            }
         }
     }
     
@@ -109,5 +113,20 @@ final class AppCoordinator: BaseCoordinator {
     
     override func rootViewController() -> UIViewController {
         tabBarController
+    }
+    
+    // MARK: - Helpers
+    
+    private func activeNavigationController(for viewController: UIViewController) -> UINavigationController? {
+        if let nav = viewController as? UINavigationController {
+            return nav
+        }
+        if let tab = viewController as? UITabBarController, let selected = tab.selectedViewController {
+            return activeNavigationController(for: selected)
+        }
+        if let presented = viewController.presentedViewController {
+            return activeNavigationController(for: presented)
+        }
+        return viewController.navigationController
     }
 }
