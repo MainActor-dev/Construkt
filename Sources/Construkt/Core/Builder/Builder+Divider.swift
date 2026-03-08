@@ -29,25 +29,29 @@ import UIKit
 /// A lightweight builder component representing a horizontal separator line (1px high) typically used in menus, stacks, or lists.
 public struct DividerView: ModifiableView {
 
-    public let modifiableView = Modified(BuilderInternalDividerView(frame: .zero)) {
-        let subview = UIView(frame: .zero)
-        $0.addSubview(subview)
-        subview.translatesAutoresizingMaskIntoConstraints = false
-        if #available(iOS 13, *) {
-            subview.backgroundColor = ViewBuilderEnvironment.defaultSeparatorColor ?? UIColor.secondaryLabel
-        } else {
-            subview.backgroundColor = ViewBuilderEnvironment.defaultSeparatorColor ?? UIColor.black
-        }
-        subview.topAnchor.constraint(equalTo: $0.topAnchor, constant: 4.0).isActive = true
-        subview.leftAnchor.constraint(equalTo: $0.leftAnchor).isActive = true
-        subview.rightAnchor.constraint(equalTo: $0.rightAnchor).isActive = true
-        subview.heightAnchor.constraint(equalToConstant: 0.5).isActive = true
-        subview.bottomAnchor.constraint(equalTo: $0.bottomAnchor, constant: -4.5).isActive = true
-        $0.backgroundColor = .clear
-    }
+    public let modifiableView: BuilderInternalDividerView
 
     // lifecycle
-    public init() {}
+    public init(color: UIColor? = nil, height: CGFloat = 0.5) {
+        self.modifiableView = Modified(BuilderInternalDividerView(frame: .zero)) {
+            let subview = UIView(frame: .zero)
+            $0.addSubview(subview)
+            subview.translatesAutoresizingMaskIntoConstraints = false
+            if let color = color {
+                subview.backgroundColor = color
+            } else if #available(iOS 13, *) {
+                subview.backgroundColor = ViewBuilderEnvironment.defaultSeparatorColor ?? UIColor.secondaryLabel
+            } else {
+                subview.backgroundColor = ViewBuilderEnvironment.defaultSeparatorColor ?? UIColor.black
+            }
+            subview.topAnchor.constraint(equalTo: $0.topAnchor, constant: 4.0).isActive = true
+            subview.leftAnchor.constraint(equalTo: $0.leftAnchor).isActive = true
+            subview.rightAnchor.constraint(equalTo: $0.rightAnchor).isActive = true
+            subview.heightAnchor.constraint(equalToConstant: height).isActive = true
+            subview.bottomAnchor.constraint(equalTo: $0.bottomAnchor, constant: -4.5).isActive = true
+            $0.backgroundColor = .clear
+        }
+    }
 
 }
 
