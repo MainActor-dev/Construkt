@@ -27,7 +27,7 @@ final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
         switch event {
         case .movieDetail(let movieId):
             let screen = factory.makeScreen(for: .movieDetail(movieId: movieId))
-            router.push(screen, animated: true, completion: nil, receiver: self)
+            router.push(screen, animated: true, hideTabBar: true, receiver: self)
             return true
             
         case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):

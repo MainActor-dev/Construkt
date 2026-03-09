@@ -128,9 +128,7 @@ struct HomeView: ViewConvertable {
             id: HomeSection.popular,
             items: viewModel.popularSectionMovies,
             header: Header {
-                StandardHeader(title: "Popular Now", actionTitle: "See All") { 
-                    navBarBackgroundRef.view?.route(AppRoute.movieList(title: "Popular Now", sectionTypeRaw: HomeSection.popular.rawValue, genreId: nil, genreName: nil, allGenres: nil), sender: nil)
-                }
+                StandardHeader(title: "Popular Now", actionTitle: "See All")
             }
         ) { movie in
             AnyCell(movie, id: "popular-\(movie.id)") { movie in
@@ -161,9 +159,7 @@ struct HomeView: ViewConvertable {
             id: HomeSection.upcoming,
             items: viewModel.upcomingMovies.map { $0.asRenderItems() },
             header: Header {
-                StandardHeader(title: "Upcoming", actionTitle: "See All") {
-                    navBarBackgroundRef.view?.route(AppRoute.movieList(title: "Upcoming", sectionTypeRaw: HomeSection.upcoming.rawValue, genreId: nil, genreName: nil, allGenres: nil), sender: nil)
-                }
+                StandardHeader(title: "Upcoming", actionTitle: "See All")
             }
         ) { item in
             AnyCell(item, id: "upcoming-\(String(describing: item))") { item in

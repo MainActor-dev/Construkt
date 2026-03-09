@@ -13,7 +13,7 @@ public class ViewLifecycleRegistry {
 }
 
 private struct AssociatedKeys {
-    static var lifecycleKey = "Construkt_LifecycleKey"
+    static var lifecycleKey: UInt8 = 0
 }
 
 /// Specialized ViewModifier extension to capture true UIViewController lifecycles

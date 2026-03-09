@@ -21,11 +21,37 @@ public enum ModalStyle {
 public protocol Router: AnyObject {
     var navigationController: UINavigationController { get }
     func setRoot(_ module: Presentable, hideBar: Bool, animated: Bool, receiver: AnyEventReceiving?)
-    func push(_ module: Presentable, animated: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
+    func push(_ module: Presentable, animated: Bool, hideTabBar: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
     func pop(animated: Bool)
     func popToRoot(animated: Bool)
     func present(_ module: Presentable, style: ModalStyle, animated: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
     func dismiss(animated: Bool, completion: (() -> Void)?)
+}
+
+public extension Router {
+    func setRoot(_ module: Presentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyEventReceiving? = nil) {
+        setRoot(module, hideBar: hideBar, animated: animated, receiver: receiver)
+    }
+    
+    func push(_ module: Presentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+        push(module, animated: animated, hideTabBar: hideTabBar, completion: completion, receiver: receiver)
+    }
+    
+    func pop(animated: Bool = true) {
+        pop(animated: animated)
+    }
+    
+    func popToRoot(animated: Bool = true) {
+        popToRoot(animated: animated)
+    }
+    
+    func present(_ module: Presentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+        present(module, style: style, animated: animated, completion: completion, receiver: receiver)
+    }
+    
+    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
+        dismiss(animated: animated, completion: completion)
+    }
 }
 
 public final class DefaultRouter: NSObject, Router, UINavigationControllerDelegate {
@@ -45,9 +71,10 @@ public final class DefaultRouter: NSObject, Router, UINavigationControllerDelega
         navigationController.isNavigationBarHidden = hideBar
     }
     
-    public func push(_ module: Presentable, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+    public func push(_ module: Presentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
         let vc = module.toPresentable()
         vc.associatedCoordinator = receiver
+        vc.hidesBottomBarWhenPushed = hideTabBar
         if let completion = completion {
             completions[vc] = completion
         }
