@@ -310,7 +310,7 @@ public struct AnySection: AnySectionObservable {
                 let newCells = section.cells.map { cell in
                     var modelToUse = cell.model
                     
-                    if let wrapper = modelToUse as? CellContentWrapper {
+                    while let wrapper = modelToUse as? CellContentWrapper {
                         modelToUse = wrapper.originalModel
                     }
                     
@@ -342,7 +342,7 @@ public struct AnySection: AnySectionObservable {
                 let newCells = section.cells.map { cell in
                     var modelToUse = cell.model
                     
-                    if let wrapper = modelToUse as? CellContentWrapper {
+                    while let wrapper = modelToUse as? CellContentWrapper {
                         modelToUse = wrapper.originalModel
                     }
                     
@@ -376,7 +376,7 @@ public struct AnySection: AnySectionObservable {
                     let newCells = section.cells.map { cell in
                         var modelToUse = cell.model
                         
-                        if let wrapper = modelToUse as? CellContentWrapper {
+                        while let wrapper = modelToUse as? CellContentWrapper {
                             modelToUse = wrapper.originalModel
                         }
                         

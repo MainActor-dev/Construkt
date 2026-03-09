@@ -166,9 +166,7 @@ struct HomeView: ViewConvertable {
                 UpcomingCell(item: item)
             }
         }
-        .onRoute { (movie: Movie) in
-            AppRoute.movieDetail(movieId: String(movie.id))
-        }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
         .layout { _ in
             HomeSection.upcoming.layout
         }

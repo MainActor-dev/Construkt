@@ -9,6 +9,20 @@ public enum RenderItem<T> {
     case placeholder
 }
 
+// MARK: - Cell Content Wrapping
+
+extension RenderItem: CellContentWrapper {
+    public var originalModel: Any {
+        switch self {
+        case .data(let value):
+            // Return the unboxed internal model for Event Routing modifiers.
+            return value
+        case .placeholder:
+            return self
+        }
+    }
+}
+
 // MARK: - Array Extension for Sections
 
 public extension Array {
