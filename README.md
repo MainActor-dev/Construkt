@@ -21,6 +21,10 @@
   - [Static Collection Views](#static-collection-views)
   - [Shimmer Loading States](#shimmer-loading-states)
 - [Advanced View Structure](#advanced-view-structure)
+- [Navigation & Auto-Routing](#navigation--auto-routing)
+  - [Coordinators](#coordinators)
+  - [Declarative Routing](#declarative-routing)
+  - [ViewConvertable](#viewconvertable)
 - [Author](#author)
 - [Contribution](#contribution)
 - [License](#license)
@@ -339,6 +343,103 @@ LabelView("Direct UIKit Access")
         label.shadowOffset = CGSize(width: 1, height: 1)
     }
 ```
+
+---
+
+## Navigation & Auto-Routing
+
+Construkt includes a full **Coordinator + Router** navigation engine that bridges UIKit's responder chain with a coordinator tree. Views declare *what* navigation should happen; coordinators decide *how*.
+
+### Coordinators
+
+Define your app's routes as an enum, then create coordinators that handle them:
+
+```swift
+enum AppRoute: Codable {
+    case movieDetail(movieId: String)
+    case movieList(title: String, genreId: Int?)
+    case search
+}
+
+final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = AppRoute
+    let router: any Router
+
+    override func start() {
+        let homeVC = LifecycleHostController(HomeView(viewModel: viewModel))
+        router.setRoot(homeVC, hideBar: true, animated: false, receiver: self)
+    }
+
+    func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
+        switch event {
+        case .movieDetail(let id):
+            router.push(factory.makeDetail(id: id), animated: true, receiver: self)
+            return true
+        default:
+            return false // bubble up to parent coordinator
+        }
+    }
+}
+```
+
+The `receiver: self` parameter automatically binds the coordinator to the pushed view controller via associated objects, so events from any screen in the stack route back to the correct coordinator.
+
+### Declarative Routing
+
+Attach navigation intent directly to collection view sections using two explicit modifiers:
+
+| Modifier | Signature | Purpose |
+|----------|-----------|---------|
+| `.onSelect` | `(T) -> Void` | Imperative side-effects (analytics, ViewModel calls) |
+| `.onRoute` | `(T) -> E` | Declarative routing — auto-bubbles via responder chain |
+| `.onRoute` | `(T) -> E?` | Optional variant — routes only when non-nil |
+
+```swift
+// Declarative: returns an event, automatically routed to the nearest coordinator
+AnySection(id: "popular", items: movies) { movie in
+    AnyCell(movie, id: movie.id) { movie in PosterCell(movie: movie) }
+}
+.onRoute { (movie: Movie) in
+    AppRoute.movieDetail(movieId: String(movie.id))
+}
+
+// Imperative: side-effects only, no navigation
+.onSelect { (movie: Movie) in
+    viewModel.markAsViewed(movie)
+}
+```
+
+Any `UIView` can also trigger navigation with a tap gesture:
+
+```swift
+ImageView(UIImage(systemName: "magnifyingglass"))
+    .onRoute(AppRoute.search)
+```
+
+### ViewConvertable
+
+Screens are pure structs that produce declarative view hierarchies. The framework wraps them in `LifecycleHostController` for UIKit integration:
+
+```swift
+struct HomeView: ViewConvertable {
+    let viewModel: HomeViewModel
+
+    func asViews() -> [View] {
+        CollectionView {
+            AnySection(id: "movies", items: viewModel.movies) { movie in
+                AnyCell(movie, id: movie.id) { movie in PosterCell(movie: movie) }
+            }
+            .onRoute { (movie: Movie) in
+                AppRoute.movieDetail(movieId: String(movie.id))
+            }
+        }
+        .onHostDidLoad { viewModel.load() }
+        .asViews()
+    }
+}
+```
+
+Events bubble up the UIKit responder chain → reach the `LifecycleHostController` → jump to the `associatedCoordinator` → handled by `canReceive()`. No direct references between views and coordinators.
 
 ---
 
