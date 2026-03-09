@@ -32,7 +32,7 @@ public struct DividerView: ModifiableView {
     public let modifiableView: BuilderInternalDividerView
 
     // lifecycle
-    public init(color: UIColor? = nil, height: CGFloat = 0.5) {
+    public init(color: UIColor? = nil, height: CGFloat = 1.0) {
         self.modifiableView = Modified(BuilderInternalDividerView(frame: .zero)) {
             let subview = UIView(frame: .zero)
             $0.addSubview(subview)
