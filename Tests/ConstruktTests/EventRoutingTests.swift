@@ -42,4 +42,64 @@ struct EventRoutingTests {
         
         #expect(rootVC.receivedRoute == .page2(id: 42))
     }
+    
+    @Test("Declarative .onReceiveRoute intercepts bubbled events")
+    func testDeclarativeRouteInterceptor() {
+        var trappedRoute: TestRoute? = nil
+        
+        let container = ContainerView()
+            .onReceiveRoute(TestRoute.self, handler: { event in
+                trappedRoute = event
+                return true
+            })
+            .build()
+            
+        let button = ButtonView("Action")
+            .onRoute(TestRoute.page1)
+            .build() as! UIButton
+            
+        container.addSubview(button)
+        
+        // Bubbles up from the button -> intercepted by the declarative container logic
+        button.route(TestRoute.page1, sender: button)
+        
+        #expect(trappedRoute == .page1)
+    }
+    
+    @Test("Targeted declarative .onReceiveRoute safely decouples objects")
+    func testTargetedRouteInterceptorMemorySafety() {
+        class RefCountedTarget {
+            var handledValue: Int = 0
+            deinit {}
+        }
+        
+        var target: RefCountedTarget? = RefCountedTarget()
+        weak var weakTarget = target
+        
+        let container = ContainerView()
+            .onReceiveRoute(TestRoute.self, on: target!) { ref, event in
+                switch event {
+                case .page2(let id):
+                    ref.handledValue = id
+                    return true
+                default:
+                    return false
+                }
+            }
+            .build()
+            
+        let button = ButtonView("Action").build() as! UIButton
+        container.addSubview(button)
+        
+        button.route(TestRoute.page2(id: 99), sender: button)
+        #expect(target?.handledValue == 99)
+        
+        // Assert releasing the target works
+        target = nil
+        #expect(weakTarget == nil)
+        
+        // Bubbling continues instead of failing with released targets
+        let handled = button.route(TestRoute.page2(id: 100), sender: button)
+        #expect(handled == false)
+    }
 }

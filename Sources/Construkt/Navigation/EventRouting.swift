@@ -34,14 +34,21 @@ public extension UIResponder {
         // 1. Check if the current responder can handle it Directly
         if let h = self as? AnyRouteReceiving, h.__receive(event, sender: sender) { return true }
         
-        // 2. If it's a View Controller, check if it has an associated ConstruktCoordinator to handle it
+        // 2. Check if a UIView has a declarative .onReceiveRoute listener attached
+        if let view = self as? UIView,
+           let receiver = view.associatedReceiver,
+           receiver.__receive(event, sender: sender) {
+            return true
+        }
+        
+        // 3. If it's a View Controller, check if it has an associated ConstruktCoordinator
         if let vc = self as? UIViewController,
            let coordinator = vc.associatedCoordinator,
            coordinator.__receive(event, sender: sender) {
             return true
         }
         
-        // 3. Otherwise, bubble up to the next responder
+        // 4. Otherwise, bubble up to the next responder
         return next?.route(event, sender: sender) ?? false
     }
 }
@@ -67,7 +74,17 @@ private final class WeakBox: NSObject {
     init(_ value: AnyRouteReceiving) { self.value = value }
 }
 
+private struct ReceiverLinkKey {
+    static var receiverKey: UInt8 = 0
+}
+
 public extension UIView {
+    /// A strongly retained reference to a declarative route received attached to this view.
+    internal var associatedReceiver: AnyRouteReceiving? {
+        get { objc_getAssociatedObject(self, &ReceiverLinkKey.receiverKey) as? AnyRouteReceiving }
+        set { objc_setAssociatedObject(self, &ReceiverLinkKey.receiverKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
+    
     private func owningViewController() -> UIViewController? {
         var r: UIResponder? = self
         while let next = r?.next {
@@ -117,5 +134,38 @@ private final class RouteTapTarget<E>: NSObject {
     @objc func handleTap() {
         guard let view = view else { return }
         view.route(eventProvider(), sender: view)
+    }
+}
+
+// MARK: - Internal Declarative Receivers
+
+@MainActor
+final class ClosureRouteReceiver<E>: RouteReceiving {
+    typealias Event = E
+    private let handler: (E) -> Bool
+    
+    init(handler: @escaping @MainActor (E) -> Bool) {
+        self.handler = handler
+    }
+    
+    func canReceive(_ event: E, sender: Any?) -> Bool {
+        return handler(event)
+    }
+}
+
+@MainActor
+final class TargetedClosureRouteReceiver<E, Target: AnyObject>: RouteReceiving {
+    typealias Event = E
+    private weak var target: Target?
+    private let handler: (Target, E) -> Bool
+    
+    init(target: Target, handler: @escaping @MainActor (Target, E) -> Bool) {
+        self.target = target
+        self.handler = handler
+    }
+    
+    func canReceive(_ event: E, sender: Any?) -> Bool {
+        guard let target = target else { return false }
+        return handler(target, event)
     }
 }
