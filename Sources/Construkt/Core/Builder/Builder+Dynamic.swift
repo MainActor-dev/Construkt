@@ -97,7 +97,7 @@ public class DynamicItemViewBuilder<Item>: AnyIndexableViewBuilder {
 }
 
 /// A reactive builder component that maps an RxSwift `Observable` emission to a dynamically rebuilt view.
-public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder, View {
+public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var count: Int { view == nil ? 0 : 1 }
     /// An observable stream that triggers upon the underlying generic observable changing state.
@@ -121,30 +121,15 @@ public class DynamicObservableViewBuilder<Value>: AnyIndexableViewBuilder, View 
         return view
     }
 
-    public func build() -> UIView {
-        let container = BuilderInternalContainerView()
-        
-        if let v = self.view {
-            container.transition(to: v)
-        }
-        
-        // Remove `weak self` so the subscription implicitly retains the builder
-        // while the container is alive securely inside `container.cancelBag`.
-        self.updated?.observe(on: .main) { [weak container] _ in
-            if let v = self.view {
-                container?.transition(to: v)
-            } else {
-                container?.empty()
-            }
-        }.store(in: container.cancelBag)
-        
-        return container
+    public func asViews() -> [View] {
+        guard let view = view else { return [] }
+        return [view]
     }
 
 }
 
 /// A reactive builder component that monitors a local `value` setter to trigger reactive downstream view rebuilds.
-public class DynamicValueViewBuilder<Value>: AnyIndexableViewBuilder, View {
+public class DynamicValueViewBuilder<Value>: AnyIndexableViewBuilder {
 
     public var value: Value {
         didSet {
@@ -168,18 +153,8 @@ public class DynamicValueViewBuilder<Value>: AnyIndexableViewBuilder, View {
         return builder(value)
     }
 
-    public func build() -> UIView {
-        let container = BuilderInternalContainerView()
-        
-        container.transition(to: self.builder(self.value))
-        
-        // Remove `weak self` so the subscription implicitly retains the builder
-        // while the container is alive securely inside `container.cancelBag`.
-        self.updated?.observe(on: .main) { [weak container] _ in
-            container?.transition(to: self.builder(self.value))
-        }.store(in: container.cancelBag)
-        
-        return container
+    public func asViews() -> [View] {
+        return [builder(value)]
     }
 
 }
