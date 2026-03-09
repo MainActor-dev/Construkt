@@ -94,9 +94,9 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
                 
                 // If it's a web view we present it as a sheet
                 if case .web = route {
-                    proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated)
+                    proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated, receiver: self)
                 } else {
-                    proxyRouter.push(screen, animated: animated, completion: nil) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on Presentable
+                    proxyRouter.push(screen, animated: animated, completion: nil, receiver: self) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on Presentable
                 }
             } else {
                 switchToTab(.home)

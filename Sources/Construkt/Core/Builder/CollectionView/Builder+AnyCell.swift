@@ -106,7 +106,7 @@ public struct AnyCell<C: UICollectionViewCell, Model>: AnyCellConvertible {
     
     // MARK: Modifiers
     
-    /// Attaches a selection handler to the cell, triggered when the user taps it.
+    /// Attaches an imperative selection handler to the cell, triggered when the user taps it.
     ///
     /// - Parameter handler: A closure providing the cell's underlying generic `Model`.
     /// - Returns: A mutated copy of the `Cell` with the selection attached.

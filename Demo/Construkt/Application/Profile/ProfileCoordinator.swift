@@ -4,7 +4,9 @@ import ConstruktKit
 
 @available(iOS 15.0, *)
 @MainActor
-final class ProfileCoordinator: BaseCoordinator {
+final class ProfileCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = AppRoute
+    
     let router: any Router
     private let factory: ScreenFactoryProtocol
     
@@ -16,8 +18,10 @@ final class ProfileCoordinator: BaseCoordinator {
     
     override func start() {
         let profileVC = factory.makeProfileViewController()
-        router.setRoot(profileVC, hideBar: false, animated: false)
+        router.setRoot(profileVC, hideBar: false, animated: false, receiver: self)
     }
     
-
+    func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
+        return false // No profile events handled yet
+    }
 }

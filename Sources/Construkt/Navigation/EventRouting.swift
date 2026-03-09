@@ -6,12 +6,14 @@
 import UIKit
 
 // MARK: - Type-erased entry (responder chain only knows this)
+@MainActor
 public protocol AnyEventReceiving: AnyObject {
     /// Return true if the event was handled (stop bubbling)
     func __receive(_ event: Any, sender: Any?) -> Bool
 }
 
 // MARK: - Generic, strongly-typed handler each target conforms to
+@MainActor
 public protocol EventHandling: AnyEventReceiving {
     associatedtype Event
     func canReceive(_ event: Event, sender: Any?) -> Bool
@@ -29,9 +31,40 @@ public extension UIResponder {
     /// Bubble a strongly-typed payload up the responder chain.
     @discardableResult
     func route<E>(_ event: E, sender: Any?) -> Bool {
+        // 1. Check if the current responder can handle it Directly
         if let h = self as? AnyEventReceiving, h.__receive(event, sender: sender) { return true }
+        
+        // 2. If it's a View Controller, check if it has an associated Coordinator to handle it
+        if let vc = self as? UIViewController,
+           let coordinator = vc.associatedCoordinator,
+           coordinator.__receive(event, sender: sender) {
+            return true
+        }
+        
+        // 3. Otherwise, bubble up to the next responder
         return next?.route(event, sender: sender) ?? false
     }
+}
+
+private struct CoordinatorLinkKey {
+    static var coordinatorKey: UInt8 = 0
+}
+
+public extension UIViewController {
+    /// A weak reference to the coordinator responsible for this view controller.
+    /// This allows events to jump from the UIResponder chain to the Coordinator tree.
+    var associatedCoordinator: AnyEventReceiving? {
+        get { (objc_getAssociatedObject(self, &CoordinatorLinkKey.coordinatorKey) as? WeakBox)?.value }
+        set {
+            let box = newValue.map { WeakBox($0) }
+            objc_setAssociatedObject(self, &CoordinatorLinkKey.coordinatorKey, box, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+}
+
+private final class WeakBox: NSObject {
+    weak var value: AnyEventReceiving?
+    init(_ value: AnyEventReceiving) { self.value = value }
 }
 
 public extension UIViewController {

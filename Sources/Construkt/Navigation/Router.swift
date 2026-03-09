@@ -20,11 +20,11 @@ public enum ModalStyle {
 
 public protocol Router: AnyObject {
     var navigationController: UINavigationController { get }
-    func setRoot(_ module: Presentable, hideBar: Bool, animated: Bool)
-    func push(_ module: Presentable, animated: Bool, completion: (() -> Void)?)
+    func setRoot(_ module: Presentable, hideBar: Bool, animated: Bool, receiver: AnyEventReceiving?)
+    func push(_ module: Presentable, animated: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
     func pop(animated: Bool)
     func popToRoot(animated: Bool)
-    func present(_ module: Presentable, style: ModalStyle, animated: Bool, completion: (() -> Void)?)
+    func present(_ module: Presentable, style: ModalStyle, animated: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
     func dismiss(animated: Bool, completion: (() -> Void)?)
 }
 
@@ -38,14 +38,16 @@ public final class DefaultRouter: NSObject, Router, UINavigationControllerDelega
         self.navigationController.delegate = self
     }
     
-    public func setRoot(_ module: Presentable, hideBar: Bool = false, animated: Bool = true) {
+    public func setRoot(_ module: Presentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyEventReceiving? = nil) {
         let vc = module.toPresentable()
+        vc.associatedCoordinator = receiver
         navigationController.setViewControllers([vc], animated: animated)
         navigationController.isNavigationBarHidden = hideBar
     }
     
-    public func push(_ module: Presentable, animated: Bool = true, completion: (() -> Void)? = nil) {
+    public func push(_ module: Presentable, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
         let vc = module.toPresentable()
+        vc.associatedCoordinator = receiver
         if let completion = completion {
             completions[vc] = completion
         }
@@ -63,8 +65,9 @@ public final class DefaultRouter: NSObject, Router, UINavigationControllerDelega
         popped.forEach { runCompletion(for: $0) }
     }
     
-    public func present(_ module: Presentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil) {
+    public func present(_ module: Presentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
         let vc = module.toPresentable()
+        vc.associatedCoordinator = receiver
         switch style {
         case .pageSheet:
             vc.modalPresentationStyle = .pageSheet

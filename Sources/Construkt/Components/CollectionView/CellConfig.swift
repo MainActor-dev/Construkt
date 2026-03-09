@@ -42,7 +42,7 @@ public struct CellConfig: Hashable {
     public let model: Any
     public let contentHash: AnyHashable?
     private let makeCell: (UICollectionView, IndexPath) -> UICollectionViewCell
-    private let onSelect: (() -> Void)?
+    private let onSelect: ((UIView?) -> Void)?
     private let onPrefetch: (() -> Void)?
     private let onCancelPrefetch: (() -> Void)?
 
@@ -84,7 +84,7 @@ public struct CellConfig: Hashable {
             )
         }
         self.onSelect = didSelect.map {
-            handler in { handler(model) }
+            handler in { _ in handler(model) }
         }
         self.onPrefetch = prefetch.map {
             handler in { handler(model) }
@@ -112,7 +112,7 @@ public struct CellConfig: Hashable {
         model: Any,
         contentHash: AnyHashable?,
         makeCell: @escaping (UICollectionView, IndexPath) -> UICollectionViewCell,
-        onSelect: (() -> Void)?,
+        onSelect: ((UIView?) -> Void)?,
         onPrefetch: (() -> Void)?,
         onCancelPrefetch: (() -> Void)?
     ) {
@@ -125,13 +125,11 @@ public struct CellConfig: Hashable {
         self.onCancelPrefetch = onCancelPrefetch
     }
     
-    public func withSelection(_ handler: @escaping () -> Void) -> CellConfig {
-        // Chain with existing execution if needed, or just replace?
-        // Usually modifiers replace or append. Let's append to existing to be safe.
+    public func withSelection(_ handler: @escaping (UIView?) -> Void) -> CellConfig {
         let current = self.onSelect
-        let newHandler: () -> Void = {
-            current?()
-            handler()
+        let newHandler: (UIView?) -> Void = { sender in
+            current?(sender)
+            handler(sender)
         }
         
         return CellConfig(
@@ -157,8 +155,8 @@ public struct CellConfig: Hashable {
         makeCell(collectionView, indexPath)
     }
     
-    public func didSelect() {
-        onSelect?()
+    public func didSelect(sender: UIView? = nil) {
+        onSelect?(sender)
     }
     
     public func prefetch() {

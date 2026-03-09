@@ -5,6 +5,7 @@
 
 import Foundation
 
+@MainActor
 public protocol Coordinator: AnyObject {
     var children: [Coordinator] { get set }
     func start()
@@ -29,6 +30,7 @@ open class BaseCoordinator: Coordinator {
 
 /// An optional convenience protocol.
 /// Developers conform their Coordinator to this to magically receive `onRoute()` intents.
+@MainActor
 public protocol RouteHandlingCoordinator: Coordinator, EventHandling {
     var router: Router { get }
 }

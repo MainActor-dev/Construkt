@@ -43,7 +43,7 @@ public final class CellConfigAdapter: NSObject, CollectionDelegate {
 
     // MARK: Selection
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        item(at: indexPath)?.didSelect()
+        item(at: indexPath)?.didSelect(sender: collectionView)
     }
 
     // MARK: Prefetch

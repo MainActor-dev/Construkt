@@ -20,12 +20,6 @@ struct ExploreView: ViewConvertable {
     // We bind the viewModel at initialization.
     private let viewModel = ExploreViewModel()
     
-    // Using a class wrapper to pass a mutating reference
-    private class Ref {
-        weak var view: UIView?
-    }
-    private let contentRef = Ref()
-    
     func asViews() -> [View] {
         ZStackView {
             // Background gradients
@@ -59,7 +53,6 @@ struct ExploreView: ViewConvertable {
         .onHostDidLoad {
             viewModel.loadData()
         }
-        .reference(&contentRef.view)
         .asViews()
     }
     
@@ -77,21 +70,18 @@ struct ExploreView: ViewConvertable {
                 ExploreGenreCard(genre: genre)
             }
         }
-        .onSelect { (genre: ExploreGenre) in
-            guard let genreId = Int(genre.id) else { return }
+        .onRoute { (genre: ExploreGenre) -> AppRoute? in
+            guard let genreId = Int(genre.id) else { return nil }
             let allGenres = viewModel.allGenres.compactMap {
                 guard let id = Int($0.id) else { return nil as Genre? }
                 return Genre(id: id, name: $0.name)
             }
-            contentRef.view?.route(
-                AppRoute.movieList(
-                    title: genre.name,
-                    sectionTypeRaw: "categories",
-                    genreId: genreId,
-                    genreName: genre.name,
-                    allGenres: allGenres
-                ),
-                sender: nil
+            return AppRoute.movieList(
+                title: genre.name,
+                sectionTypeRaw: "categories",
+                genreId: genreId,
+                genreName: genre.name,
+                allGenres: allGenres
             )
         }
         .layout {
@@ -117,7 +107,7 @@ struct ExploreView: ViewConvertable {
                 ExploreCollectionCard(collection: collection)
             }
         }
-        .onSelect { (collection: ExploreCollection) in
+        .onRoute { (collection: ExploreCollection) in
             AppRoute.movieDetail(movieId: collection.id)
         }
         .layout {
@@ -143,7 +133,7 @@ struct ExploreView: ViewConvertable {
                 ExploreArrivalRow(arrival: arrival)
             }
         }
-        .onSelect { (arrival: ExploreArrival) in
+        .onRoute { (arrival: ExploreArrival) in
             AppRoute.movieDetail(movieId: arrival.id)
         }
         .layout {

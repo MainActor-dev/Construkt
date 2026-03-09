@@ -77,7 +77,7 @@ struct HomeView: ViewConvertable {
             }
         }
         // Direct event routing via ConstruktKit .onRoute modifier!
-        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
         .layout { _ in
             let layout = HomeSection.hero.layout
             layout.visibleItemsInvalidationHandler = { (items, offset, env) in
@@ -102,7 +102,7 @@ struct HomeView: ViewConvertable {
                 GenresCell(id: genre.id, genre: genre)
             }
         }
-        .onSelect { (genre: Genre) in
+        .onRoute { (genre: Genre) in
             AppRoute.movieList(
                 title: "Categories",
                 sectionTypeRaw: HomeSection.categories.rawValue,
@@ -137,7 +137,7 @@ struct HomeView: ViewConvertable {
                 PosterCell(movie: movie)
             }
         }
-        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
         .backgroundDecoration(id: "popular_bg") {
             LinearGradient(colors: [
                 UIColor.black.withAlphaComponent(0.3),
@@ -170,7 +170,7 @@ struct HomeView: ViewConvertable {
                 UpcomingCell(item: item)
             }
         }
-        .onSelect { (movie: Movie) in
+        .onRoute { (movie: Movie) in
             AppRoute.movieDetail(movieId: String(movie.id))
         }
         .layout { _ in
@@ -200,7 +200,7 @@ struct HomeView: ViewConvertable {
                 TopRatedCell(index: index + 1, movie: movie)
             }
         }
-        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
         .onSelect { (ad: String) in
             print("Ad Selected: \(ad)")
         }

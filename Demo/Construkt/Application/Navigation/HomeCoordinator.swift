@@ -20,19 +20,19 @@ final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     
     override func start() {
         let homeVC = factory.makeHomeViewController()
-        router.setRoot(homeVC, hideBar: false, animated: false)
+        router.setRoot(homeVC, hideBar: false, animated: false, receiver: self)
     }
     
     func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
         switch event {
         case .movieDetail(let movieId):
             let screen = factory.makeScreen(for: .movieDetail(movieId: movieId))
-            router.push(screen, animated: true, completion: nil)
+            router.push(screen, animated: true, completion: nil, receiver: self)
             return true
             
         case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):
             let screen = factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: sectionTypeRaw, genreId: genreId, genreName: genreName, allGenres: allGenres))
-            router.push(screen, animated: true, completion: nil)
+            router.push(screen, animated: true, completion: nil, receiver: self)
             return true
             
         case .search:
