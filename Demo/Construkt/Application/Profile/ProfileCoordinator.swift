@@ -1,22 +1,23 @@
 import UIKit
+import ConstruktKit
 
 
 @available(iOS 15.0, *)
 @MainActor
 final class ProfileCoordinator: BaseCoordinator {
+    let router: any Router
     private let factory: ScreenFactoryProtocol
     
-    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    init(router: any Router, factory: ScreenFactoryProtocol) {
+        self.router = router
         self.factory = factory
-        super.init(router: router)
+        super.init()
     }
     
     override func start() {
         let profileVC = factory.makeProfileViewController()
-        router.setRoot(profileVC, animated: false, onPop: nil)
+        router.setRoot(profileVC, hideBar: false, animated: false)
     }
     
-    override func rootViewController() -> UIViewController {
-        return router.navigationController
-    }
+
 }

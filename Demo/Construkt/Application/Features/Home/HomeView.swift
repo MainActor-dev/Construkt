@@ -1,44 +1,23 @@
 //
-//  DeclarativeHomeViewController.swift
+//  HomeView.swift
 //  Construkt
-//
-//  Created by User on 2026-02-02.
 //
 
 import UIKit
-
 import ConstruktKit
 
-class HomeViewController: UIViewController {
+struct HomeView: ViewConvertable {
     
-    public enum Action {
-        case movieSelected(Movie)
-        case listSelected(HomeSection, Genre?, [Genre]?)
-        case searchSelected
-    }
-    
-    public var onAction: ((Action) -> Void)?
-    
+    // We bind the viewModel at initialization.
     private let viewModel = MovieViewModel()
-    private weak var cachedCollectionView: UICollectionView?
     
-    private var navBarBackgroundView: UIView?
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor("#0A0A0A")
-        view.embed(body)
-        fetchData()
+    // Using a class wrapper to pass a mutating reference for the navigation bar background view
+    private class Ref {
+        weak var view: UIView?
     }
+    private let navBarBackgroundRef = Ref()
     
-    private func fetchData() {
-        viewModel.loadHomeData()
-    }
-    
-    // MARK: - Layout
-    
-    var body: View {
+    func asViews() -> [View] {
         ZStackView {
             CollectionView {
                 heroSection
@@ -47,12 +26,12 @@ class HomeViewController: UIViewController {
                 upcomingSection
                 topRatedSection
             }
-            .emptyState(when: viewModel.isEmptyObservable) { [weak self] in
+            .emptyState(when: viewModel.isEmptyObservable) {
                 EmptyView(
                     title: "No movies found",
                     subtitle: "Check your connection.",
                     buttonTitle: "Retry",
-                    onAction: { [weak self] in self?.fetchData() }
+                    onAction: { [weak viewModel] in viewModel?.loadHomeData() }
                 )
             }
             .backgroundColor(UIColor("#0A0A0A"))
@@ -61,28 +40,34 @@ class HomeViewController: UIViewController {
                 $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                 $0.collectionView.showsVerticalScrollIndicator = false
             }
-            .onRefresh(viewModel.isNowPlayingLoading) { [weak self] in
-                self?.fetchData()
+            .onRefresh(viewModel.isNowPlayingLoading) { [weak viewModel] in
+                viewModel?.loadHomeData()
             }
-            .onScroll { [weak self] scrollView in
-                self?.handleNavBarScroll(scrollView)
+            .onScroll { scrollView in
+                handleNavBarScroll(scrollView)
             }
             
             HomeNavigationBar(
                 isLoading: viewModel.isNowPlayingLoading,
-                onBackgroundReference: { [weak self] view in
-                    self?.navBarBackgroundView = view
+                onBackgroundReference: { view in
+                    navBarBackgroundRef.view = view
                 },
-                onSearchTap: { [weak self] in
-                    self?.onAction?(.searchSelected)
+                onSearchTap: {
+                    // Send search route via responder chain
+                    navBarBackgroundRef.view?.route(AppRoute.search, sender: nil)
                 }
             )
         }
         .margins(bottom: 100)
+        // Bind genuine UIKit View Lifecycle via ConstruktKit!
+        .onHostDidLoad {
+            viewModel.loadHomeData()
+        }
+        .asViews()
     }
     
     // MARK: - Sections
-    
+
     private var heroSection: AnySection {
         AnySection(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
             AnyCell(movie, id: "hero-\(movie.id)") { movie in
@@ -91,13 +76,12 @@ class HomeViewController: UIViewController {
                 }
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
-        .layout { [weak self] _ in
+        // Direct event routing via ConstruktKit .onRoute modifier!
+        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
+        .layout { _ in
             let layout = HomeSection.hero.layout
-            layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
-                self?.handleHeroScroll(items: items, offset: offset, env: env)
+            layout.visibleItemsInvalidationHandler = { (items, offset, env) in
+                handleHeroScroll(items: items, offset: offset, env: env)
             }
             return layout
         }
@@ -118,8 +102,14 @@ class HomeViewController: UIViewController {
                 GenresCell(id: genre.id, genre: genre)
             }
         }
-        .onSelect(on: self) { (self, genre: Genre) in
-            self.showMovieList(for: .categories, selectedGenre: genre)
+        .onSelect { (genre: Genre) in
+            AppRoute.movieList(
+                title: "Categories",
+                sectionTypeRaw: HomeSection.categories.rawValue,
+                genreId: genre.id,
+                genreName: genre.name,
+                allGenres: viewModel.currentGenres
+            )
         }
         .shimmer(
             count: 6,
@@ -138,8 +128,8 @@ class HomeViewController: UIViewController {
             id: HomeSection.popular,
             items: viewModel.popularSectionMovies,
             header: Header {
-                StandardHeader(title: "Popular Now", actionTitle: "See All") { [weak self] in
-                    self?.showMovieList(for: .popular)
+                StandardHeader(title: "Popular Now", actionTitle: "See All") { 
+                    navBarBackgroundRef.view?.route(AppRoute.movieList(title: "Popular Now", sectionTypeRaw: HomeSection.popular.rawValue, genreId: nil, genreName: nil, allGenres: nil), sender: nil)
                 }
             }
         ) { movie in
@@ -147,9 +137,7 @@ class HomeViewController: UIViewController {
                 PosterCell(movie: movie)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
+        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
         .backgroundDecoration(id: "popular_bg") {
             LinearGradient(colors: [
                 UIColor.black.withAlphaComponent(0.3),
@@ -173,8 +161,8 @@ class HomeViewController: UIViewController {
             id: HomeSection.upcoming,
             items: viewModel.upcomingMovies.map { $0.asRenderItems() },
             header: Header {
-                StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
-                    self?.showMovieList(for: .upcoming)
+                StandardHeader(title: "Upcoming", actionTitle: "See All") {
+                    navBarBackgroundRef.view?.route(AppRoute.movieList(title: "Upcoming", sectionTypeRaw: HomeSection.upcoming.rawValue, genreId: nil, genreName: nil, allGenres: nil), sender: nil)
                 }
             }
         ) { item in
@@ -182,8 +170,8 @@ class HomeViewController: UIViewController {
                 UpcomingCell(item: item)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
+        .onSelect { (movie: Movie) in
+            AppRoute.movieDetail(movieId: String(movie.id))
         }
         .layout { _ in
             HomeSection.upcoming.layout
@@ -212,10 +200,8 @@ class HomeViewController: UIViewController {
                 TopRatedCell(index: index + 1, movie: movie)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
-        .onSelect(on: self) { (me, ad: String) in
+        .onSelect { (movie: Movie) in AppRoute.movieDetail(movieId: String(movie.id)) }
+        .onSelect { (ad: String) in
             print("Ad Selected: \(ad)")
         }
         .layout { _ in
@@ -225,26 +211,9 @@ class HomeViewController: UIViewController {
             TopRatedCell(index: 0, movie: .placeholder)
         }
     }
-}
-
-// MARK: - Navigation
-
-extension HomeViewController {
-    private func showDetail(for movie: Movie) {
-        onAction?(.movieSelected(movie))
-    }
     
-    private func showMovieList(
-        for section: HomeSection,
-        selectedGenre: Genre? = nil
-    ) {
-        onAction?(.listSelected(section, selectedGenre, viewModel.currentGenres))
-    }
-}
+    // MARK: - Handlers
 
-// MARK: - Helpers
-
-extension HomeViewController {
     private func handleHeroScroll(
         items: [NSCollectionLayoutVisibleItem],
         offset: CGPoint,
@@ -255,15 +224,12 @@ extension HomeViewController {
         
         let collectionView: UICollectionView
         
-        if let cached = cachedCollectionView {
-            collectionView = cached
-        } else if let wrapper = view.firstSubview(ofType: CollectionViewWrapperView.self),
-                  let found = wrapper.subviews.first(where: { $0 is UICollectionView }) as? UICollectionView {
-            collectionView = found
-            cachedCollectionView = found
-        } else {
+        // Find the collection view from the active hierarchy
+        guard let wrapper = navBarBackgroundRef.view?.superview?.superview?.firstSubview(ofType: CollectionViewWrapperView.self),
+              let found = wrapper.subviews.first(where: { $0 is UICollectionView }) as? UICollectionView else {
             return
         }
+        collectionView = found
         
         for item in items {
             let distanceFromCenter = abs(item.center.x - visibleRectCenter)
@@ -301,7 +267,6 @@ extension HomeViewController {
     private func handleNavBarScroll(_ scrollView: UIScrollView) {
         let y = scrollView.contentOffset.y
         let alpha = min(1.0, max(0.0, y / 100.0))
-        navBarBackgroundView?.alpha = alpha
+        navBarBackgroundRef.view?.alpha = alpha
     }
 }
-

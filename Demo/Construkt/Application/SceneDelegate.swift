@@ -41,7 +41,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         
         // AppCoordinator and Factory
-        let baseRouter = Router(navigationController: UINavigationController())
+        let baseRouter = DefaultRouter(navigationController: UINavigationController())
         let factory = ScreenFactory()
         let coordinator = AppCoordinator(router: baseRouter, factory: factory)
         

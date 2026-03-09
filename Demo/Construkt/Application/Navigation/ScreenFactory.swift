@@ -1,12 +1,13 @@
 import UIKit
+import ConstruktKit
 
 
 @MainActor
 protocol ScreenFactoryProtocol {
     func makeScreen(for route: AppRoute) -> Presentable
-    func makeHomeViewController() -> HomeViewController
-    func makeExploreViewController() -> ExploreViewController
-    func makeProfileViewController() -> UIViewController
+    func makeHomeViewController() -> Presentable
+    func makeExploreViewController() -> Presentable
+    func makeProfileViewController() -> Presentable
 }
 
 @MainActor
@@ -48,15 +49,15 @@ final class ScreenFactory: ScreenFactoryProtocol {
         }
     }
     
-    func makeHomeViewController() -> HomeViewController {
-        return HomeViewController()
+    func makeHomeViewController() -> Presentable {
+        return HomeView().toPresentable()
     }
     
-    func makeExploreViewController() -> ExploreViewController {
-        return ExploreViewController()
+    func makeExploreViewController() -> Presentable {
+        return ExploreView().toPresentable()
     }
     
-    func makeProfileViewController() -> UIViewController {
-        return ProfileViewController()
+    func makeProfileViewController() -> Presentable {
+        return ProfileView().toPresentable()
     }
 }

@@ -1,4 +1,5 @@
 import UIKit
+import ConstruktKit
 
 @MainActor
 enum AppTab: Int {
@@ -9,7 +10,10 @@ enum AppTab: Int {
 
 @available(iOS 15.0, *)
 @MainActor
-final class AppCoordinator: BaseCoordinator {
+final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = AppRoute
+    
+    let router: any Router
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
     private let deepLinkMapper: DeepLinkMapper
@@ -17,17 +21,18 @@ final class AppCoordinator: BaseCoordinator {
     /// Keep a serializable path for restoration.
     public private(set) var currentPath: [AppRoute] = []
     
-    init(router: RouterProtocol, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
+    init(router: any Router, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
+        self.router = router
         self.factory = factory
         self.deepLinkMapper = deepLinkMapper
-        super.init(router: router)
+        super.init()
     }
     
     override func start() {
         let homeNav = NavigationController()
-        let homeRouter = Router(navigationController: homeNav)
+        let homeRouter = DefaultRouter(navigationController: homeNav)
         let homeCoordinator = HomeCoordinator(router: homeRouter, factory: factory)
-        addChild(homeCoordinator)
+        store(homeCoordinator)
         
         // Setup Home Tab
         homeCoordinator.onSwitchToExplore = { [weak self] in
@@ -37,18 +42,18 @@ final class AppCoordinator: BaseCoordinator {
         homeNav.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), selectedImage: UIImage(systemName: "house.fill"))
         
         let exploreNav = NavigationController()
-        let exploreRouter = Router(navigationController: exploreNav)
+        let exploreRouter = DefaultRouter(navigationController: exploreNav)
         let exploreCoordinator = ExploreCoordinator(router: exploreRouter, factory: factory)
-        addChild(exploreCoordinator)
+        store(exploreCoordinator)
         
         // Setup Explore Tab
         exploreCoordinator.start()
         exploreNav.tabBarItem = UITabBarItem(title: "Explore", image: UIImage(systemName: "magnifyingglass"), selectedImage: UIImage(systemName: "text.magnifyingglass"))
         
         let profileNav = NavigationController()
-        let profileRouter = Router(navigationController: profileNav)
+        let profileRouter = DefaultRouter(navigationController: profileNav)
         let profileCoordinator = ProfileCoordinator(router: profileRouter, factory: factory)
-        addChild(profileCoordinator)
+        store(profileCoordinator)
         
         // Setup Profile Tab
         profileCoordinator.start()
@@ -84,13 +89,24 @@ final class AppCoordinator: BaseCoordinator {
             switchToTab(.explore)
         case .movieDetail, .movieList, .web:
             if let selectedNav = activeNavigationController(for: tabBarController) {
-                let proxyRouter = Router(navigationController: selectedNav)
+                let proxyRouter = DefaultRouter(navigationController: selectedNav)
                 let screen = factory.makeScreen(for: route)
-                proxyRouter.push(screen, animated: animated, hideTabBar: true, onPop: nil)
+                
+                // If it's a web view we present it as a sheet
+                if case .web = route {
+                    proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated)
+                } else {
+                    proxyRouter.push(screen, animated: animated, completion: nil) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on Presentable
+                }
             } else {
                 switchToTab(.home)
             }
         }
+    }
+    
+    func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
+        open(event)
+        return true
     }
     
     public func handleDeepLink(_ url: URL) {
@@ -111,7 +127,8 @@ final class AppCoordinator: BaseCoordinator {
         // Logic for restoring children navigation controllers stack sequentially.
     }
     
-    override func rootViewController() -> UIViewController {
+    /// Returns the main tab bar controller as the root of this coordinator.
+    func rootViewController() -> UIViewController {
         tabBarController
     }
     

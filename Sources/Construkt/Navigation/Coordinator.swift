@@ -16,6 +16,7 @@ public extension Coordinator {
 }
 
 /// Base class to eliminate boilerplate for developers creating Coordinators
+@MainActor
 open class BaseCoordinator: Coordinator {
     public var children: [Coordinator] = []
     
