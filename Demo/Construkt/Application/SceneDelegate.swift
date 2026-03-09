@@ -40,37 +40,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         
-        // Show the launch screen first
-        let launchVC = LaunchViewController()
-        window.rootViewController = launchVC
-        window.makeKeyAndVisible()
-        
-        launchVC.onFinished = { [weak self] in
-            self?.transitionToMainApp()
-        }
-    }
-    
-    private func transitionToMainApp() {
+        // AppCoordinator and Factory
         let baseRouter = Router(navigationController: UINavigationController())
         let factory = ScreenFactory()
         let coordinator = AppCoordinator(router: baseRouter, factory: factory)
         
-        self.appCoordinator = coordinator
-        coordinator.start()
+        // Initial Loading Screen
+        let launchVC = LaunchViewController()
+        launchVC.onFinished = { [weak self] in
+            // Boot Core Flow
+            self?.appCoordinator = coordinator
+            coordinator.start()
+            
+            // Crossfade transition to main layout
+            UIView.transition(
+                with: window,
+                duration: 0.4,
+                options: .transitionCrossDissolve,
+                animations: {
+                    self?.window?.rootViewController = coordinator.rootViewController()
+                }
+            )
+        }
         
-        let mainVC = coordinator.rootViewController()
-        
-        // Crossfade transition
-        UIView.transition(
-            with: window!,
-            duration: 0.4,
-            options: .transitionCrossDissolve,
-            animations: {
-                self.window?.rootViewController = mainVC
-            }
-        )
+        window.rootViewController = launchVC
+        window.makeKeyAndVisible()
     }
-
+    
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.

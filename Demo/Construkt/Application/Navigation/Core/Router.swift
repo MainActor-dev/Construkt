@@ -98,8 +98,11 @@ public final class Router: NSObject, RouterProtocol {
     
     deinit {
         // Cleanup any presented modals
-        if navigationController.presentedViewController != nil {
-            navigationController.dismiss(animated: false)
+        let nav = navigationController
+        Task { @MainActor in
+            if nav.presentedViewController != nil {
+                nav.dismiss(animated: false)
+            }
         }
     }
     

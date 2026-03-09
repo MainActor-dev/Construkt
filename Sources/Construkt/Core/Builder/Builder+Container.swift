@@ -105,7 +105,7 @@ public class BuilderInternalContainerView: UIView, ViewBuilderEventHandling {
         if superview == nil {
             self.views = views
         } else if let view = views?.asViews().first {
-            transition(to: view)
+            transition(to: view, delay: 0)
         }
     }
 
