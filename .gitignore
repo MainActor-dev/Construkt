@@ -21,7 +21,7 @@ Pods/
 construkt-ai/
 
 # Repository Cleanups
-# .agent/
-# .agents/
+.agent/
+.agents/
 ui-references/
 cleanup_branches.sh
