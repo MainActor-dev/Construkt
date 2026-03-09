@@ -80,7 +80,7 @@ extension ModifiableView where Base: BuilderInternalTableView {
 
 }
 
-open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderEventHandling {
+open class BuilderInternalTableView: UITableView, UITableViewDataSource, UITableViewDelegate, ViewBuilderRouteReceiving {
     
     public var updateHandler: ((Any) -> Void)?
     

@@ -7,10 +7,10 @@ import ConstruktKit
 final class ProfileCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     typealias Event = AppRoute
     
-    let router: any Router
+    let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
     
-    init(router: any Router, factory: ScreenFactoryProtocol) {
+    init(router: any ConstruktRouter, factory: ScreenFactoryProtocol) {
         self.router = router
         self.factory = factory
         super.init()

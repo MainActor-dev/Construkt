@@ -84,7 +84,7 @@ extension ModifiableView where Base: BuilderInternalContainerView {
 
 /// A custom internal `UIView` subclass dedicated to orchestrating its children under
 /// a `ContainerView` or `ZStackView`.
-public class BuilderInternalContainerView: UIView, ViewBuilderEventHandling {
+public class BuilderInternalContainerView: UIView, ViewBuilderRouteReceiving {
 
     fileprivate var views: ViewConvertable?
     fileprivate var padding: UIEdgeInsets = .zero

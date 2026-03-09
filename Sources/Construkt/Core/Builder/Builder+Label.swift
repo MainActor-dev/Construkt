@@ -147,7 +147,7 @@ extension ModifiableView where Base: UILabel {
 
 /// A custom subclass of `UILabel` designed to interface smoothly with `ViewBuilder` lifecycle
 /// events and handle custom padding logic natively.
-public class BuilderInternalUILabel: UILabel, ViewBuilderEventHandling {
+public class BuilderInternalUILabel: UILabel, ViewBuilderRouteReceiving {
 
     var labelMargins: UIEdgeInsets = .zero
     

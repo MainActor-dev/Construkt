@@ -348,7 +348,7 @@ LabelView("Direct UIKit Access")
 
 ## Navigation & Auto-Routing
 
-Construkt includes a full **Coordinator + Router** navigation engine that bridges UIKit's responder chain with a coordinator tree. Views declare *what* navigation should happen; coordinators decide *how*.
+Construkt includes a full **ConstruktCoordinator + ConstruktRouter** navigation engine that bridges UIKit's responder chain with a coordinator tree. Views declare *what* navigation should happen; coordinators decide *how*.
 
 ### Coordinators
 
@@ -363,7 +363,7 @@ enum AppRoute: Codable {
 
 final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     typealias Event = AppRoute
-    let router: any Router
+    let router: any ConstruktRouter
 
     override func start() {
         let homeVC = LifecycleHostController(HomeView(viewModel: viewModel))

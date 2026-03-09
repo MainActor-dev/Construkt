@@ -1,5 +1,5 @@
 //
-//  Router.swift
+//  ConstruktRouter.swift
 //  Construkt
 //
 
@@ -18,22 +18,22 @@ public enum ModalStyle {
     case custom((UIViewController) -> Void)
 }
 
-public protocol Router: AnyObject {
+public protocol ConstruktRouter: AnyObject {
     var navigationController: UINavigationController { get }
-    func setRoot(_ module: Presentable, hideBar: Bool, animated: Bool, receiver: AnyEventReceiving?)
-    func push(_ module: Presentable, animated: Bool, hideTabBar: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
+    func setRoot(_ module: ConstruktPresentable, hideBar: Bool, animated: Bool, receiver: AnyRouteReceiving?)
+    func push(_ module: ConstruktPresentable, animated: Bool, hideTabBar: Bool, completion: (() -> Void)?, receiver: AnyRouteReceiving?)
     func pop(animated: Bool)
     func popToRoot(animated: Bool)
-    func present(_ module: Presentable, style: ModalStyle, animated: Bool, completion: (() -> Void)?, receiver: AnyEventReceiving?)
+    func present(_ module: ConstruktPresentable, style: ModalStyle, animated: Bool, completion: (() -> Void)?, receiver: AnyRouteReceiving?)
     func dismiss(animated: Bool, completion: (() -> Void)?)
 }
 
-public extension Router {
-    func setRoot(_ module: Presentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyEventReceiving? = nil) {
+public extension ConstruktRouter {
+    func setRoot(_ module: ConstruktPresentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyRouteReceiving? = nil) {
         setRoot(module, hideBar: hideBar, animated: animated, receiver: receiver)
     }
     
-    func push(_ module: Presentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+    func push(_ module: ConstruktPresentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyRouteReceiving? = nil) {
         push(module, animated: animated, hideTabBar: hideTabBar, completion: completion, receiver: receiver)
     }
     
@@ -45,7 +45,7 @@ public extension Router {
         popToRoot(animated: animated)
     }
     
-    func present(_ module: Presentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+    func present(_ module: ConstruktPresentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyRouteReceiving? = nil) {
         present(module, style: style, animated: animated, completion: completion, receiver: receiver)
     }
     
@@ -54,7 +54,7 @@ public extension Router {
     }
 }
 
-public final class DefaultRouter: NSObject, Router, UINavigationControllerDelegate {
+public final class DefaultRouter: NSObject, ConstruktRouter, UINavigationControllerDelegate {
     public let navigationController: UINavigationController
     private var completions: [UIViewController: () -> Void] = [:]
     
@@ -64,14 +64,14 @@ public final class DefaultRouter: NSObject, Router, UINavigationControllerDelega
         self.navigationController.delegate = self
     }
     
-    public func setRoot(_ module: Presentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyEventReceiving? = nil) {
+    public func setRoot(_ module: ConstruktPresentable, hideBar: Bool = false, animated: Bool = true, receiver: AnyRouteReceiving? = nil) {
         let vc = module.toPresentable()
         vc.associatedCoordinator = receiver
         navigationController.setViewControllers([vc], animated: animated)
         navigationController.isNavigationBarHidden = hideBar
     }
     
-    public func push(_ module: Presentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+    public func push(_ module: ConstruktPresentable, animated: Bool = true, hideTabBar: Bool = false, completion: (() -> Void)? = nil, receiver: AnyRouteReceiving? = nil) {
         let vc = module.toPresentable()
         vc.associatedCoordinator = receiver
         vc.hidesBottomBarWhenPushed = hideTabBar
@@ -92,7 +92,7 @@ public final class DefaultRouter: NSObject, Router, UINavigationControllerDelega
         popped.forEach { runCompletion(for: $0) }
     }
     
-    public func present(_ module: Presentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyEventReceiving? = nil) {
+    public func present(_ module: ConstruktPresentable, style: ModalStyle = .pageSheet, animated: Bool = true, completion: (() -> Void)? = nil, receiver: AnyRouteReceiving? = nil) {
         let vc = module.toPresentable()
         vc.associatedCoordinator = receiver
         switch style {

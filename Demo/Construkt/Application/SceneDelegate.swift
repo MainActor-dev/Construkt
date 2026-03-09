@@ -99,7 +99,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else { return }
         print("🔗 Deep Link Received: \(url.absoluteString)")
-        print("🔗 Coordinator Status: \(String(describing: appCoordinator))")
+        print("🔗 ConstruktCoordinator Status: \(String(describing: appCoordinator))")
         appCoordinator?.handleDeepLink(url)
     }
 }

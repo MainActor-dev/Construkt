@@ -159,11 +159,11 @@ extension UIView {
 
 }
 
-public protocol ViewBuilderEventHandling: UIView {
+public protocol ViewBuilderRouteReceiving: UIView {
     // stores into attributes
 }
 
-extension ModifiableView where Base: ViewBuilderEventHandling {
+extension ModifiableView where Base: ViewBuilderRouteReceiving {
 
     @discardableResult
     public func onAppear(_ handler: @escaping (_ context: ViewBuilderContext<UIView>) -> Void) -> ViewModifier<Base> {

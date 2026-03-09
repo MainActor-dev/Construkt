@@ -13,7 +13,7 @@ enum AppTab: Int {
 final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     typealias Event = AppRoute
     
-    let router: any Router
+    let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
     private let deepLinkMapper: DeepLinkMapper
@@ -21,7 +21,7 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     /// Keep a serializable path for restoration.
     public private(set) var currentPath: [AppRoute] = []
     
-    init(router: any Router, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
+    init(router: any ConstruktRouter, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
         self.router = router
         self.factory = factory
         self.deepLinkMapper = deepLinkMapper
@@ -96,7 +96,7 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
                 if case .web = route {
                     proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated, receiver: self)
                 } else {
-                    proxyRouter.push(screen, animated: animated, completion: nil, receiver: self) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on Presentable
+                    proxyRouter.push(screen, animated: animated, completion: nil, receiver: self) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on ConstruktPresentable
                 }
             } else {
                 switchToTab(.home)

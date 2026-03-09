@@ -1,25 +1,25 @@
 //
-//  Coordinator.swift
+//  ConstruktCoordinator.swift
 //  Construkt
 //
 
 import Foundation
 
 @MainActor
-public protocol Coordinator: AnyObject {
-    var children: [Coordinator] { get set }
+public protocol ConstruktCoordinator: AnyObject {
+    var children: [ConstruktCoordinator] { get set }
     func start()
 }
 
-public extension Coordinator {
-    func store(_ child: Coordinator) { children.append(child) }
-    func free(_ child: Coordinator) { children.removeAll { $0 === child } }
+public extension ConstruktCoordinator {
+    func store(_ child: ConstruktCoordinator) { children.append(child) }
+    func free(_ child: ConstruktCoordinator) { children.removeAll { $0 === child } }
 }
 
 /// Base class to eliminate boilerplate for developers creating Coordinators
 @MainActor
-open class BaseCoordinator: Coordinator {
-    public var children: [Coordinator] = []
+open class BaseCoordinator: ConstruktCoordinator {
+    public var children: [ConstruktCoordinator] = []
     
     public init() {}
     
@@ -29,8 +29,8 @@ open class BaseCoordinator: Coordinator {
 }
 
 /// An optional convenience protocol.
-/// Developers conform their Coordinator to this to magically receive `onRoute()` intents.
+/// Developers conform their ConstruktCoordinator to this to magically receive `onRoute()` intents.
 @MainActor
-public protocol RouteHandlingCoordinator: Coordinator, EventHandling {
-    var router: Router { get }
+public protocol RouteHandlingCoordinator: ConstruktCoordinator, RouteReceiving {
+    var router: ConstruktRouter { get }
 }

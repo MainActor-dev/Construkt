@@ -7,7 +7,7 @@ private enum TestRoute: Equatable {
     case page2(id: Int)
 }
 
-private class MockRootViewController: UIViewController, EventHandling {
+private class MockRootViewController: UIViewController, RouteReceiving {
     typealias Event = TestRoute
     
     var receivedRoute: TestRoute?

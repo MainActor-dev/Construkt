@@ -163,12 +163,12 @@ public class StateContainer<State: Equatable>: UIView {
             view.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
     }
-// MARK: - ViewBuilderEventHandling conforming
+// MARK: - ViewBuilderRouteReceiving conforming
     open override func didMoveToWindow() {
          optionalBuilderAttributes()?.commonDidMoveToWindow(self)
     }
 }
-extension StateContainer: ViewBuilderEventHandling {}
+extension StateContainer: ViewBuilderRouteReceiving {}
 
 // Wrapper to allow usage in Builder
 public struct StateView<T: Equatable>: ModifiableView {
