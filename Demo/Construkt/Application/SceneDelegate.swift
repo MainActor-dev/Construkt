@@ -32,7 +32,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private var appRouteHandler: AppRouteHandler?
+    private var appCoordinator: AppCoordinator?
+    // private var appRouteHandler: AppRouteHandler? // (Example usage kept below)
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -40,21 +41,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         
-        // Setup TabBar and RouteHandler
-        let tabBarController = UITabBarController()
+        // Setup TabBar and Coordinator
         let baseRouter = DefaultRouter()
-        let routeHandler = AppRouteHandler(router: baseRouter, tabBarController: tabBarController)
-        routeHandler.setupTabs()
+        let factory = ScreenFactory()
+        let coordinator = AppCoordinator(router: baseRouter, factory: factory)
         
+        /*
+        // --- ConstruktRouteHandler Example (Alternative to Coordinators) ---
+        //
+        // If you prefer not to use Coordinators, you can use AppRouteHandler directly:
+        //
+        // let tabBarController = UITabBarController()
+        // let routeHandler = AppRouteHandler(router: baseRouter, tabBarController: tabBarController)
+        // routeHandler.setupTabs()
+        // self.appRouteHandler = routeHandler
+        // tabBarController.associatedRouteHandler = routeHandler
+        */
+
         // Initial Loading Screen
         let launchVC = LaunchViewController()
         launchVC.onFinished = { [weak self] in
             // Boot Core Flow
-            self?.appRouteHandler = routeHandler
-            
-            // Because setupTabs created the UI trees, we just need to bind the handler
-            // to the TabBarController so events bubbling from any tab are trapped here.
-            tabBarController.associatedRouteHandler = routeHandler
+            coordinator.start()
+            self?.appCoordinator = coordinator
             
             // Crossfade transition to main layout
             UIView.transition(
@@ -62,7 +71,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 duration: 0.4,
                 options: .transitionCrossDissolve,
                 animations: {
-                    self?.window?.rootViewController = tabBarController
+                    self?.window?.rootViewController = coordinator.rootViewController()
                 }
             )
         }
@@ -103,8 +112,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else { return }
         print("🔗 Deep Link Received: \(url.absoluteString)")
-        print("🔗 ConstruktRouteHandler Status: \(String(describing: appRouteHandler))")
-        appRouteHandler?.handleDeepLink(url)
+        print("🔗 AppCoordinator Status: \(String(describing: appCoordinator))")
+        appCoordinator?.handleDeepLink(url)
+        
+        /*
+        // --- ConstruktRouteHandler Deep Link Example ---
+        // appRouteHandler?.handleDeepLink(url)
+        */
     }
 }
 
