@@ -203,7 +203,6 @@ struct ProfileNavbar: ViewBuilder {
         }
         .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
         .height(60)
-        .position(.top)
         .safeArea(false)
     }
 }

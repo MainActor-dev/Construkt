@@ -40,94 +40,96 @@ struct MovieDetailView: ViewConvertable {
         let details = viewModel.movieDetails.compactMap { $0 }
         let casts = viewModel.movieCasts
         
-        return ZStackView {
-            ImageView(nil)
-                .contentMode(.scaleAspectFill)
-                .clipsToBounds(true)
-                .onReceive(details.map { $0.backdropURL ?? $0.posterURL }) { context in
-                    context.view.setImage(from: context.value)
-                }
-                .onReceive(viewModel.isLoadingDetails) { context in
-                    context.view.isHidden = context.value
-                }
-                .customConstraints { [handles, heroHeight] view in
-                    guard let superview = view.superview else { return }
-                    view.translatesAutoresizingMaskIntoConstraints = false
-                    let heightConstraint = view.heightAnchor.constraint(equalToConstant: heroHeight)
-                    handles.heroHeightConstraint = heightConstraint
-                    NSLayoutConstraint.activate([
-                        view.topAnchor.constraint(equalTo: superview.topAnchor),
-                        view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
-                        view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
-                        heightConstraint
-                    ])
-                }
-                .onReceive(scrollBinding.$offset) { [handles] context in
-                     let yOffset = context.value
-                     guard let constraint = handles.heroHeightConstraint else { return }
-                     if yOffset < 0 {
-                         constraint.constant = heroHeight + abs(yOffset)
-                     } else {
-                         constraint.constant = max(0, heroHeight - yOffset)
-                     }
-                }
-            
-            // Layer 2: Scroll Content
-            ContainerView {
-                VerticalScrollView {
-                    VStackView(spacing: 24) {
-                        // Transparent Header Space + Content Overlay
-                        MovieDetailHero(details: details, height: self.heroHeight)
-                        
-                        VStackView(spacing: 24) {
-                            actionButtons
-                            MovieStoryline(details: details)
-                            MovieCast(casts: casts) { cast in
-                                print("Tapped on cast: \(cast.name)")
-                            }
-                            MovieSimilar(details: details) { [scrollBinding, weak viewModel] movie in
-                                scrollBinding.scrollToTopTrigger += 1
-                                viewModel?.selectMovie(movie)
-                            }
-                        }
-                        .padding(top: 0, left: 20, bottom: 0, right: 20)
-                        
-                        // Spacer
-                        SpacerView(h: 40)
+        return Screen {
+            ZStackView {
+                ImageView(nil)
+                    .contentMode(.scaleAspectFill)
+                    .clipsToBounds(true)
+                    .onReceive(details.map { $0.backdropURL ?? $0.posterURL }) { context in
+                        context.view.setImage(from: context.value)
                     }
-                }
-                .onDidScroll { [scrollBinding] context in
-                    scrollBinding.offset = context.view.contentOffset.y
-                }
-                .with { [handles] scrollView in
-                    scrollView.contentInsetAdjustmentBehavior = .never
-                    scrollView.backgroundColor = .clear
-                    handles.scrollView = scrollView
-                }
-                .onReceive(scrollBinding.$scrollToTopTrigger.skip(1)) { [handles] _ in
-                    handles.scrollView?.setContentOffset(.zero, animated: true)
-                }
-                .onReceive(viewModel.isLoadingDetails) { context in
-                    context.view.isHidden = context.value
-                }
-                
-                // Overlay Navigation Bar
-                MovieDetailNavBar(
-                    title: details.compactMap { $0.title },
-                    scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
-                    onBack: { sender in
-                        sender.route(MovieDetailRoute.back, sender: nil)
-                    }
-                )
-                
-                // Loading Indicator
-                LoadingView()
-                    .visible(false)
                     .onReceive(viewModel.isLoadingDetails) { context in
-                        context.view.isHidden = !context.value
+                        context.view.isHidden = context.value
                     }
-                    .backgroundColor(.black.withAlphaComponent(0.5))
+                    .customConstraints { [handles, heroHeight] view in
+                        guard let superview = view.superview else { return }
+                        view.translatesAutoresizingMaskIntoConstraints = false
+                        let heightConstraint = view.heightAnchor.constraint(equalToConstant: heroHeight)
+                        handles.heroHeightConstraint = heightConstraint
+                        NSLayoutConstraint.activate([
+                            view.topAnchor.constraint(equalTo: superview.topAnchor),
+                            view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
+                            view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
+                            heightConstraint
+                        ])
+                    }
+                    .onReceive(scrollBinding.$offset) { [handles] context in
+                         let yOffset = context.value
+                         guard let constraint = handles.heroHeightConstraint else { return }
+                         if yOffset < 0 {
+                             constraint.constant = heroHeight + abs(yOffset)
+                         } else {
+                             constraint.constant = max(0, heroHeight - yOffset)
+                         }
+                    }
+                
+                // Layer 2: Scroll Content
+                ContainerView {
+                    VerticalScrollView {
+                        VStackView(spacing: 24) {
+                            // Transparent Header Space + Content Overlay
+                            MovieDetailHero(details: details, height: self.heroHeight)
+                            
+                            VStackView(spacing: 24) {
+                                actionButtons
+                                MovieStoryline(details: details)
+                                MovieCast(casts: casts) { cast in
+                                    print("Tapped on cast: \(cast.name)")
+                                }
+                                MovieSimilar(details: details) { [scrollBinding, weak viewModel] movie in
+                                    scrollBinding.scrollToTopTrigger += 1
+                                    viewModel?.selectMovie(movie)
+                                }
+                            }
+                            .padding(top: 0, left: 20, bottom: 0, right: 20)
+                            
+                            // Spacer
+                            SpacerView(h: 40)
+                        }
+                    }
+                    .onDidScroll { [scrollBinding] context in
+                        scrollBinding.offset = context.view.contentOffset.y
+                    }
+                    .with { [handles] scrollView in
+                        scrollView.contentInsetAdjustmentBehavior = .never
+                        scrollView.backgroundColor = .clear
+                        handles.scrollView = scrollView
+                    }
+                    .onReceive(scrollBinding.$scrollToTopTrigger.skip(1)) { [handles] _ in
+                        handles.scrollView?.setContentOffset(.zero, animated: true)
+                    }
+                    .onReceive(viewModel.isLoadingDetails) { context in
+                        context.view.isHidden = context.value
+                    }
+                    
+                    // Loading Indicator
+                    LoadingView()
+                        .visible(false)
+                        .onReceive(viewModel.isLoadingDetails) { context in
+                            context.view.isHidden = !context.value
+                        }
+                        .backgroundColor(.black.withAlphaComponent(0.5))
+                }
             }
+        }
+        .navigationBar {
+            MovieDetailNavBar(
+                title: details.compactMap { $0.title },
+                scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
+                onBack: { sender in
+                    sender.route(MovieDetailRoute.back, sender: nil)
+                }
+            )
         }
         .backgroundColor(UIColor("#0A0A0A"))
         .onHostDidLoad {

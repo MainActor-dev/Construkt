@@ -19,7 +19,7 @@ enum ProfileSection: String, SectionConfigIdentifier {
 struct ProfileView: ViewConvertable {
     
     func asViews() -> [View] {
-        ZStackView {
+        Screen {
             CollectionView {
                 heroSection
                 premiumSection
@@ -27,6 +27,8 @@ struct ProfileView: ViewConvertable {
                 accountSettingsSection
                 versionSection
             }
+        }
+        .navigationBar {
             ProfileNavbar()
         }
         .backgroundColor(UIColor("#0A0A0A"))

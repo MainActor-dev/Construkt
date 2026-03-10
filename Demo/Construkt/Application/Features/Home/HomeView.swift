@@ -40,7 +40,7 @@ struct HomeView: ViewConvertable {
     }
     
     func asViews() -> [View] {
-        ZStackView {
+        Screen {
             CollectionView {
                 heroSection
                 genresSection
@@ -69,7 +69,8 @@ struct HomeView: ViewConvertable {
             .onScroll { [scrollBinding] scrollView in
                 scrollBinding.offset = scrollView.contentOffset.y
             }
-            
+        }
+        .navigationBar {
             HomeNavigationBar(
                 isLoading: viewModel.isNowPlayingLoading,
                 scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),

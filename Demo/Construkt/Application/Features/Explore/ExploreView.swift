@@ -27,7 +27,7 @@ struct ExploreView: ViewConvertable {
     private let viewModel = ExploreViewModel()
     
     func asViews() -> [View] {
-        ZStackView {
+        Screen {
             // Background gradients
             CircleView()
                 .backgroundColor(UIColor.systemIndigo.withAlphaComponent(0.05))
@@ -51,8 +51,8 @@ struct ExploreView: ViewConvertable {
                 $0.collectionView.contentInset.top = 60
                 $0.collectionView.showsVerticalScrollIndicator = false
             }
-            
-            // Fixed Header
+        }
+        .navigationBar {
             headerOverlay
         }
         .backgroundColor(UIColor(white: 0.04, alpha: 1)) // Neutral 950
@@ -170,7 +170,6 @@ struct ExploreView: ViewConvertable {
         }
         .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
         .height(48)
-        .position(.top)
         .safeArea(false)
     }
 }
