@@ -42,7 +42,8 @@ When generating UI, use the Construkt primitives:
 | `LinearGradient` / `CAGradientLayer` | `LinearGradient(colors: [.red, .blue])` |
 | `BlurView` / `UIVisualEffectView` | `BlurView(style: .regular)` |
 | `List` / `UITableView` | `TableView(DynamicItemViewBuilder) { ... }` |
-| `LazyVGrid`/`UICollectionView` | `CollectionView { Section { ... } }` |
+| `LazyVGrid`/`UICollectionView` | `CollectionView { AnySection { ... } }` |
+| Screen layout container | `Screen { content }.navigationBar { bar }` |
 
 ---
 
@@ -81,6 +82,32 @@ ZStackView {
         .margins(16)
 }
 ```
+
+---
+
+### Screen Layout Container
+
+Use `Screen` to establish a standard page architecture with content and navigation bar "slots". This replaces manual `ZStackView` + `.position(.top)` boilerplate:
+
+```swift
+Screen {
+    CollectionView {
+        heroSection
+        popularSection
+    }
+    .onScroll { scrollView in
+        scrollBinding.offset = scrollView.contentOffset.y
+    }
+}
+.navigationBar {
+    HomeNavigationBar(
+        scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding()
+    )
+}
+.backgroundColor(UIColor("#0A0A0A"))
+```
+
+The `Screen` handles Z-stacking automatically. Each screen provides its own distinct navigation bar.
 
 ---
 
@@ -304,6 +331,7 @@ You **must exclusively use** these native Construkt modifiers. Do not invent Swi
 - `.onReceive(binding) { context in }` — react to any value change
 - `.hidden(when: $isHidden)` — reactively show/hide
 - `.userInteractionEnabled(when: $binding)` — reactively enable/disable interaction
+- `.eraseToAnyViewBinding()` — type-erase any `ViewBinding` into `AnyViewBinding<T>`
 
 ### Typography (LabelView modifiers)
 - `.font(UIFont)` / `.font(.headline)` — set font
@@ -355,23 +383,107 @@ You **must exclusively use** these native Construkt modifiers. Do not invent Swi
 - `DynamicContainerView($binding) { value in ... }` — reactively swaps child view
 - `ForEach(array) { element in ... }` — iterate over an array to produce views
 - `ForEach(count) { index in ... }` — iterate N times to produce views
+- `CGFloat.scrollProgress(over: CGFloat) -> CGFloat` — normalize scroll offset into 0…1 range
 
 ## 8. Advanced Capabilities
 
 Construkt supports full application features declaratively.
 
 ### Navigation and Routing
-When handling taps or selections, Construkt provides a `context` proxy to the current `UIView` and its closest `UIViewController`/`UINavigationController`.
+Construkt provides multiple ways to navigate between screens.
+
+**Declarative Routing** — attach navigation intent directly to sections:
+```swift
+AnySection(id: "popular", items: movies) { movie in
+    AnyCell(movie, id: movie.id) { movie in PosterCell(movie: movie) }
+}
+.onRoute { (movie: Movie) in
+    AppRoute.movieDetail(movieId: String(movie.id))
+}
+```
+
+**Sender-Based Routing** — route from the tapped view's responder chain:
+```swift
+.onTapGesture { context in
+    context.view.route(HomeRoute.search, sender: nil)
+}
+```
+
+**Inline Route Handling** — attach handlers when constructing screens:
+```swift
+HomeView()
+    .onReceiveRoute(HomeRoute.self) { route in
+        switch route {
+        case .movieDetail(let id): open(.movieDetail(movieId: id))
+        case .search: open(.search)
+        }
+        return true
+    }
+    .toPresentable()
+```
+
+**Coordinator Pattern** — for complex navigation hierarchies with parent-child relationships:
+```swift
+final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = HomeRoute
+    let router: ConstruktRouter
+
+    init(router: ConstruktRouter) {
+        self.router = router
+    }
+
+    override func start() {
+        let homeVC = HomeView(viewModel: viewModel).toPresentable()
+        router.setRoot(homeVC, hideBar: true, animated: false, receiver: self)
+    }
+
+    func canReceive(_ event: HomeRoute, sender: Any?) -> Bool {
+        switch event {
+        case .movieDetail(let id):
+            router.push(MovieDetailView(movie: movie).toPresentable(), animated: true, receiver: self)
+            return true
+        case .search:
+            router.push(SearchViewController(), animated: true, receiver: self)
+            return true
+        }
+    }
+}
+```
+
+Key types:
+- `BaseCoordinator` — base class with `children`, `store()`, `free()`, and `start()`
+- `RouteHandlingCoordinator` — protocol requiring `router` + `canReceive()` to handle route events
+- `ConstruktRouter` / `DefaultRouter` — `push`, `pop`, `present`, `dismiss`, `setRoot`
+- `receiver: self` — binds the coordinator to the VC so events route back correctly
+
+### Scroll-Driven Reactive Patterns
+
+For scroll-driven UI (e.g., stretchy headers, fading nav bars), separate reactive data from imperative UIKit handles:
 
 ```swift
-ButtonView("Open Details")
-    .onTap { context in
-        // Push a generic view natively
-        context.push(DetailView(item: item)) 
-        
-        // Present a specific View Controller
-        context.present(CustomViewController())
-    }
+// Pure reactive data — observable, testable
+private class ScrollBinding {
+    @Variable var offset: CGFloat = 0
+    @Variable var scrollToTopTrigger: UInt = 0
+}
+
+// Imperative UIKit handles — needed for constraint manipulation
+private class ViewHandles {
+    weak var heroHeightConstraint: NSLayoutConstraint?
+    weak var scrollView: UIScrollView?
+}
+```
+
+Bind scroll events to `ScrollBinding`, then use `.onReceive` to drive UI:
+```swift
+.onScroll { scrollView in
+    scrollBinding.offset = scrollView.contentOffset.y
+}
+
+// In the nav bar:
+.onReceive(scrollBinding.$offset) { context in
+    context.view.alpha = context.value.scrollProgress(over: 100)
+}
 ```
 
 ### Scroll Views
@@ -477,3 +589,4 @@ When generating ConstruktKit code, AI often hallucinates SwiftUI equivalents. If
 2. Non-existent modifiers (e.g. using `.clipShape()` instead of `.cornerRadius().clipsToBounds(true)`)
 3. Wrong modifier signatures (e.g. wrong padding parameters or `.border` arguments)
 4. Wrong component initializer signatures (e.g. `SpacerView(width:)` instead of `FixedSpacerView(width:)`)
+5. Using `ZStackView` + `.position(.top)` for nav bars instead of `Screen { ... }.navigationBar { ... }`
