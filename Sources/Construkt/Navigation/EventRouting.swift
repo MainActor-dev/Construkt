@@ -41,6 +41,13 @@ public extension UIResponder {
             return true
         }
         
+        // 3. If it's a View Controller, check if it has an isolated Route Handler attached
+        if let vc = self as? UIViewController,
+           let handler = vc.associatedRouteHandler,
+           handler.__receive(event, sender: sender) {
+            return true
+        }
+        
         // 3. If it's a View Controller, check if it has an associated ConstruktCoordinator
         if let vc = self as? UIViewController,
            let coordinator = vc.associatedCoordinator,

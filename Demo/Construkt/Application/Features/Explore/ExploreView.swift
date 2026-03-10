@@ -6,6 +6,12 @@
 import UIKit
 import ConstruktKit
 
+public enum ExploreRoute {
+    case movieDetail(movieId: String)
+    case movieList(title: String, sectionTypeRaw: String, genreId: Int?, genreName: String?, allGenres: [Genre]?)
+    case search
+}
+
 enum ExploreSection: String, SectionConfigIdentifier {
     case search
     case genres
@@ -70,13 +76,13 @@ struct ExploreView: ViewConvertable {
                 ExploreGenreCard(genre: genre)
             }
         }
-        .onRoute { (genre: ExploreGenre) -> AppRoute? in
+        .onRoute { (genre: ExploreGenre) -> ExploreRoute? in
             guard let genreId = Int(genre.id) else { return nil }
             let allGenres = viewModel.allGenres.compactMap {
                 guard let id = Int($0.id) else { return nil as Genre? }
                 return Genre(id: id, name: $0.name)
             }
-            return AppRoute.movieList(
+            return ExploreRoute.movieList(
                 title: genre.name,
                 sectionTypeRaw: "categories",
                 genreId: genreId,
@@ -108,7 +114,7 @@ struct ExploreView: ViewConvertable {
             }
         }
         .onRoute { (collection: ExploreCollection) in
-            AppRoute.movieDetail(movieId: collection.id)
+            ExploreRoute.movieDetail(movieId: collection.id)
         }
         .layout {
             .carousel(
@@ -134,7 +140,7 @@ struct ExploreView: ViewConvertable {
             }
         }
         .onRoute { (arrival: ExploreArrival) in
-            AppRoute.movieDetail(movieId: arrival.id)
+            ExploreRoute.movieDetail(movieId: arrival.id)
         }
         .layout {
             .list(itemHeight: .estimated(80))
@@ -158,7 +164,7 @@ struct ExploreView: ViewConvertable {
                     .tintColor(.white)
                     .size(width: 24, height: 24)
                     .contentMode(.scaleAspectFit)
-                    .onRoute(AppRoute.search)
+                    .onRoute(ExploreRoute.search)
             }
             .padding(insets: .init(top: 12, left: 24, bottom: 12, right: 24))
         }

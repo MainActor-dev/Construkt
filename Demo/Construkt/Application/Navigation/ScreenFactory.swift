@@ -49,8 +49,35 @@ final class ScreenFactory: ScreenFactoryProtocol {
         }
     }
     
+    class RoutingProxy {
+        weak var controller: UIViewController?
+    }
+    
     func makeHomeViewController() -> ConstruktPresentable {
-        return HomeView().toPresentable()
+       
+        let proxy = RoutingProxy()
+        
+        let container = HomeView().onReceiveRoute(HomeRoute.self) { [proxy] route in
+            guard let vc = proxy.controller else { return false }
+            
+            let appRoute: AppRoute
+            switch route {
+            case .movieDetail(let movieId):
+                appRoute = .movieDetail(movieId: movieId)
+            case .movieList(let title, let sectionType, let genreId, let genreName, let allGenres):
+                appRoute = .movieList(title: title, sectionTypeRaw: sectionType, genreId: genreId, genreName: genreName, allGenres: allGenres)
+            case .search:
+                appRoute = .search
+            }
+            
+            // Bubble the translated route up from the host controller's view
+            vc.view.route(appRoute, sender: vc.view)
+            return true
+        }
+        
+        let vc = container.toPresentable()
+        proxy.controller = vc
+        return vc
     }
     
     func makeExploreViewController() -> ConstruktPresentable {
