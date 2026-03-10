@@ -25,7 +25,17 @@ final class ScreenFactory: ScreenFactoryProtocol {
         case .movieDetail(let movieId):
             guard let id = Int(movieId) else { return UIViewController() }
             let dummyMovie = Movie(id: id, title: "", overview: "", releaseDate: nil, posterPath: nil, backdropPath: nil, voteAverage: 0, genreIds: nil)
-            return MovieDetailViewController(movie: dummyMovie)
+            return MovieDetailView(movie: dummyMovie)
+                .onReceiveRoute(MovieDetailRoute.self, handler: { [unowned self] route in
+                    switch route {
+                    case .back:
+                        return false // Back routes are handled appropriately by default
+                    case .similarMovie(let movie):
+                        let appRoute = AppRoute.movieDetail(movieId: String(movie.id))
+                        return true
+                    }
+                })
+                .toPresentable()
             
         case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):
             let sectionType = HomeSection(rawValue: sectionTypeRaw) ?? .categories

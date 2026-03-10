@@ -131,7 +131,18 @@ class MovieListViewController: UIViewController {
     }
     
     private func showDetail(for movie: Movie) {
-        let detailVC = MovieDetailViewController(movie: movie)
+        let detailVC = MovieDetailView(movie: movie)
+            .onReceiveRoute(MovieDetailRoute.self, handler: { [weak self] route in
+                switch route {
+                case .back:
+                    self?.navigationController?.popViewController(animated: true)
+                    return true
+                case .similarMovie(let movie):
+                    self?.showDetail(for: movie)
+                    return true
+                }
+            })
+            .toPresentable()
         navigationController?.pushViewController(detailVC, animated: true)
     }
     

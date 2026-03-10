@@ -40,9 +40,7 @@ final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(white: 0.1, alpha: 0.9)
         tabBarController.tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBarController.tabBar.scrollEdgeAppearance = appearance
-        }
+        tabBarController.tabBar.scrollEdgeAppearance = appearance
         tabBarController.tabBar.tintColor = .white
         tabBarController.tabBar.unselectedItemTintColor = .gray
     }
@@ -113,7 +111,20 @@ final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
         case .movieDetail(let movieId):
             guard let id = Int(movieId) else { return UIViewController() }
             let dummyMovie = Movie(id: id, title: "", overview: "", releaseDate: nil, posterPath: nil, backdropPath: nil, voteAverage: 0, genreIds: nil)
-            return MovieDetailViewController(movie: dummyMovie)
+            return MovieDetailView(movie: dummyMovie)
+                .onReceiveRoute(MovieDetailRoute.self, handler: { [unowned self] route in
+                    switch route {
+                    case .back:
+                        if let selectedNav = activeNavigationController(for: tabBarController) {
+                            selectedNav.popViewController(animated: true)
+                        }
+                        return true
+                    case .similarMovie(let movie):
+                        open(.movieDetail(movieId: String(movie.id)))
+                        return true
+                    }
+                })
+                .toPresentable()
             
         case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):
             let sectionType = HomeSection(rawValue: sectionTypeRaw) ?? .categories

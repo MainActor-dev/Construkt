@@ -314,3 +314,14 @@ public extension ViewBinding where Value: Equatable {
     }
     
 }
+
+public extension ViewBinding {
+    
+    /// Wraps any concrete `ViewBinding` into a type-erased `AnyViewBinding`.
+    func eraseToAnyViewBinding() -> AnyViewBinding<Value> {
+        AnyViewBinding { queue, handler in
+            self.observe(on: queue, handler)
+        }
+    }
+    
+}

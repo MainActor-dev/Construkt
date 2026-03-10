@@ -17,11 +17,27 @@ struct HomeView: ViewConvertable {
     // We bind the viewModel at initialization.
     private let viewModel = MovieViewModel()
     
-    // Using a class wrapper to pass a mutating reference for the navigation bar background view
-    private class Ref {
-        weak var view: UIView?
+    // MARK: - State
+    
+    /// Pure reactive data — observable, no UIKit dependency
+    private class ScrollBinding {
+        @Variable var offset: CGFloat = 0
     }
-    private let navBarBackgroundRef = Ref()
+    
+    /// Imperative UIKit handles — needed for layout callbacks only
+    private class ViewHandles {
+        weak var collectionView: UICollectionView?
+    }
+    
+    private let scrollBinding = ScrollBinding()
+    private let handles = ViewHandles()
+    
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let navBarFadeDistance: CGFloat = 100
+        static let heroOriginalHeight: CGFloat = 550
+    }
     
     func asViews() -> [View] {
         ZStackView {
@@ -41,26 +57,24 @@ struct HomeView: ViewConvertable {
                 )
             }
             .backgroundColor(UIColor("#0A0A0A"))
-            .with {
-                $0.collectionView.contentInsetAdjustmentBehavior = .never
-                $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                $0.collectionView.showsVerticalScrollIndicator = false
+            .with { [handles] view in
+                view.collectionView.contentInsetAdjustmentBehavior = .never
+                view.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                view.collectionView.showsVerticalScrollIndicator = false
+                handles.collectionView = view.collectionView
             }
             .onRefresh(viewModel.isNowPlayingLoading) { [weak viewModel] in
                 viewModel?.loadHomeData()
             }
-            .onScroll { scrollView in
-                handleNavBarScroll(scrollView)
+            .onScroll { [scrollBinding] scrollView in
+                scrollBinding.offset = scrollView.contentOffset.y
             }
             
             HomeNavigationBar(
                 isLoading: viewModel.isNowPlayingLoading,
-                onBackgroundReference: { view in
-                    navBarBackgroundRef.view = view
-                },
-                onSearchTap: {
-                    // Send search route via responder chain
-                    navBarBackgroundRef.view?.route(HomeRoute.search, sender: nil)
+                scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
+                onSearchTap: { sender in
+                    sender.route(HomeRoute.search, sender: nil)
                 }
             )
         }
@@ -224,14 +238,9 @@ struct HomeView: ViewConvertable {
         let containerWidth = env.container.contentSize.width
         let visibleRectCenter = offset.x + containerWidth / 2.0
         
-        let collectionView: UICollectionView
-        
-        // Find the collection view from the active hierarchy
-        guard let wrapper = navBarBackgroundRef.view?.superview?.superview?.firstSubview(ofType: CollectionViewWrapperView.self),
-              let found = wrapper.subviews.first(where: { $0 is UICollectionView }) as? UICollectionView else {
+        guard let collectionView = handles.collectionView else {
             return
         }
-        collectionView = found
         
         for item in items {
             let distanceFromCenter = abs(item.center.x - visibleRectCenter)
@@ -247,9 +256,8 @@ struct HomeView: ViewConvertable {
         let y = offset.y
         if y < 0 {
             items.forEach { item in
-                let originalHeight: CGFloat = 550
-                let newHeight = originalHeight + abs(y)
-                let scale = newHeight / originalHeight
+                let newHeight = Layout.heroOriginalHeight + abs(y)
+                let scale = newHeight / Layout.heroOriginalHeight
                 
                 let translationY = y / 2
                 item.alpha = 1.0
@@ -266,9 +274,4 @@ struct HomeView: ViewConvertable {
         return views
     }
     
-    private func handleNavBarScroll(_ scrollView: UIScrollView) {
-        let y = scrollView.contentOffset.y
-        let alpha = min(1.0, max(0.0, y / 100.0))
-        navBarBackgroundRef.view?.alpha = alpha
-    }
 }

@@ -54,7 +54,20 @@ public class SearchViewController: UIViewController {
                             }
                         }
                         .onSelect(on: self) { (self, movie: Movie) in
-                            let vc = MovieDetailViewController(movie: movie)
+                            let vc = MovieDetailView(movie: movie)
+                                .onReceiveRoute(MovieDetailRoute.self, handler: { [weak self] route in
+                                    switch route {
+                                    case .back:
+                                        self?.navigationController?.popViewController(animated: true)
+                                        return true
+                                    case .similarMovie(let similarMovie):
+                                        let newVC = MovieDetailView(movie: similarMovie).toPresentable() // NOTE: Will need to route this properly in a real app, maybe by calling self again
+                                        // For simplicity, we just push it
+                                        self?.navigationController?.pushViewController(newVC, animated: true)
+                                        return true
+                                    }
+                                })
+                                .toPresentable()
                             self.navigationController?.pushViewController(vc, animated: true)
                         }
                         .shimmer(count: 8, when: viewModel.isLoadingObservable) {
