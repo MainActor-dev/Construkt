@@ -1,9 +1,9 @@
 import UIKit
 import ConstruktKit
 
+// MARK: - Unused
 public enum MovieDetailRoute {
     case back
-    case similarMovie(Movie)
 }
 
 struct MovieDetailView: ViewConvertable {
@@ -127,7 +127,7 @@ struct MovieDetailView: ViewConvertable {
                 title: details.compactMap { $0.title },
                 scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
                 onBack: { sender in
-                    sender.route(MovieDetailRoute.back, sender: nil)
+                    sender.route(AppRoute.back, sender: self)
                 }
             )
         }

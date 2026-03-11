@@ -12,6 +12,37 @@ public struct Movie: Codable, Identifiable, Equatable, Sendable {
     
     public let genreIds: [Int]?
     
+    init(
+        id: Int,
+        title: String,
+        overview: String,
+        releaseDate: String?,
+        posterPath: String?,
+        backdropPath: String?,
+        voteAverage: Double,
+        genreIds: [Int]?
+    ) {
+        self.id = id
+        self.title = title
+        self.overview = overview
+        self.releaseDate = releaseDate
+        self.posterPath = posterPath
+        self.backdropPath = backdropPath
+        self.voteAverage = voteAverage
+        self.genreIds = genreIds
+    }
+    
+    init(id: Int) {
+        self.id = id
+        self.title = ""
+        self.overview = ""
+        self.releaseDate = nil
+        self.posterPath = nil
+        self.backdropPath = nil
+        self.voteAverage = 0
+        self.genreIds = []
+    }
+    
     enum CodingKeys: String, CodingKey {
         case id
         case title

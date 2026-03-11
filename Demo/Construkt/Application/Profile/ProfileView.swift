@@ -28,9 +28,6 @@ struct ProfileView: ViewConvertable {
                 versionSection
             }
         }
-        .navigationBar {
-            ProfileNavbar()
-        }
         .backgroundColor(UIColor("#0A0A0A"))
         .asViews()
     }

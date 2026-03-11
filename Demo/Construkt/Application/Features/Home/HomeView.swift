@@ -6,12 +6,6 @@
 import UIKit
 import ConstruktKit
 
-public enum HomeRoute {
-    case movieDetail(movieId: String)
-    case movieList(title: String, sectionTypeRaw: String, genreId: Int?, genreName: String?, allGenres: [Genre]?)
-    case search
-}
-
 struct HomeView: ViewConvertable {
     
     // We bind the viewModel at initialization.
@@ -75,7 +69,7 @@ struct HomeView: ViewConvertable {
                 isLoading: viewModel.isNowPlayingLoading,
                 scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
                 onSearchTap: { sender in
-                    sender.route(HomeRoute.search, sender: nil)
+                    sender.route(AppRoute.search, sender: nil)
                 }
             )
         }
@@ -99,7 +93,7 @@ struct HomeView: ViewConvertable {
         }
         // Direct event routing via ConstruktKit .onRoute modifier!
         .onRoute { (movie: Movie) in
-            HomeRoute.movieDetail(movieId: String(movie.id))
+            AppRoute.movieDetail(movieId: movie.id)
         }
         .layout { _ in
             let layout = HomeSection.hero.layout
@@ -126,7 +120,7 @@ struct HomeView: ViewConvertable {
             }
         }
         .onRoute { (genre: Genre) in
-            HomeRoute.movieList(
+            AppRoute.movieList(
                 title: "Categories",
                 sectionTypeRaw: HomeSection.categories.rawValue,
                 genreId: genre.id,
@@ -158,7 +152,7 @@ struct HomeView: ViewConvertable {
                 PosterCell(movie: movie)
             }
         }
-        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: movie.id) }
         .backgroundDecoration(id: "popular_bg") {
             LinearGradient(colors: [
                 UIColor.black.withAlphaComponent(0.3),
@@ -189,7 +183,7 @@ struct HomeView: ViewConvertable {
                 UpcomingCell(item: item)
             }
         }
-        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: movie.id) }
         .layout { _ in
             HomeSection.upcoming.layout
         }
@@ -217,7 +211,7 @@ struct HomeView: ViewConvertable {
                 TopRatedCell(index: index + 1, movie: movie)
             }
         }
-        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
+        .onRoute { (movie: Movie) in AppRoute.movieDetail(movieId: movie.id) }
         .onSelect { (ad: String) in
             print("Ad Selected: \(ad)")
         }

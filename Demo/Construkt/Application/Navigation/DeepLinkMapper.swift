@@ -12,7 +12,7 @@ public struct DeepLinkMapper {
         // e.g. construkt://movie/123
         if url.host == "movie", url.pathComponents.count > 1 {
             let id = url.lastPathComponent
-            return .movieDetail(movieId: id)
+            return .movieDetail(movieId: Int(id) ?? 0)
         }
         
         return nil

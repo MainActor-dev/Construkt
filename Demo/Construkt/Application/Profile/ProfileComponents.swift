@@ -195,14 +195,3 @@ struct ProfileVersionInfo: ViewBuilder {
             .padding(top: 0, left: 0, bottom: 16, right: 0)
     }
 }
-
-struct ProfileNavbar: ViewBuilder {
-    var body: View {
-        ZStackView {
-            BlurView(style: .dark)
-        }
-        .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
-        .height(60)
-        .safeArea(false)
-    }
-}
