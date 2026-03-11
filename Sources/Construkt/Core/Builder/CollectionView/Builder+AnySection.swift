@@ -271,7 +271,8 @@ public struct AnySection: AnySectionObservable {
 
     // MARK: - Actions Modifier
     
-    /// Attaches a type-safe selection action that applies uniformly to every item housed dynamically within this section.
+    /// Attaches a type-safe, imperative selection action to every item within this section.
+    /// Use this for side-effects (logging, analytics, delegate calls) that do NOT produce a navigation event.
     public func onSelect<T>(_ handler: @escaping (T) -> Void) -> AnySection {
         let improved = binding.map { sections in
             sections.map { section in
@@ -284,8 +285,72 @@ public struct AnySection: AnySectionObservable {
                     
                     guard let model = modelToUse as? T else { return cell }
                     
-                    return cell.withSelection {
+                    return cell.withSelection { _ in
                         handler(model)
+                    }
+                }
+                 
+                return SectionConfig(
+                    identifier: section.identifier,
+                    cells: newCells,
+                    header: section.header,
+                    footer: section.footer,
+                    layoutProvider: section.layoutProvider
+                )
+            }
+        }
+        return AnySection(binding: improved)
+    }
+    
+    /// Attaches a declarative routing action to every item within this section.
+    /// The returned event is automatically bubbled up the UIResponder chain to the nearest `RouteHandlingCoordinator`.
+    public func onRoute<T, E>(_ handler: @escaping (T) -> E) -> AnySection {
+        let improved = binding.map { sections in
+            sections.map { section in
+                let newCells = section.cells.map { cell in
+                    var modelToUse = cell.model
+                    
+                    while let wrapper = modelToUse as? CellContentWrapper {
+                        modelToUse = wrapper.originalModel
+                    }
+                    
+                    guard let model = modelToUse as? T else { return cell }
+                    
+                    return cell.withSelection { sender in
+                        let event = handler(model)
+                        sender?.route(event, sender: sender)
+                    }
+                }
+                 
+                return SectionConfig(
+                    identifier: section.identifier,
+                    cells: newCells,
+                    header: section.header,
+                    footer: section.footer,
+                    layoutProvider: section.layoutProvider
+                )
+            }
+        }
+        return AnySection(binding: improved)
+    }
+    
+    /// Optional-aware variant: routes only when the handler returns a non-nil event.
+    /// Supports guard patterns like `guard ... else { return nil }`.
+    public func onRoute<T, E>(_ handler: @escaping (T) -> E?) -> AnySection {
+        let improved = binding.map { sections in
+            sections.map { section in
+                let newCells = section.cells.map { cell in
+                    var modelToUse = cell.model
+                    
+                    while let wrapper = modelToUse as? CellContentWrapper {
+                        modelToUse = wrapper.originalModel
+                    }
+                    
+                    guard let model = modelToUse as? T else { return cell }
+                    
+                    return cell.withSelection { sender in
+                        guard let event = handler(model) else { return }
+                        sender?.route(event, sender: sender)
                     }
                 }
                  
@@ -311,12 +376,12 @@ public struct AnySection: AnySectionObservable {
                     let newCells = section.cells.map { cell in
                         var modelToUse = cell.model
                         
-                        if let wrapper = modelToUse as? CellContentWrapper {
+                        while let wrapper = modelToUse as? CellContentWrapper {
                             modelToUse = wrapper.originalModel
                         }
                         
                         guard let model = modelToUse as? T else { return cell }
-                        return cell.withSelection { [weak target] in
+                        return cell.withSelection { [weak target] sender in
                             guard let target = target else { return }
                             handler(target, model)
                         }

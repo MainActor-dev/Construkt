@@ -4,7 +4,6 @@ import ConstruktKit
 struct StandardHeader: ViewBuilder {
     let title: String
     let actionTitle: String?
-    var onAction: (() -> Void)? = nil
     
     var body: View {
         HStackView() {
@@ -16,10 +15,11 @@ struct StandardHeader: ViewBuilder {
             SpacerView()
             
             if let action = actionTitle {
-                ButtonView(action) { _ in onAction?() }
+                ButtonView(action)
                     .font(.systemFont(ofSize: 14))
                     .color(.lightGray)
                     .shimmerable(true)
+                    .onRoute(AppRoute.movieList(title: "Popular Now", sectionTypeRaw: HomeSection.popular.rawValue, genreId: nil, genreName: nil, allGenres: nil))
             }
         }
         .alignment(.center)

@@ -1,5 +1,16 @@
+//
+//  ExploreView.swift
+//  Construkt
+//
+
 import UIKit
 import ConstruktKit
+
+public enum ExploreRoute {
+    case movieDetail(movieId: String)
+    case movieList(title: String, sectionTypeRaw: String, genreId: Int?, genreName: String?, allGenres: [Genre]?)
+    case search
+}
 
 enum ExploreSection: String, SectionConfigIdentifier {
     case search
@@ -10,71 +21,48 @@ enum ExploreSection: String, SectionConfigIdentifier {
     var uniqueId: String { rawValue }
 }
 
-class ExploreViewController: UIViewController {
+struct ExploreView: ViewConvertable {
     
-    public enum Action {
-        case movieSelected(String)
-        case genreSelected(selected: ExploreGenre, all: [ExploreGenre])
-        case searchSelected
-    }
-    
-    public var onAction: ((Action) -> Void)?
-    
+    // We bind the viewModel at initialization.
     private let viewModel = ExploreViewModel()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor(white: 0.04, alpha: 1) // Neutral 950
-        
-        viewModel.loadData()
-        
-        view.embed(
-            ZStackView {
-                // Background gradients
-                CircleView()
-                    .backgroundColor(UIColor.systemIndigo.withAlphaComponent(0.05))
-                    .size(width: 250, height: 250)
-                    .position(.topLeft)
-                    .margins(top: 0, left: 40)
-                
-                CircleView()
-                    .backgroundColor(UIColor.systemPink.withAlphaComponent(0.05))
-                    .size(width: 320, height: 320)
-                    .position(.bottomRight)
-                    .margins(bottom: 160, right: 0)
-                
-                // Main Collection View
-                CollectionView {
-                    genresSection
-                    collectionsSection
-                    arrivalsSection
-                }
-                .with {
-                    $0.collectionView.contentInset.top = 60
-                    $0.collectionView.showsVerticalScrollIndicator = false
-                }
-                
-                // Fixed Header
-                headerOverlay
+    func asViews() -> [View] {
+        Screen {
+            // Background gradients
+            CircleView()
+                .backgroundColor(UIColor.systemIndigo.withAlphaComponent(0.05))
+                .size(width: 250, height: 250)
+                .position(.topLeft)
+                .margins(top: 0, left: 40)
+            
+            CircleView()
+                .backgroundColor(UIColor.systemPink.withAlphaComponent(0.05))
+                .size(width: 320, height: 320)
+                .position(.bottomRight)
+                .margins(bottom: 160, right: 0)
+            
+            // Main Collection View
+            CollectionView {
+                genresSection
+                collectionsSection
+                arrivalsSection
             }
-        )
+            .with {
+                $0.collectionView.contentInset.top = 60
+                $0.collectionView.showsVerticalScrollIndicator = false
+            }
+        }
+        .navigationBar {
+            headerOverlay
+        }
+        .backgroundColor(UIColor(white: 0.04, alpha: 1)) // Neutral 950
+        .onHostDidLoad {
+            viewModel.loadData()
+        }
+        .asViews()
     }
     
     // MARK: - Sections
-    
-    private var searchSection: AnySection {
-        AnySection(id: ExploreSection.search, items: ["search_bar"]) { _ in
-            AnyCell("search_bar", id: "search_bar") { _ in
-                HStackView {
-                    ExploreSearchBar(viewModel: self.viewModel)
-                }
-                .padding(top: 12, left: 24, bottom: 12, right: 24)
-            }
-        }
-        .layout {
-            .list(itemHeight: .estimated(60))
-        }
-    }
     
     private var genresSection: AnySection {
         AnySection(
@@ -88,8 +76,19 @@ class ExploreViewController: UIViewController {
                 ExploreGenreCard(genre: genre)
             }
         }
-        .onSelect(on: self) { (me, genre: ExploreGenre) in
-            me.showMovieList(for: genre)
+        .onRoute { (genre: ExploreGenre) -> ExploreRoute? in
+            guard let genreId = Int(genre.id) else { return nil }
+            let allGenres = viewModel.allGenres.compactMap {
+                guard let id = Int($0.id) else { return nil as Genre? }
+                return Genre(id: id, name: $0.name)
+            }
+            return ExploreRoute.movieList(
+                title: genre.name,
+                sectionTypeRaw: "categories",
+                genreId: genreId,
+                genreName: genre.name,
+                allGenres: allGenres
+            )
         }
         .layout {
             .grid(
@@ -114,8 +113,8 @@ class ExploreViewController: UIViewController {
                 ExploreCollectionCard(collection: collection)
             }
         }
-        .onSelect(on: self) { (me, collection: ExploreCollection) in
-            me.showDetail(for: collection.id)
+        .onRoute { (collection: ExploreCollection) in
+            ExploreRoute.movieDetail(movieId: collection.id)
         }
         .layout {
             .carousel(
@@ -140,8 +139,8 @@ class ExploreViewController: UIViewController {
                 ExploreArrivalRow(arrival: arrival)
             }
         }
-        .onSelect(on: self) { (me, arrival: ExploreArrival) in
-            me.showDetail(for: arrival.id)
+        .onRoute { (arrival: ExploreArrival) in
+            ExploreRoute.movieDetail(movieId: arrival.id)
         }
         .layout {
             .list(itemHeight: .estimated(80))
@@ -165,30 +164,12 @@ class ExploreViewController: UIViewController {
                     .tintColor(.white)
                     .size(width: 24, height: 24)
                     .contentMode(.scaleAspectFit)
-                    .onTapGesture { [weak self] _ in self?.showSearch() }
+                    .onRoute(ExploreRoute.search)
             }
             .padding(insets: .init(top: 12, left: 24, bottom: 12, right: 24))
         }
         .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
         .height(48)
-        .position(.top)
         .safeArea(false)
     }
 }
-
-// MARK: - Navigation
-
-extension ExploreViewController {
-    private func showDetail(for id: String) {
-        onAction?(.movieSelected(id))
-    }
-    
-    private func showMovieList(for genre: ExploreGenre) {
-        onAction?(.genreSelected(selected: genre, all: viewModel.allGenres))
-    }
-    
-    private func showSearch() {
-        onAction?(.searchSelected)
-    }
-}
-

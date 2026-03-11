@@ -10,14 +10,14 @@ struct PropertyTests {
     @Test("Initial value is accessible")
     func initialValue() {
         let property = Property<Int>(42)
-        #expect(property.value == 42)
+        #expect(property.wrappedValue == 42)
     }
     
     @Test("Setting value updates the stored value")
     func setValue() {
         let property = Property<String>("hello")
-        property.value = "world"
-        #expect(property.value == "world")
+        property.wrappedValue = "world"
+        #expect(property.wrappedValue == "world")
     }
     
     @Test("Observer receives initial value on subscribe")
@@ -46,7 +46,7 @@ struct PropertyTests {
                 }
             }.store(in: bag)
             
-            property.value = 99
+            property.wrappedValue = 99
         }
     }
     
@@ -68,7 +68,7 @@ struct PropertyTests {
                 if receivedB.count == 2 { done() }
             }.store(in: bag)
             
-            property.value = 2
+            property.wrappedValue = 2
         }
         
         #expect(receivedA == [1, 2])
@@ -84,9 +84,9 @@ struct PropertyTests {
             received.append(value)
         }
         
-        property.value = 1
+        property.wrappedValue = 1
         token.cancel()
-        property.value = 2  // should not be received
+        property.wrappedValue = 2  // should not be received
         
         #expect(received == [0, 1])
     }
@@ -102,11 +102,11 @@ struct PropertyTests {
                 received.append(value)
             }.store(in: bag)
             
-            property.value = 1
+            property.wrappedValue = 1
             // bag deallocates here
         }
         
-        property.value = 2  // should not be received
+        property.wrappedValue = 2  // should not be received
         #expect(received == [0, 1])
     }
 }
@@ -214,7 +214,7 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = 10
+        property.wrappedValue = 10
         #expect(received == ["5", "10"])
     }
     
@@ -230,8 +230,8 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = "abc"  // nil — filtered
-        property.value = "42"
+        property.wrappedValue = "abc"  // nil — filtered
+        property.wrappedValue = "42"
         
         #expect(received == [1, 42])
     }
@@ -248,9 +248,9 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = 2
-        property.value = 3
-        property.value = 4
+        property.wrappedValue = 2
+        property.wrappedValue = 3
+        property.wrappedValue = 4
         
         #expect(received == [2, 4])
     }
@@ -267,9 +267,9 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = 1
-        property.value = 2
-        property.value = 3
+        property.wrappedValue = 1
+        property.wrappedValue = 2
+        property.wrappedValue = 3
         
         // initial(0) skipped, 1 skipped, 2 forwarded, 3 forwarded
         #expect(received == [2, 3])
@@ -287,8 +287,8 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = 2
-        property.value = 3
+        property.wrappedValue = 2
+        property.wrappedValue = 3
         
         // 0+1=1, 1+2=3, 3+3=6
         #expect(received == [1, 3, 6])
@@ -306,10 +306,10 @@ struct OperatorTests {
             received.append(value)
         }.store(in: bag)
         
-        property.value = 1  // duplicate
-        property.value = 2
-        property.value = 2  // duplicate  
-        property.value = 3
+        property.wrappedValue = 1  // duplicate
+        property.wrappedValue = 2
+        property.wrappedValue = 2  // duplicate  
+        property.wrappedValue = 3
         
         #expect(received == [1, 2, 3])
     }
@@ -328,8 +328,8 @@ struct OperatorTests {
                 received.append(value)
             }.store(in: bag)
         
-        property.value = "HELLO"  // duplicate (case insensitive)
-        property.value = "world"
+        property.wrappedValue = "HELLO"  // duplicate (case insensitive)
+        property.wrappedValue = "world"
         
         #expect(received == ["hello", "world"])
     }
@@ -381,8 +381,8 @@ struct OperatorTests {
             received.append(pair)
         }.store(in: bag)
         
-        a.value = 2
-        b.value = "y"
+        a.wrappedValue = 2
+        b.wrappedValue = "y"
         
         // (1,"x") initial, (2,"x") after a=2, (2,"y") after b="y"
         #expect(received.count == 3)
@@ -450,6 +450,7 @@ struct OperatorTests {
         let signal = Signal<Int>()
         let bag = CancelBag()
         var received: [Int] = []
+        let expectation = DispatchSemaphore(value: 0)
         
         signal.throttle(for: 0.2, latest: false)
             .observe(on: nil) { value in
@@ -461,16 +462,16 @@ struct OperatorTests {
         signal.send(2)
         signal.send(3)
         
-        try? await Task.sleep(for: .milliseconds(50))
+        _ = expectation.wait(timeout: .now() + 0.05)
         
         // Only the first should have gotten through
         #expect(received == [1])
         
         // After the window expires, next value should get through
-        try? await Task.sleep(for: .milliseconds(250))
+        _ = expectation.wait(timeout: .now() + 0.25)
         signal.send(4)
         
-        try? await Task.sleep(for: .milliseconds(50))
+        _ = expectation.wait(timeout: .now() + 0.05)
         #expect(received == [1, 4])
     }
 }

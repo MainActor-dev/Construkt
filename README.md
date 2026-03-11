@@ -21,6 +21,10 @@
   - [Static Collection Views](#static-collection-views)
   - [Shimmer Loading States](#shimmer-loading-states)
 - [Advanced View Structure](#advanced-view-structure)
+- [Navigation & Auto-Routing](#navigation--auto-routing)
+  - [Coordinators](#coordinators)
+  - [Declarative Routing](#declarative-routing)
+  - [ViewConvertable](#viewconvertable)
 - [Author](#author)
 - [Contribution](#contribution)
 - [License](#license)
@@ -204,6 +208,7 @@ Construkt's native binding system includes a rich suite of built-in operators so
 - `.merge(with:)`, `.combineLatest(_:_:)`
 - `.distinctUntilChanged()`, `.removeDuplicates(by:)`
 - `.scan(_:_:)`
+- `.eraseToAnyViewBinding()` — type-erase any `ViewBinding` into `AnyViewBinding<T>`
 
 ### Combine & RxSwift Integration
 
@@ -222,7 +227,7 @@ LabelView(publisher) // Construkt treats Combine Publishers as native ViewBindin
 
 Construkt provides declarative wrappers for most standard UIKit components:
 - **Text & Controls:** `LabelView`, `ButtonView`, `TextField`, `TextEditor`, `Toggle`, `Slider`, `Stepper`
-- **Layout & Spacing:** `VStackView`, `HStackView`, `ZStackView`, `SpacerView`, `DividerView`
+- **Layout & Spacing:** `VStackView`, `HStackView`, `ZStackView`, `Screen`, `SpacerView`, `DividerView`
 - **Visual & Indicators:** `ImageView`, `BlurView`, `LinearGradient`, `ProgressView`, `ActivityIndicator`, `CircleView`
 
 ---
@@ -339,6 +344,209 @@ LabelView("Direct UIKit Access")
         label.shadowOffset = CGSize(width: 1, height: 1)
     }
 ```
+
+### Screen Layout Container
+
+`Screen` is a high-level layout component that provides a standard page architecture with content and navigation bar slots. It replaces manual `ZStackView` + `.position(.top)` boilerplate:
+
+```swift
+struct HomeView: ViewConvertable {
+    func asViews() -> [View] {
+        Screen {
+            CollectionView {
+                heroSection
+                popularSection
+            }
+            .onScroll { scrollView in
+                scrollBinding.offset = scrollView.contentOffset.y
+            }
+        }
+        .navigationBar {
+            HomeNavigationBar(
+                scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding()
+            )
+        }
+        .backgroundColor(UIColor("#0A0A0A"))
+        .asViews()
+    }
+}
+```
+
+The `Screen` component handles Z-stacking and pinning automatically. Each screen can provide a completely distinct navigation bar UI while the layout structure remains consistent.
+
+### Scroll-Driven Helpers
+
+Construkt includes a `CGFloat` extension for normalizing scroll offsets into 0…1 progress values, useful for scroll-driven animation effects:
+
+```swift
+let progress = scrollOffset.scrollProgress(over: 100) // 0.0 → 1.0 over 100pt
+navBarBackground.alpha = progress
+```
+
+---
+
+## Navigation & Auto-Routing
+
+Construkt includes a flexible navigation engine with two approaches: **ConstruktRouteHandler** for centralized route handling, and **ConstruktCoordinator** for coordinator-tree architectures. Both use UIKit's responder chain so views never hold direct references to navigation logic.
+
+### Route Handler (Recommended)
+
+Define routes as an enum, then create a centralized handler that manages all navigation:
+
+```swift
+enum AppRoute: Codable {
+    case movieDetail(movieId: String)
+    case movieList(title: String, genreId: Int?)
+    case search
+}
+
+final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
+    override func handle(_ route: AppRoute, sender: Any?) -> Bool {
+        open(route, animated: true)
+        return true
+    }
+
+    func open(_ route: AppRoute, animated: Bool = true) {
+        switch route {
+        case .movieDetail(let id):
+            let screen = MovieDetailView(movie: movie)
+                .onReceiveRoute(MovieDetailRoute.self) { [unowned self] route in
+                    switch route {
+                    case .back:
+                        navigationController?.popViewController(animated: true)
+                        return true
+                    case .similarMovie(let movie):
+                        open(.movieDetail(movieId: String(movie.id)))
+                        return true
+                    }
+                }
+                .toPresentable()
+            router.push(screen, animated: animated, receiver: self)
+        case .search:
+            router.push(SearchViewController(), animated: animated, receiver: self)
+        // ...
+        }
+    }
+}
+```
+
+### Inline Route Handling with `onReceiveRoute`
+
+Use `.onReceiveRoute` to attach route handlers directly when constructing screens:
+
+```swift
+HomeView()
+    .onReceiveRoute(HomeRoute.self) { [unowned self] route in
+        switch route {
+        case .movieDetail(let id): open(.movieDetail(movieId: id))
+        case .search: open(.search)
+        }
+        return true
+    }
+    .toPresentable()
+```
+
+### Coordinator Pattern
+
+For larger apps with complex navigation hierarchies, Construkt provides a full **Coordinator** tree. Coordinators own navigation logic and form a parent-child hierarchy via `store()`/`free()`:
+
+```swift
+final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = HomeRoute
+    let router: ConstruktRouter
+
+    init(router: ConstruktRouter) {
+        self.router = router
+    }
+
+    override func start() {
+        let homeVC = HomeView(viewModel: viewModel).toPresentable()
+        router.setRoot(homeVC, hideBar: true, animated: false, receiver: self)
+    }
+
+    func canReceive(_ event: HomeRoute, sender: Any?) -> Bool {
+        switch event {
+        case .movieDetail(let id):
+            let detailVC = MovieDetailView(movie: movie).toPresentable()
+            router.push(detailVC, animated: true, receiver: self)
+            return true
+        case .search:
+            let searchVC = SearchViewController()
+            router.push(searchVC, animated: true, receiver: self)
+            return true
+        }
+    }
+}
+```
+
+Key concepts:
+- **`BaseCoordinator`** — base class with `children` array and `start()`. Override `start()` to set up the initial screen.
+- **`RouteHandlingCoordinator`** — protocol combining `ConstruktCoordinator` + `RouteReceiving`. Requires a `router` property and `canReceive()` to handle events.
+- **`ConstruktRouter`** — protocol for navigation actions (`push`, `pop`, `present`, `dismiss`, `setRoot`). Use `DefaultRouter` as the concrete implementation.
+- **`receiver: self`** — the `receiver` parameter binds the coordinator to the pushed view controller via associated objects, so route events from that screen flow back to the correct coordinator.
+
+### Declarative Routing
+
+Attach navigation intent directly to collection view sections using two explicit modifiers:
+
+| Modifier | Signature | Purpose |
+|----------|-----------|---------|
+| `.onSelect` | `(T) -> Void` | Imperative side-effects (analytics, ViewModel calls) |
+| `.onRoute` | `(T) -> E` | Declarative routing — auto-bubbles via responder chain |
+| `.onRoute` | `(T) -> E?` | Optional variant — routes only when non-nil |
+
+```swift
+// Declarative: returns an event, automatically routed via the responder chain
+AnySection(id: "popular", items: movies) { movie in
+    AnyCell(movie, id: movie.id) { movie in PosterCell(movie: movie) }
+}
+.onRoute { (movie: Movie) in
+    AppRoute.movieDetail(movieId: String(movie.id))
+}
+```
+
+Any `UIView` can also trigger navigation directly using `UIResponder.route()`:
+
+```swift
+// From a tap gesture — routes from the sender view's responder chain
+.onTapGesture { context in 
+    context.view.route(HomeRoute.search, sender: nil) 
+}
+
+// Or declaratively on any view
+ImageView(UIImage(systemName: "magnifyingglass"))
+    .onRoute(AppRoute.search)
+```
+
+### ViewConvertable
+
+Screens are pure structs that produce declarative view hierarchies. The framework wraps them in `LifecycleHostController` for UIKit integration:
+
+```swift
+struct HomeView: ViewConvertable {
+    let viewModel: HomeViewModel
+
+    func asViews() -> [View] {
+        Screen {
+            CollectionView {
+                AnySection(id: "movies", items: viewModel.movies) { movie in
+                    AnyCell(movie, id: movie.id) { movie in PosterCell(movie: movie) }
+                }
+                .onRoute { (movie: Movie) in
+                    HomeRoute.movieDetail(movieId: String(movie.id))
+                }
+            }
+        }
+        .navigationBar {
+            HomeNavigationBar(scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding())
+        }
+        .onHostDidLoad { viewModel.load() }
+        .asViews()
+    }
+}
+```
+
+Events bubble up the UIKit responder chain → reach the `LifecycleHostController` → handled by the registered `onReceiveRoute` handler or `ConstruktRouteHandler`. No direct references between views and navigation logic.
 
 ---
 

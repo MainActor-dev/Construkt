@@ -1,47 +1,46 @@
 import UIKit
-import ma_ios_common
+import ConstruktKit
 
+
+@available(iOS 15.0, *)
 @MainActor
-final class HomeCoordinator: BaseCoordinator {
+final class HomeCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = AppRoute
+    
+    let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
     
     var onSwitchToExplore: (() -> Void)?
     
-    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    init(router: any ConstruktRouter, factory: ScreenFactoryProtocol) {
+        self.router = router
         self.factory = factory
-        super.init(router: router)
+        super.init()
     }
     
-    func start() {
+    override func start() {
         let homeVC = factory.makeHomeViewController()
-        homeVC.onAction = { [weak self] action in
-            guard let self = self else { return }
-            switch action {
-            case .movieSelected(let movie):
-                let screen = self.factory.makeScreen(for: .movieDetail(movieId: String(movie.id)))
-                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
-                
-            case .listSelected(let section, let genre, let allGenres):
-                let title: String
-                switch section {
-                case .categories: title = genre?.name ?? "Genre"
-                case .popular: title = "Popular Movies"
-                case .upcoming: title = "Upcoming Movies"
-                case .topRated: title = "Top Rated Movies"
-                default: title = "Movies"
-                }
-                let screen = self.factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: section.rawValue, genreId: genre?.id, genreName: genre?.name, allGenres: allGenres))
-                self.router.push(screen, animated: true, hideTabBar: true, onPop: nil)
-                
-            case .searchSelected:
-                self.onSwitchToExplore?()
-            }
-        }
-        
-        router.setRoot(homeVC, animated: false, onPop: nil)
+        router.setRoot(homeVC, hideBar: false, animated: false, receiver: self)
     }
     
-    override func rootViewController() -> UIViewController {
-        return router.navigationController
+    func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
+        switch event {
+        case .movieDetail(let movieId):
+            let screen = factory.makeScreen(for: .movieDetail(movieId: movieId))
+            router.push(screen, animated: true, hideTabBar: true, receiver: self)
+            return true
+            
+        case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):
+            let screen = factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: sectionTypeRaw, genreId: genreId, genreName: genreName, allGenres: allGenres))
+            router.push(screen, animated: true, completion: nil, receiver: self)
+            return true
+            
+        case .search:
+            onSwitchToExplore?()
+            return true
+            
+        default:
+            return false // Let it bubble up
+        }
     }
 }

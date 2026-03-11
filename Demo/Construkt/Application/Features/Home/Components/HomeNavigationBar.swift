@@ -3,8 +3,12 @@ import ConstruktKit
 
 struct HomeNavigationBar: ViewBuilder {
     let isLoading: AnyViewBinding<Bool>
-    let onBackgroundReference: (UIView) -> Void
-    var onSearchTap: (() -> Void)?
+    let scrollOffset: AnyViewBinding<CGFloat>
+    var onSearchTap: ((UIView) -> Void)?
+    
+    private enum Layout {
+        static let fadeDistance: CGFloat = 100
+    }
     
     var body: View {
         ZStackView {
@@ -12,8 +16,8 @@ struct HomeNavigationBar: ViewBuilder {
             GradientView(colors: [.black.withAlphaComponent(0.8), .black.withAlphaComponent(0.3)])
                 .height(100)
                 .alpha(0) // Start transparent
-                .with { view in
-                    onBackgroundReference(view)
+                .onReceive(scrollOffset) { context in
+                    context.view.alpha = context.value.scrollProgress(over: Layout.fadeDistance)
                 }
             
             // Navbar Content
@@ -29,7 +33,7 @@ struct HomeNavigationBar: ViewBuilder {
                         .tintColor(.white)
                         .size(width: 24, height: 24)
                         .contentMode(.scaleAspectFit)
-                        .onTapGesture { _ in onSearchTap?() },
+                        .onTapGesture { context in onSearchTap?(context.view) },
                     ImageView(UIImage(systemName: "person.crop.circle.fill"))
                         .tintColor(.gray)
                         .size(width: 32, height: 32)

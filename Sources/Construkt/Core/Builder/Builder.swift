@@ -70,6 +70,59 @@ extension Array where Element == ViewConvertable {
     public func asViews() -> [View] { self.flatMap { $0.asViews() } }
 }
 
+// MARK: - Routing Modifiers
+
+public extension ViewConvertable {
+    /// Declaratively catch and handle events bubbling up from child views.
+    func onReceiveRoute<E>(_ eventType: E.Type, handler: @escaping @MainActor (E) -> Bool) -> [View] {
+        return self.asViews().map { element in
+            RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, handler: handler) })
+        }
+    }
+    
+    /// Declaratively catch and handle events bubbling up from child views, injecting an unretained target safely.
+    func onReceiveRoute<E, Target: AnyObject>(_ eventType: E.Type, on target: Target, handler: @escaping @MainActor (Target, E) -> Bool) -> [View] {
+        return self.asViews().map { element in
+            RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, target: target, handler: handler) })
+        }
+    }
+}
+
+/// An internal wrapper that securely attaches an `.onReceiveRoute` listener to an arbitrary `View`.
+///
+/// Because `View` can be anything (including Custom UIViews) and we don't want to enforce global
+/// `@MainActor` onto the entire Builder framework and all client views just yet, we wrap the `View`
+/// and only attach the native UIKit event listeners when `.build()` is actually called on the main thread.
+public struct RouteReceivingModifier: ModifiableView {
+    public typealias Base = UIView
+    
+    private let view: View
+    private let configurator: @MainActor (UIView) -> Void
+    
+    public init(view: View, configurator: @escaping @MainActor (UIView) -> Void) {
+        self.view = view
+        self.configurator = configurator
+    }
+    
+    @MainActor
+    public var modifiableView: UIView {
+        let built = view.build()
+        configurator(built)
+        return built
+    }
+    
+    @MainActor
+    fileprivate static func configure<E>(_ view: UIView, handler: @escaping @MainActor (E) -> Bool) {
+        // We use the same closure receiver used by EventRouting.swift ModifiableView.onReceiveRoute
+        view.associatedReceiver = ClosureRouteReceiver(handler: handler)
+    }
+    
+    @MainActor
+    fileprivate static func configure<E, Target: AnyObject>(_ view: UIView, target: Target, handler: @escaping @MainActor (Target, E) -> Bool) {
+        view.associatedReceiver = TargetedClosureRouteReceiver(target: target, handler: handler)
+    }
+}
+
 
 
 /// An abstract representation of a UI component that knows how to build a tangible `UIView`.

@@ -103,6 +103,22 @@ extension ModifiableView {
         }
     }
 
+     @discardableResult
+    public func roundedCorners(_ radius: CGFloat, corners: UIRectCorner) -> ViewModifier<Base> {
+        ViewModifier(modifiableView) {
+            var mask: CACornerMask = []
+            if corners.contains(.topLeft) { mask.insert(.layerMinXMinYCorner) }
+            if corners.contains(.topRight) { mask.insert(.layerMaxXMinYCorner) }
+            if corners.contains(.bottomLeft) { mask.insert(.layerMinXMaxYCorner) }
+            if corners.contains(.bottomRight) { mask.insert(.layerMaxXMaxYCorner) }
+            if corners.contains(.allCorners) { mask = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner] }
+            
+            $0.layer.maskedCorners = mask
+            $0.layer.cornerRadius = radius
+            $0.clipsToBounds = true
+        }
+    }
+
     /// Hides the view unconditionally. Can be used with conditionally compiled builder nodes.
     @discardableResult
     public func hidden(_ hidden: Bool) -> ViewModifier<Base> {

@@ -204,7 +204,7 @@ extension UIStackView {
 
 /// A custom subclass of `UIStackView` designed to interface smoothly with `ViewBuilder` lifecycle
 /// events and handle custom padding safely.
-public class BuilderInternalUIStackView: UIStackView, ViewBuilderEventHandling {
+public class BuilderInternalUIStackView: UIStackView, ViewBuilderRouteReceiving {
 
     override public func didMoveToWindow() {
         optionalBuilderAttributes()?.commonDidMoveToWindow(self)

@@ -1,45 +1,46 @@
 //
-//  DeclarativeHomeViewController.swift
+//  HomeView.swift
 //  Construkt
-//
-//  Created by User on 2026-02-02.
 //
 
 import UIKit
-
 import ConstruktKit
 
-class HomeViewController: UIViewController {
+public enum HomeRoute {
+    case movieDetail(movieId: String)
+    case movieList(title: String, sectionTypeRaw: String, genreId: Int?, genreName: String?, allGenres: [Genre]?)
+    case search
+}
+
+struct HomeView: ViewConvertable {
     
-    public enum Action {
-        case movieSelected(Movie)
-        case listSelected(HomeSection, Genre?, [Genre]?)
-        case searchSelected
-    }
-    
-    public var onAction: ((Action) -> Void)?
-    
+    // We bind the viewModel at initialization.
     private let viewModel = MovieViewModel()
-    private weak var cachedCollectionView: UICollectionView?
     
-    private var navBarBackgroundView: UIView?
+    // MARK: - State
     
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor("#0A0A0A")
-        view.embed(body)
-        fetchData()
+    /// Pure reactive data — observable, no UIKit dependency
+    private class ScrollBinding {
+        @Variable var offset: CGFloat = 0
     }
     
-    private func fetchData() {
-        viewModel.loadHomeData()
+    /// Imperative UIKit handles — needed for layout callbacks only
+    private class ViewHandles {
+        weak var collectionView: UICollectionView?
     }
     
-    // MARK: - Layout
+    private let scrollBinding = ScrollBinding()
+    private let handles = ViewHandles()
     
-    var body: View {
-        ZStackView {
+    // MARK: - Layout Constants
+    
+    private enum Layout {
+        static let navBarFadeDistance: CGFloat = 100
+        static let heroOriginalHeight: CGFloat = 550
+    }
+    
+    func asViews() -> [View] {
+        Screen {
             CollectionView {
                 heroSection
                 genresSection
@@ -47,42 +48,47 @@ class HomeViewController: UIViewController {
                 upcomingSection
                 topRatedSection
             }
-            .emptyState(when: viewModel.isEmptyObservable) { [weak self] in
+            .emptyState(when: viewModel.isEmptyObservable) {
                 EmptyView(
                     title: "No movies found",
                     subtitle: "Check your connection.",
                     buttonTitle: "Retry",
-                    onAction: { [weak self] in self?.fetchData() }
+                    onAction: { [weak viewModel] in viewModel?.loadHomeData() }
                 )
             }
             .backgroundColor(UIColor("#0A0A0A"))
-            .with {
-                $0.collectionView.contentInsetAdjustmentBehavior = .never
-                $0.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                $0.collectionView.showsVerticalScrollIndicator = false
+            .with { [handles] view in
+                view.collectionView.contentInsetAdjustmentBehavior = .never
+                view.collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                view.collectionView.showsVerticalScrollIndicator = false
+                handles.collectionView = view.collectionView
             }
-            .onRefresh(viewModel.isNowPlayingLoading) { [weak self] in
-                self?.fetchData()
+            .onRefresh(viewModel.isNowPlayingLoading) { [weak viewModel] in
+                viewModel?.loadHomeData()
             }
-            .onScroll { [weak self] scrollView in
-                self?.handleNavBarScroll(scrollView)
+            .onScroll { [scrollBinding] scrollView in
+                scrollBinding.offset = scrollView.contentOffset.y
             }
-            
+        }
+        .navigationBar {
             HomeNavigationBar(
                 isLoading: viewModel.isNowPlayingLoading,
-                onBackgroundReference: { [weak self] view in
-                    self?.navBarBackgroundView = view
-                },
-                onSearchTap: { [weak self] in
-                    self?.onAction?(.searchSelected)
+                scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
+                onSearchTap: { sender in
+                    sender.route(HomeRoute.search, sender: nil)
                 }
             )
         }
         .margins(bottom: 100)
+        // Bind genuine UIKit View Lifecycle via ConstruktKit!
+        .onHostDidLoad {
+            viewModel.loadHomeData()
+        }
+        .asViews()
     }
     
     // MARK: - Sections
-    
+
     private var heroSection: AnySection {
         AnySection(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
             AnyCell(movie, id: "hero-\(movie.id)") { movie in
@@ -91,13 +97,14 @@ class HomeViewController: UIViewController {
                 }
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
+        // Direct event routing via ConstruktKit .onRoute modifier!
+        .onRoute { (movie: Movie) in
+            HomeRoute.movieDetail(movieId: String(movie.id))
         }
-        .layout { [weak self] _ in
+        .layout { _ in
             let layout = HomeSection.hero.layout
-            layout.visibleItemsInvalidationHandler = { [weak self] (items, offset, env) in
-                self?.handleHeroScroll(items: items, offset: offset, env: env)
+            layout.visibleItemsInvalidationHandler = { (items, offset, env) in
+                handleHeroScroll(items: items, offset: offset, env: env)
             }
             return layout
         }
@@ -118,8 +125,14 @@ class HomeViewController: UIViewController {
                 GenresCell(id: genre.id, genre: genre)
             }
         }
-        .onSelect(on: self) { (self, genre: Genre) in
-            self.showMovieList(for: .categories, selectedGenre: genre)
+        .onRoute { (genre: Genre) in
+            HomeRoute.movieList(
+                title: "Categories",
+                sectionTypeRaw: HomeSection.categories.rawValue,
+                genreId: genre.id,
+                genreName: genre.name,
+                allGenres: viewModel.currentGenres
+            )
         }
         .shimmer(
             count: 6,
@@ -138,18 +151,14 @@ class HomeViewController: UIViewController {
             id: HomeSection.popular,
             items: viewModel.popularSectionMovies,
             header: Header {
-                StandardHeader(title: "Popular Now", actionTitle: "See All") { [weak self] in
-                    self?.showMovieList(for: .popular)
-                }
+                StandardHeader(title: "Popular Now", actionTitle: "See All")
             }
         ) { movie in
             AnyCell(movie, id: "popular-\(movie.id)") { movie in
                 PosterCell(movie: movie)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
+        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
         .backgroundDecoration(id: "popular_bg") {
             LinearGradient(colors: [
                 UIColor.black.withAlphaComponent(0.3),
@@ -173,18 +182,14 @@ class HomeViewController: UIViewController {
             id: HomeSection.upcoming,
             items: viewModel.upcomingMovies.map { $0.asRenderItems() },
             header: Header {
-                StandardHeader(title: "Upcoming", actionTitle: "See All") { [weak self] in
-                    self?.showMovieList(for: .upcoming)
-                }
+                StandardHeader(title: "Upcoming", actionTitle: "See All")
             }
         ) { item in
             AnyCell(item, id: "upcoming-\(String(describing: item))") { item in
                 UpcomingCell(item: item)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
+        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
         .layout { _ in
             HomeSection.upcoming.layout
         }
@@ -212,10 +217,8 @@ class HomeViewController: UIViewController {
                 TopRatedCell(index: index + 1, movie: movie)
             }
         }
-        .onSelect(on: self) { (me, movie: Movie) in
-            me.showDetail(for: movie)
-        }
-        .onSelect(on: self) { (me, ad: String) in
+        .onRoute { (movie: Movie) in HomeRoute.movieDetail(movieId: String(movie.id)) }
+        .onSelect { (ad: String) in
             print("Ad Selected: \(ad)")
         }
         .layout { _ in
@@ -225,26 +228,9 @@ class HomeViewController: UIViewController {
             TopRatedCell(index: 0, movie: .placeholder)
         }
     }
-}
-
-// MARK: - Navigation
-
-extension HomeViewController {
-    private func showDetail(for movie: Movie) {
-        onAction?(.movieSelected(movie))
-    }
     
-    private func showMovieList(
-        for section: HomeSection,
-        selectedGenre: Genre? = nil
-    ) {
-        onAction?(.listSelected(section, selectedGenre, viewModel.currentGenres))
-    }
-}
+    // MARK: - Handlers
 
-// MARK: - Helpers
-
-extension HomeViewController {
     private func handleHeroScroll(
         items: [NSCollectionLayoutVisibleItem],
         offset: CGPoint,
@@ -253,15 +239,7 @@ extension HomeViewController {
         let containerWidth = env.container.contentSize.width
         let visibleRectCenter = offset.x + containerWidth / 2.0
         
-        let collectionView: UICollectionView
-        
-        if let cached = cachedCollectionView {
-            collectionView = cached
-        } else if let wrapper = view.firstSubview(ofType: CollectionViewWrapperView.self),
-                  let found = wrapper.subviews.first(where: { $0 is UICollectionView }) as? UICollectionView {
-            collectionView = found
-            cachedCollectionView = found
-        } else {
+        guard let collectionView = handles.collectionView else {
             return
         }
         
@@ -279,9 +257,8 @@ extension HomeViewController {
         let y = offset.y
         if y < 0 {
             items.forEach { item in
-                let originalHeight: CGFloat = 550
-                let newHeight = originalHeight + abs(y)
-                let scale = newHeight / originalHeight
+                let newHeight = Layout.heroOriginalHeight + abs(y)
+                let scale = newHeight / Layout.heroOriginalHeight
                 
                 let translationY = y / 2
                 item.alpha = 1.0
@@ -298,10 +275,4 @@ extension HomeViewController {
         return views
     }
     
-    private func handleNavBarScroll(_ scrollView: UIScrollView) {
-        let y = scrollView.contentOffset.y
-        let alpha = min(1.0, max(0.0, y / 100.0))
-        navBarBackgroundView?.alpha = alpha
-    }
 }
-

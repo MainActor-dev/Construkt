@@ -25,13 +25,14 @@
 
 import UIKit
 import ConstruktKit
-import ma_ios_common
 
+
+@available(iOS 15.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private var appCoordinator: AppCoordinator?
+    private var appRouteHandler: AppRouteHandler?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -39,37 +40,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         
-        // Show the launch screen first
+        // Setup TabBar and RouteHandler
+        let tabBarController = UITabBarController()
+        let baseRouter = DefaultRouter()
+        let routeHandler = AppRouteHandler(router: baseRouter, tabBarController: tabBarController)
+        routeHandler.setupTabs()
+        
+        // Initial Loading Screen
         let launchVC = LaunchViewController()
+        launchVC.onFinished = { [weak self] in
+            // Boot Core Flow
+            self?.appRouteHandler = routeHandler
+            
+            // Because setupTabs created the UI trees, we just need to bind the handler
+            // to the TabBarController so events bubbling from any tab are trapped here.
+            tabBarController.associatedRouteHandler = routeHandler
+            
+            // Crossfade transition to main layout
+            UIView.transition(
+                with: window,
+                duration: 0.4,
+                options: .transitionCrossDissolve,
+                animations: {
+                    self?.window?.rootViewController = tabBarController
+                }
+            )
+        }
+        
         window.rootViewController = launchVC
         window.makeKeyAndVisible()
-        
-        launchVC.onFinished = { [weak self] in
-            self?.transitionToMainApp()
-        }
     }
     
-    private func transitionToMainApp() {
-        let baseRouter = Router(navigationController: UINavigationController())
-        let factory = ScreenFactory()
-        let coordinator = AppCoordinator(router: baseRouter, factory: factory)
-        
-        self.appCoordinator = coordinator
-        coordinator.start()
-        
-        let mainVC = coordinator.rootViewController()
-        
-        // Crossfade transition
-        UIView.transition(
-            with: window!,
-            duration: 0.4,
-            options: .transitionCrossDissolve,
-            animations: {
-                self.window?.rootViewController = mainVC
-            }
-        )
-    }
-
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.
@@ -96,6 +97,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+    }
+    
+    // MARK: - Deep Links
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        print("🔗 Deep Link Received: \(url.absoluteString)")
+        print("🔗 ConstruktRouteHandler Status: \(String(describing: appRouteHandler))")
+        appRouteHandler?.handleDeepLink(url)
     }
 }
 

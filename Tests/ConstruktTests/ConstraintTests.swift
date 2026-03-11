@@ -2,7 +2,7 @@ import Testing
 import UIKit
 @testable import ConstruktKit
 
-@Suite("Constraints")
+@Suite("Constraints") @MainActor
 struct ConstraintTests {
     
     @Test("frame(height:width:) applies exact constraints")

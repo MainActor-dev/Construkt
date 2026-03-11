@@ -1,3 +1,8 @@
+//
+//  ProfileView.swift
+//  Construkt
+//
+
 import UIKit
 import ConstruktKit
 
@@ -11,19 +16,10 @@ enum ProfileSection: String, SectionConfigIdentifier {
     var uniqueId: String { rawValue }
 }
 
-/// Demonstrate static CollectionView sections
-class ProfileViewController: UIViewController {
+struct ProfileView: ViewConvertable {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor("#0A0A0A")
-        view.embed(body)
-    }
-    
-    // MARK: - Layout
-    
-    var body: View {
-        ZStackView {
+    func asViews() -> [View] {
+        Screen {
             CollectionView {
                 heroSection
                 premiumSection
@@ -31,15 +27,19 @@ class ProfileViewController: UIViewController {
                 accountSettingsSection
                 versionSection
             }
+        }
+        .navigationBar {
             ProfileNavbar()
         }
+        .backgroundColor(UIColor("#0A0A0A"))
+        .asViews()
     }
     
     // MARK: - Sections
     
     private var heroSection: AnySection {
         AnySection(id: ProfileSection.hero) {
-            AnyCell("hero", id: "hero") { item in
+            AnyCell("hero", id: "hero") { _ in
                 ProfileHeroSection()
             }
         }
@@ -51,7 +51,7 @@ class ProfileViewController: UIViewController {
     
     private var premiumSection: AnySection {
         AnySection(id: ProfileSection.premium) {
-            AnyCell("premium", id: "premium") { item in
+            AnyCell("premium", id: "premium") { _ in
                 ProfilePremiumBanner()
             }
         }
@@ -69,7 +69,7 @@ class ProfileViewController: UIViewController {
                     .font(.systemFont(ofSize: 12, weight: .medium))
             }
             
-            AnyCell("downloads", id: "downloads") { item in
+            AnyCell("downloads", id: "downloads") { _ in
                 ProfileSettingsRow(
                     icon: "arrow.down.circle",
                     title: "Downloads",
@@ -94,11 +94,11 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            AnyCell("notifications", id: "notifications") { item in
+            AnyCell("notifications", id: "notifications") { _ in
                 ProfileSettingsToggle(icon: "bell", title: "Notifications", isOn: true, isLast: false)
             }
             
-            AnyCell("darkMode", id: "darkMode") { item in
+            AnyCell("darkMode", id: "darkMode") { _ in
                 ProfileSettingsToggle(icon: "moon", title: "Dark Mode", isOn: false, isLast: true)
             }
         }
@@ -131,7 +131,7 @@ class ProfileViewController: UIViewController {
                     .font(.systemFont(ofSize: 12, weight: .medium))
             }
             
-            AnyCell("payment", id: "payment") { item in
+            AnyCell("payment", id: "payment") { _ in
                 ProfileSettingsRow(
                     icon: "creditcard",
                     title: "Payment Methods",
@@ -141,7 +141,7 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            AnyCell("security", id: "security") { item in
+            AnyCell("security", id: "security") { _ in
                 ProfileSettingsRow(
                     icon: "exclamationmark.shield",
                     title: "Security",
@@ -151,7 +151,7 @@ class ProfileViewController: UIViewController {
                 )
             }
             
-            AnyCell("logout", id: "logout") { item in
+            AnyCell("logout", id: "logout") { _ in
                 ProfileSettingsRow(
                     icon: "rectangle.portrait.and.arrow.right",
                     title: "Log Out",
@@ -185,7 +185,7 @@ class ProfileViewController: UIViewController {
     
     private var versionSection: AnySection {
         AnySection(id: ProfileSection.version) {
-            AnyCell("version", id: "version") { item in
+            AnyCell("version", id: "version") { _ in
                 ProfileVersionInfo()
             }
         }

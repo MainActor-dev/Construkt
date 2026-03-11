@@ -2,7 +2,7 @@ import Testing
 import UIKit
 @testable import ConstruktKit
 
-@Suite("Padding")
+@Suite("Padding") @MainActor
 struct PaddingTests {
     
     @Test("BuilderInternalUIStackView handles padding via layoutMargins")

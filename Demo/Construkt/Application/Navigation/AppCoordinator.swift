@@ -1,5 +1,5 @@
 import UIKit
-import ma_ios_common
+import ConstruktKit
 
 @MainActor
 enum AppTab: Int {
@@ -8,21 +8,31 @@ enum AppTab: Int {
     case profile = 2
 }
 
+@available(iOS 15.0, *)
 @MainActor
-final class AppCoordinator: BaseCoordinator {
+final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
+    typealias Event = AppRoute
+    
+    let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
     private let tabBarController = UITabBarController()
+    private let deepLinkMapper: DeepLinkMapper
     
-    init(router: RouterProtocol, factory: ScreenFactoryProtocol) {
+    /// Keep a serializable path for restoration.
+    public private(set) var currentPath: [AppRoute] = []
+    
+    init(router: any ConstruktRouter, factory: ScreenFactoryProtocol, deepLinkMapper: DeepLinkMapper = .init()) {
+        self.router = router
         self.factory = factory
-        super.init(router: router)
+        self.deepLinkMapper = deepLinkMapper
+        super.init()
     }
     
-    func start() {
+    override func start() {
         let homeNav = NavigationController()
-        let homeRouter = Router(navigationController: homeNav)
+        let homeRouter = DefaultRouter(navigationController: homeNav)
         let homeCoordinator = HomeCoordinator(router: homeRouter, factory: factory)
-        addChild(homeCoordinator)
+        store(homeCoordinator)
         
         // Setup Home Tab
         homeCoordinator.onSwitchToExplore = { [weak self] in
@@ -32,18 +42,18 @@ final class AppCoordinator: BaseCoordinator {
         homeNav.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), selectedImage: UIImage(systemName: "house.fill"))
         
         let exploreNav = NavigationController()
-        let exploreRouter = Router(navigationController: exploreNav)
+        let exploreRouter = DefaultRouter(navigationController: exploreNav)
         let exploreCoordinator = ExploreCoordinator(router: exploreRouter, factory: factory)
-        addChild(exploreCoordinator)
+        store(exploreCoordinator)
         
         // Setup Explore Tab
         exploreCoordinator.start()
         exploreNav.tabBarItem = UITabBarItem(title: "Explore", image: UIImage(systemName: "magnifyingglass"), selectedImage: UIImage(systemName: "text.magnifyingglass"))
         
         let profileNav = NavigationController()
-        let profileRouter = Router(navigationController: profileNav)
+        let profileRouter = DefaultRouter(navigationController: profileNav)
         let profileCoordinator = ProfileCoordinator(router: profileRouter, factory: factory)
-        addChild(profileCoordinator)
+        store(profileCoordinator)
         
         // Setup Profile Tab
         profileCoordinator.start()
@@ -67,7 +77,73 @@ final class AppCoordinator: BaseCoordinator {
         tabBarController.selectedIndex = tab.rawValue
     }
     
-    override func rootViewController() -> UIViewController {
+    // MARK: Public navigation & deep link API
+    
+    public func open(_ route: AppRoute, animated: Bool = true) {
+        currentPath.append(route)
+        
+        switch route {
+        case .home:
+            switchToTab(.home)
+        case .explore, .search:
+            switchToTab(.explore)
+        case .movieDetail, .movieList, .web:
+            if let selectedNav = activeNavigationController(for: tabBarController) {
+                let proxyRouter = DefaultRouter(navigationController: selectedNav)
+                let screen = factory.makeScreen(for: route)
+                
+                // If it's a web view we present it as a sheet
+                if case .web = route {
+                    proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated, receiver: self)
+                } else {
+                    proxyRouter.push(screen, animated: animated, completion: nil, receiver: self) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on ConstruktPresentable
+                }
+            } else {
+                switchToTab(.home)
+            }
+        }
+    }
+    
+    func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
+        open(event)
+        return true
+    }
+    
+    public func handleDeepLink(_ url: URL) {
+        guard let route = deepLinkMapper.route(from: url) else { return }
+        open(route)
+    }
+    
+    // MARK: Restoration
+    
+    public func saveRestorationData() -> Data? {
+        try? JSONEncoder().encode(currentPath)
+    }
+    
+    public func restore(from data: Data) {
+        guard let saved = try? JSONDecoder().decode([AppRoute].self, from: data) else { return }
+        // Set the root to the first item (e.g. .home) and manually replay the route pushes.
+        // currentPath = saved
+        // Logic for restoring children navigation controllers stack sequentially.
+    }
+    
+    /// Returns the main tab bar controller as the root of this coordinator.
+    func rootViewController() -> UIViewController {
         tabBarController
+    }
+    
+    // MARK: - Helpers
+    
+    private func activeNavigationController(for viewController: UIViewController) -> UINavigationController? {
+        if let nav = viewController as? UINavigationController {
+            return nav
+        }
+        if let tab = viewController as? UITabBarController, let selected = tab.selectedViewController {
+            return activeNavigationController(for: selected)
+        }
+        if let presented = viewController.presentedViewController {
+            return activeNavigationController(for: presented)
+        }
+        return viewController.navigationController
     }
 }

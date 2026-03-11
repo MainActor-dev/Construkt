@@ -1,46 +1,46 @@
 import UIKit
 import ConstruktKit
 
-final class MovieDetailViewController: UIViewController {
+public enum MovieDetailRoute {
+    case back
+    case similarMovie(Movie)
+}
+
+struct MovieDetailView: ViewConvertable {
     
     // MARK: - Properties
     private let viewModel = MovieViewModel()
-    private var movie: Movie
+    private let movie: Movie
     private let heroHeight: CGFloat = 450
     
-    private weak var scrollView: UIScrollView?
-    private weak var heroImageView: UIView?
-    private weak var navBarBackgroundView: UIView?
-    private weak var navBarTitleLabel: UIView?
-    private var heroHeightConstraint: NSLayoutConstraint?
+    // MARK: - State
+    
+    /// Pure reactive data — observable, no UIKit dependency
+    private class ScrollBinding {
+        @Variable var offset: CGFloat = 0
+        @Variable var scrollToTopTrigger: UInt = 0
+    }
+    
+    /// Imperative UIKit handles — needed for layout & scroll only
+    private class ViewHandles {
+        weak var heroHeightConstraint: NSLayoutConstraint?
+        weak var scrollView: UIScrollView?
+    }
+    
+    private let scrollBinding = ScrollBinding()
+    private let handles = ViewHandles()
+    
     // MARK: - Init
     init(movie: Movie) {
         self.movie = movie
-        super.init(nibName: nil, bundle: nil)
     }
     
-    required init?(coder: NSCoder) { nil }
-    
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor("#0A0A0A")
-        setupUI()
-        fetchDetail()
-    }
-    
-    private func fetchDetail() {
-        viewModel.selectMovie(movie)
-    }
-    
-    // MARK: - Setup UI
-    private func setupUI() {
+    // MARK: - Body
+    func asViews() -> [View] {
         let details = viewModel.movieDetails.compactMap { $0 }
         let casts = viewModel.movieCasts
         
-        view.subviews.forEach { $0.removeFromSuperview() }
-        
-        view.embed(
+        return Screen {
             ZStackView {
                 ImageView(nil)
                     .contentMode(.scaleAspectFill)
@@ -51,20 +51,26 @@ final class MovieDetailViewController: UIViewController {
                     .onReceive(viewModel.isLoadingDetails) { context in
                         context.view.isHidden = context.value
                     }
-                    .with { [weak self] view in
-                        self?.heroImageView = view
-                    }
-                    .customConstraints { [weak self] view in
-                        guard let self = self, let superview = view.superview else { return }
+                    .customConstraints { [handles, heroHeight] view in
+                        guard let superview = view.superview else { return }
                         view.translatesAutoresizingMaskIntoConstraints = false
-                        let heightConstraint = view.heightAnchor.constraint(equalToConstant: self.heroHeight)
-                        self.heroHeightConstraint = heightConstraint
+                        let heightConstraint = view.heightAnchor.constraint(equalToConstant: heroHeight)
+                        handles.heroHeightConstraint = heightConstraint
                         NSLayoutConstraint.activate([
                             view.topAnchor.constraint(equalTo: superview.topAnchor),
                             view.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
                             view.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
                             heightConstraint
                         ])
+                    }
+                    .onReceive(scrollBinding.$offset) { [handles] context in
+                         let yOffset = context.value
+                         guard let constraint = handles.heroHeightConstraint else { return }
+                         if yOffset < 0 {
+                             constraint.constant = heroHeight + abs(yOffset)
+                         } else {
+                             constraint.constant = max(0, heroHeight - yOffset)
+                         }
                     }
                 
                 // Layer 2: Scroll Content
@@ -80,11 +86,9 @@ final class MovieDetailViewController: UIViewController {
                                 MovieCast(casts: casts) { cast in
                                     print("Tapped on cast: \(cast.name)")
                                 }
-                                MovieSimilar(details: details) { [weak self] movie in
-                                    if let scrollView = self?.scrollView as? UIScrollView {
-                                        scrollView.setContentOffset(.zero, animated: true)
-                                    }
-                                    self?.viewModel.selectMovie(movie)
+                                MovieSimilar(details: details) { [scrollBinding, weak viewModel] movie in
+                                    scrollBinding.scrollToTopTrigger += 1
+                                    viewModel?.selectMovie(movie)
                                 }
                             }
                             .padding(top: 0, left: 20, bottom: 0, right: 20)
@@ -93,27 +97,20 @@ final class MovieDetailViewController: UIViewController {
                             SpacerView(h: 40)
                         }
                     }
-                    .onDidScroll { [weak self] context in
-                        let yOffset = context.view.contentOffset.y
-                        self?.updateStretchyHeader(yOffset: yOffset)
-                        self?.handleNavBarScroll(yOffset: yOffset)
+                    .onDidScroll { [scrollBinding] context in
+                        scrollBinding.offset = context.view.contentOffset.y
                     }
-                    .with { scrollView in
+                    .with { [handles] scrollView in
                         scrollView.contentInsetAdjustmentBehavior = .never
                         scrollView.backgroundColor = .clear
+                        handles.scrollView = scrollView
+                    }
+                    .onReceive(scrollBinding.$scrollToTopTrigger.skip(1)) { [handles] _ in
+                        handles.scrollView?.setContentOffset(.zero, animated: true)
                     }
                     .onReceive(viewModel.isLoadingDetails) { context in
                         context.view.isHidden = context.value
                     }
-                    .reference(&scrollView)
-                    
-                    // Overlay Navigation Bar
-                    MovieDetailNavBar(
-                        title: details.compactMap { $0.title },
-                        onBack: { [weak self] in self?.navigationController?.popViewController(animated: true) },
-                        backgroundViewCapture: { [weak self] view in self?.navBarBackgroundView = view },
-                        titleLabelCapture: { [weak self] view in self?.navBarTitleLabel = view }
-                    )
                     
                     // Loading Indicator
                     LoadingView()
@@ -124,29 +121,21 @@ final class MovieDetailViewController: UIViewController {
                         .backgroundColor(.black.withAlphaComponent(0.5))
                 }
             }
-        )
-    }
-    
-    private func updateStretchyHeader(yOffset: CGFloat) {
-        guard let _ = heroImageView else { return }
-        
-        if yOffset < 0 {
-            heroHeightConstraint?.constant = heroHeight + abs(yOffset)
-        } else {
-            heroHeightConstraint?.constant = max(0, heroHeight - yOffset)
         }
-    }
-    
-    private func handleNavBarScroll(yOffset: CGFloat) {
-        // Fade in background between 0 and 100pt
-        let bgAlpha = min(1.0, max(0.0, yOffset / 100.0))
-        navBarBackgroundView?.alpha = bgAlpha
-        
-        // Fade in title between 300 and 350pt (when hero title disappears)
-        let titleStart: CGFloat = 300
-        let titleEnd: CGFloat = 350
-        let titleAlpha = min(1.0, max(0.0, (yOffset - titleStart) / (titleEnd - titleStart)))
-        navBarTitleLabel?.alpha = titleAlpha
+        .navigationBar {
+            MovieDetailNavBar(
+                title: details.compactMap { $0.title },
+                scrollOffset: scrollBinding.$offset.eraseToAnyViewBinding(),
+                onBack: { sender in
+                    sender.route(MovieDetailRoute.back, sender: nil)
+                }
+            )
+        }
+        .backgroundColor(UIColor("#0A0A0A"))
+        .onHostDidLoad {
+            viewModel.selectMovie(movie)
+        }
+        .asViews()
     }
     
     private var actionButtons: View {
