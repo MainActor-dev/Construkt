@@ -5,7 +5,6 @@ import ConstruktKit
 @available(iOS 15.0, *)
 @MainActor
 final class ExploreCoordinator: BaseCoordinator, RouteHandlingCoordinator {
-    typealias Event = AppRoute
     
     let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
@@ -17,29 +16,34 @@ final class ExploreCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     }
     
     override func start() {
-        let exploreVC = factory.makeExploreViewController()
+        let exploreVC = factory.makeScreen(for: .explore)
         router.setRoot(exploreVC, hideBar: false, animated: false, receiver: self)
     }
     
     func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
         switch event {
+        case .back:
+            router.pop(animated: true)
         case .movieDetail(let movieId):
             let screen = factory.makeScreen(for: .movieDetail(movieId: movieId))
-            router.push(screen, animated: true, completion: nil, receiver: self)
-            return true
-            
+            push(screen)
         case .movieList(let title, let sectionTypeRaw, let genreId, let genreName, let allGenres):
             let screen = factory.makeScreen(for: .movieList(title: title, sectionTypeRaw: sectionTypeRaw, genreId: genreId, genreName: genreName, allGenres: allGenres))
-            router.push(screen, animated: true, completion: nil, receiver: self)
-            return true
-            
+            push(screen)
         case .search:
             let screen = factory.makeScreen(for: .search)
-            router.push(screen, animated: true, completion: nil, receiver: self)
-            return true
+            push(screen)
             
         default:
-            return false // Allow bubbling
+            return false
         }
+        
+        return true
+    }
+    
+    private func push(_ screen: ConstruktPresentable) {
+        router.push(screen, hideTabBar: true, receiver: self)
     }
 }
+
+

@@ -6,12 +6,6 @@
 import UIKit
 import ConstruktKit
 
-public enum ExploreRoute {
-    case movieDetail(movieId: String)
-    case movieList(title: String, sectionTypeRaw: String, genreId: Int?, genreName: String?, allGenres: [Genre]?)
-    case search
-}
-
 enum ExploreSection: String, SectionConfigIdentifier {
     case search
     case genres
@@ -76,13 +70,13 @@ struct ExploreView: ViewConvertable {
                 ExploreGenreCard(genre: genre)
             }
         }
-        .onRoute { (genre: ExploreGenre) -> ExploreRoute? in
+        .onRoute { (genre: ExploreGenre) -> AppRoute? in
             guard let genreId = Int(genre.id) else { return nil }
             let allGenres = viewModel.allGenres.compactMap {
                 guard let id = Int($0.id) else { return nil as Genre? }
                 return Genre(id: id, name: $0.name)
             }
-            return ExploreRoute.movieList(
+            return AppRoute.movieList(
                 title: genre.name,
                 sectionTypeRaw: "categories",
                 genreId: genreId,
@@ -114,7 +108,7 @@ struct ExploreView: ViewConvertable {
             }
         }
         .onRoute { (collection: ExploreCollection) in
-            ExploreRoute.movieDetail(movieId: collection.id)
+            AppRoute.movieDetail(movieId: collection.intId)
         }
         .layout {
             .carousel(
@@ -140,7 +134,7 @@ struct ExploreView: ViewConvertable {
             }
         }
         .onRoute { (arrival: ExploreArrival) in
-            ExploreRoute.movieDetail(movieId: arrival.id)
+            AppRoute.movieDetail(movieId: arrival.intId)
         }
         .layout {
             .list(itemHeight: .estimated(80))
@@ -164,12 +158,13 @@ struct ExploreView: ViewConvertable {
                     .tintColor(.white)
                     .size(width: 24, height: 24)
                     .contentMode(.scaleAspectFit)
-                    .onRoute(ExploreRoute.search)
+                    .onRoute(AppRoute.search)
             }
             .padding(insets: .init(top: 12, left: 24, bottom: 12, right: 24))
         }
         .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
         .height(48)
         .safeArea(false)
+        .position(.top)
     }
 }

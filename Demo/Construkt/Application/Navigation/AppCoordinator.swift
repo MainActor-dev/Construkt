@@ -11,7 +11,6 @@ enum AppTab: Int {
 @available(iOS 15.0, *)
 @MainActor
 final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
-    typealias Event = AppRoute
     
     let router: any ConstruktRouter
     private let factory: ScreenFactoryProtocol
@@ -30,8 +29,8 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     
     override func start() {
         let homeNav = NavigationController()
-        let homeRouter = DefaultRouter(navigationController: homeNav)
-        let homeCoordinator = HomeCoordinator(router: homeRouter, factory: factory)
+        let AppRouter = DefaultRouter(navigationController: homeNav)
+        let homeCoordinator = HomeCoordinator(router: AppRouter, factory: factory)
         store(homeCoordinator)
         
         // Setup Home Tab
@@ -58,7 +57,7 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
         // Setup Profile Tab
         profileCoordinator.start()
         profileNav.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.crop.circle"), selectedImage: UIImage(systemName: "person.crop.circle.fill"))
-        
+       
         tabBarController.viewControllers = [homeNav, exploreNav, profileNav]
         
         // Styling TabBar roughly (can refine later with custom subclass)
@@ -66,9 +65,7 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(white: 0.1, alpha: 0.9)
         tabBarController.tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBarController.tabBar.scrollEdgeAppearance = appearance
-        }
+        tabBarController.tabBar.scrollEdgeAppearance = appearance
         tabBarController.tabBar.tintColor = .white
         tabBarController.tabBar.unselectedItemTintColor = .gray
     }
@@ -87,20 +84,15 @@ final class AppCoordinator: BaseCoordinator, RouteHandlingCoordinator {
             switchToTab(.home)
         case .explore, .search:
             switchToTab(.explore)
-        case .movieDetail, .movieList, .web:
-            if let selectedNav = activeNavigationController(for: tabBarController) {
-                let proxyRouter = DefaultRouter(navigationController: selectedNav)
-                let screen = factory.makeScreen(for: route)
-                
-                // If it's a web view we present it as a sheet
-                if case .web = route {
-                    proxyRouter.present(screen, style: .sheet(detents: [.medium, .large]), animated: animated, receiver: self)
-                } else {
-                    proxyRouter.push(screen, animated: animated, completion: nil, receiver: self) // hideTabBar is not needed natively if hidesBottomBarWhenPushed is set on ConstruktPresentable
-                }
-            } else {
-                switchToTab(.home)
-            }
+        case .profile:
+            switchToTab(.profile)
+        case .movieDetail:
+            let screen = factory.makeScreen(for: route)
+            router.push(screen, animated: true, hideTabBar: true, receiver: self)
+        case .back:
+            router.pop(animated: true)
+        default:
+            return
         }
     }
     

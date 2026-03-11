@@ -1,6 +1,8 @@
 import UIKit
 import ConstruktKit
 
+// MARK: Unused
+
 @available(iOS 15.0, *)
 @MainActor
 final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
@@ -75,6 +77,7 @@ final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
             } else {
                 switchToTab(.home)
             }
+        default: return
         }
     }
     
@@ -108,19 +111,15 @@ final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
             return makeExploreViewController()
         case .search:
             return SearchViewController()
-        case .movieDetail(let movieId):
-            guard let id = Int(movieId) else { return UIViewController() }
-            let dummyMovie = Movie(id: id, title: "", overview: "", releaseDate: nil, posterPath: nil, backdropPath: nil, voteAverage: 0, genreIds: nil)
-            return MovieDetailView(movie: dummyMovie)
+        case .movieDetail(let id):
+            let movie = Movie(id: id)
+            return MovieDetailView(movie: movie)
                 .onReceiveRoute(MovieDetailRoute.self, handler: { [unowned self] route in
                     switch route {
                     case .back:
                         if let selectedNav = activeNavigationController(for: tabBarController) {
                             selectedNav.popViewController(animated: true)
                         }
-                        return true
-                    case .similarMovie(let movie):
-                        open(.movieDetail(movieId: String(movie.id)))
                         return true
                     }
                 })
@@ -145,40 +144,18 @@ final class AppRouteHandler: ConstruktRouteHandler<AppRoute> {
             let vc = UIViewController()
             vc.title = url.absoluteString
             return vc
+        default:
+            return UIViewController()
         }
     }
     
     
     private func makeHomeViewController() -> ConstruktPresentable {
-        HomeView()
-            .onReceiveRoute(HomeRoute.self)  { [unowned self] route in
-                switch route {
-                case .movieDetail(let movieId):
-                    open(.movieDetail(movieId: movieId))
-                case .movieList(let title, let sectionType, let genreId, let genreName, let allGenres):
-                    open(.movieList(title: title, sectionTypeRaw: sectionType, genreId: genreId, genreName: genreName, allGenres: allGenres))
-                case .search:
-                    open(.search)
-                }
-                return true
-            }
-            .toPresentable()
+        HomeView().toPresentable()
     }
     
     private func makeExploreViewController() -> ConstruktPresentable {
-        ExploreView()
-            .onReceiveRoute(ExploreRoute.self) { [unowned self] route in
-                switch route {
-                case .movieDetail(let movieId):
-                    open(.movieDetail(movieId: movieId))
-                case .movieList(let title, let sectionType, let genreId, let genreName, let allGenres):
-                    open(.movieList(title: title, sectionTypeRaw: sectionType, genreId: genreId, genreName: genreName, allGenres: allGenres))
-                case .search:
-                    open(.search)
-                }
-                return true
-            }
-            .toPresentable()
+        ExploreView().toPresentable()
     }
     
     private func makeProfileViewController() -> ConstruktPresentable {

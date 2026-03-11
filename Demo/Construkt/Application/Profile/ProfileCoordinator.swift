@@ -17,7 +17,7 @@ final class ProfileCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     }
     
     override func start() {
-        let profileVC = factory.makeProfileViewController()
+        let profileVC = factory.makeScreen(for: .profile)
         router.setRoot(profileVC, hideBar: false, animated: false, receiver: self)
     }
     

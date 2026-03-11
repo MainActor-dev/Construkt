@@ -12,6 +12,10 @@ public struct ExploreCollection: Hashable, Identifiable {
     public let topic: String
     public let title: String
     public let imageURL: String
+    
+    var intId: Int {
+        Int(id) ?? 0
+    }
 }
 
 public struct ExploreArrival: Hashable, Identifiable {
@@ -19,6 +23,10 @@ public struct ExploreArrival: Hashable, Identifiable {
     public let title: String
     public let subtitle: String
     public let imageURL: String
+    
+    var intId: Int {
+        Int(id) ?? 0
+    }
 }
 
 public final class ExploreViewModel {
