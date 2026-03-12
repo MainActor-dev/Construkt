@@ -24,32 +24,32 @@ public class MovieViewModel {
         }
     }
 
-    @Variable private var state = HomeData()
-    @Variable private var selectedMovie: MovieDetail? = nil
-    @Variable private var casts: LoadableState<[Cast]> = .initial
-    @Variable private var isDetailsLoading: Bool = false
+    private let state = Property(HomeData())
+    private let selectedMovie = Property<MovieDetail?>(nil)
+    private let casts = Property<LoadableState<[Cast]>>(.initial)
+    private let isDetailsLoading = Property<Bool>(false)
     
     // MARK: - Bindings
-    public var movieDetails: AnyViewBinding<MovieDetail?> { $selectedMovie.map { $0 } }
-    public var movieCasts: AnyViewBinding<[Cast]> { $casts.mapItems() }
-    public var isCastsLoading: AnyViewBinding<Bool> { $casts.mapLoading() }
-    public var isLoadingDetails: AnyViewBinding<Bool> { $isDetailsLoading.map { $0 } }
+    public var movieDetails: AnyViewBinding<MovieDetail?> { selectedMovie.map { $0 } }
+    public var movieCasts: AnyViewBinding<[Cast]> { casts.mapItems() }
+    public var isCastsLoading: AnyViewBinding<Bool> { casts.mapLoading() }
+    public var isLoadingDetails: AnyViewBinding<Bool> { isDetailsLoading.map { $0 } }
     
     public func selectMovie(_ movie: Movie) {        
-        self.isDetailsLoading = true
+        self.isDetailsLoading.wrappedValue = true
         Task {
             self.fetchMovieCasts(id: movie.id)
             do {
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 let detailedMovie = try await service.getMovieDetails(id: movie.id)
                 await MainActor.run {
-                    self.selectedMovie = detailedMovie
-                    self.isDetailsLoading = false
+                    self.selectedMovie.wrappedValue = detailedMovie
+                    self.isDetailsLoading.wrappedValue = false
                 }
             } catch {
                 print("Failed to fetch details for movie \(movie.id): \(error)")
                 await MainActor.run {
-                    self.isDetailsLoading = false
+                    self.isDetailsLoading.wrappedValue = false
                 }
             }
         }
@@ -57,44 +57,44 @@ public class MovieViewModel {
     
     // Now Playing
     public var nowPlayingMovies: AnyViewBinding<[Movie]> {
-        $state.map { $0.nowPlaying }.mapItems()
+        state.map { $0.nowPlaying }.mapItems()
     }
     public var isNowPlayingLoading: AnyViewBinding<Bool> {
-        $state.map { $0.nowPlaying }.mapLoading()
+        state.map { $0.nowPlaying }.mapLoading()
     }
     
     // Popular
     public var popularSectionMovies: AnyViewBinding<[Movie]> {
-        $state.map { $0.popular }.mapItems()
+        state.map { $0.popular }.mapItems()
     }
     public var isPopularSectionLoading: AnyViewBinding<Bool> {
-        $state.map { $0.popular }.mapLoading()
+        state.map { $0.popular }.mapLoading()
     }
     
     // Upcoming
     public var upcomingMovies: AnyViewBinding<[Movie]> {
-        $state.map { $0.upcoming }.mapItems()
+        state.map { $0.upcoming }.mapItems()
     }
     public var isUpcomingLoading: AnyViewBinding<Bool> {
-        $state.map { $0.upcoming }.mapLoading()
+        state.map { $0.upcoming }.mapLoading()
     }
     
     // Top-Rated
     public var topRatedMovies: AnyViewBinding<[Movie]> {
-        $state.map { $0.topRated }.mapItems()
+        state.map { $0.topRated }.mapItems()
     }
-    public var isTopRatedLoading: AnyViewBinding<Bool> { $state.map { $0.topRated }.mapLoading() }
+    public var isTopRatedLoading: AnyViewBinding<Bool> { state.map { $0.topRated }.mapLoading() }
     
     // Genres
-    public var genres: AnyViewBinding<[Genre]> { $state.map { $0.genres }.mapItems() }
-    public var isLoadingGenres: AnyViewBinding<Bool> { $state.map { $0.genres }.mapLoading() }
+    public var genres: AnyViewBinding<[Genre]> { state.map { $0.genres }.mapItems() }
+    public var isLoadingGenres: AnyViewBinding<Bool> { state.map { $0.genres }.mapLoading() }
     
     public var isEmptyObservable: AnyViewBinding<Bool> {
-        return $state.map { !$0.isAnyLoading && $0.isEmpty }
+        return state.map { !$0.isAnyLoading && $0.isEmpty }
     }
     
     public var currentGenres: [Genre] {
-        state.genres.value ?? []
+        state.wrappedValue.genres.value ?? []
     }
     
     // MARK: - Dependencies
@@ -107,11 +107,11 @@ public class MovieViewModel {
     }
     
     public func loadHomeData() {
-        state.nowPlaying = .loading
-        state.popular = .loading
-        state.upcoming = .loading
-        state.topRated = .loading
-        state.genres = .loading
+        state.wrappedValue.nowPlaying = .loading
+        state.wrappedValue.popular = .loading
+        state.wrappedValue.upcoming = .loading
+        state.wrappedValue.topRated = .loading
+        state.wrappedValue.genres = .loading
         
         Task {
              try? await Task.sleep(nanoseconds: 1_000_000_000)
@@ -128,10 +128,10 @@ public class MovieViewModel {
             do {
                 let result = try await service.getNowPlayingMovies(page: 1)
                 await MainActor.run {
-                    self.state.nowPlaying = .loaded(result.results)
+                    self.state.wrappedValue.nowPlaying = .loaded(result.results)
                 }
             } catch {
-                await MainActor.run { self.state.nowPlaying = .loaded([]) }
+                await MainActor.run { self.state.wrappedValue.nowPlaying = .loaded([]) }
             }
         }
     }
@@ -141,10 +141,10 @@ public class MovieViewModel {
             do {
                 let result = try await service.getPopularMovies(page: 1)
                 await MainActor.run {
-                    self.state.popular = .loaded(result.results)
+                    self.state.wrappedValue.popular = .loaded(result.results)
                 }
             } catch {
-                await MainActor.run { self.state.popular = .loaded([]) }
+                await MainActor.run { self.state.wrappedValue.popular = .loaded([]) }
             }
         }
     }
@@ -154,10 +154,10 @@ public class MovieViewModel {
             do {
                 let result = try await service.getPopularMovies(page: 2)
                 await MainActor.run {
-                    self.state.upcoming = .loaded(result.results)
+                    self.state.wrappedValue.upcoming = .loaded(result.results)
                 }
             } catch {
-                await MainActor.run { self.state.upcoming = .loaded([]) }
+                await MainActor.run { self.state.wrappedValue.upcoming = .loaded([]) }
             }
         }
     }
@@ -167,10 +167,10 @@ public class MovieViewModel {
             do {
                 let result = try await service.getTopRatedMovies(page: 1)
                 await MainActor.run {
-                    self.state.topRated = .loaded(result.results)
+                    self.state.wrappedValue.topRated = .loaded(result.results)
                 }
             } catch {
-                await MainActor.run { self.state.topRated = .loaded([]) }
+                await MainActor.run { self.state.wrappedValue.topRated = .loaded([]) }
             }
         }
     }
@@ -180,25 +180,25 @@ public class MovieViewModel {
             do {
                 let result = try await service.getGenres()
                 await MainActor.run {
-                    self.state.genres = .loaded(result.genres)
+                    self.state.wrappedValue.genres = .loaded(result.genres)
                 }
             } catch {
-                await MainActor.run { self.state.genres = .error(error.localizedDescription) }
+                await MainActor.run { self.state.wrappedValue.genres = .error(error.localizedDescription) }
             }
         }
     }
 
     public func fetchMovieCasts(id: Int) {
-        self.casts = .loading
+        self.casts.wrappedValue = .loading
         Task {
             do {
                 let result = try await service.getMovieCredits(id: id)
                 await MainActor.run {
-                    self.casts = .loaded(result.cast)
+                    self.casts.wrappedValue = .loaded(result.cast)
                 }
             } catch {
                 await MainActor.run {
-                    self.casts = .error(error.localizedDescription)
+                    self.casts.wrappedValue = .error(error.localizedDescription)
                 }
             }
         }

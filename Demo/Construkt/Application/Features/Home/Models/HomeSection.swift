@@ -16,6 +16,10 @@ enum HomeSection: String, SectionConfigIdentifier {
             return CollectionLayoutSectionBuilder.carousel(itemWidth: .fractionalWidth(1.0), itemHeight: .absolute(500))
                 .insets(top: 0, leading: 0, bottom: 16, trailing: 0)
                 .orthogonalScrolling(.groupPagingCentered)
+                .supplementaryFooter(
+                    height: .absolute(30),
+                    contentInsets: .init(top: -30, leading: 0, bottom: 0, trailing: 0)
+                )
                 .section
         case .categories:
             return CollectionLayoutSectionBuilder.carousel(itemWidth: .estimated(100), itemHeight: .absolute(40))
