@@ -8,6 +8,8 @@ public struct Screen: ViewBuilder {
     private var navBar: ViewConvertable?
     private var bgColor: UIColor?
     private var bottomMargin: CGFloat = 0
+    private var overlayContent: ViewConvertable?
+    private var isContentUnderNavBar: Bool = true
     
     public init(@ViewResultBuilder content: () -> ViewConvertable) {
         self.content = content()
@@ -34,11 +36,49 @@ public struct Screen: ViewBuilder {
         return copy
     }
     
+    /// Adds additional content that sits outside the main content stack (e.g., floating buttons, overlays).
+    public func overlay(@ViewResultBuilder _ overlay: () -> ViewConvertable) -> Screen {
+        var copy = self
+        copy.overlayContent = overlay()
+        return copy
+    }
+    
+    /// Determines whether the main content extends underneath the navigation bar or sits strictly below it.
+    /// Default is `false` (content sits below the navigation bar).
+    public func contentUnderNavBar(_ under: Bool = true) -> Screen {
+        var copy = self
+        copy.isContentUnderNavBar = under
+        return copy
+    }
+    
     public var body: View {
         ZStackView {
-            content
-            if let navBar = navBar {
-                navBar
+            // Back layer: overlay content (behind everything)
+            if let overlayContent = overlayContent {
+                overlayContent
+            }
+            
+            if !isContentUnderNavBar {
+                // Content fills entire screen (stretches under navBar)
+                content
+                
+                // Navbar floats on top
+                if let navBar = navBar {
+                    ContainerView { navBar }
+                        .position(.top)
+                }
+            } else {
+                // Front layer: navbar + content (content sits strictly below navBar)
+                VStackView(spacing: 0) {
+                    if let navBar = navBar {
+                        navBar
+                    }
+                    ContainerView {
+                        content
+                    }
+                    .contentHuggingPriority(.defaultLow, for: .vertical)
+                    .contentCompressionResistancePriority(.defaultLow, for: .vertical)
+                }
             }
         }
         .backgroundColor(bgColor)
