@@ -118,6 +118,20 @@ public class BuilderInternalContainerView: UIView, ViewBuilderRouteReceiving {
         optionalBuilderAttributes()?.commonDidMoveToWindow(self)
     }
 
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hitView = super.hitTest(point, with: event)
+        
+        // Pass through if the container itself is hit (not a subview), 
+        // the background is clear, and it has no gesture recognizers.
+        if hitView == self && backgroundColor == .clear {
+            if let recognizers = gestureRecognizers, !recognizers.isEmpty {
+                return hitView
+            }
+            return nil
+        }
+        
+        return hitView
+    }
 }
 
 extension BuilderInternalContainerView: ViewBuilderPaddable {
