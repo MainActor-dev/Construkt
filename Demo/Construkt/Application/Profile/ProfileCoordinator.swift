@@ -22,6 +22,13 @@ final class ProfileCoordinator: BaseCoordinator, RouteHandlingCoordinator {
     }
     
     func canReceive(_ event: AppRoute, sender: Any?) -> Bool {
-        return false // No profile events handled yet
+        switch event {
+        case .back:
+            router.pop(animated: true)
+        default:
+            let screen = factory.makeScreen(for: event)
+            router.push(screen, animated: true, hideTabBar: true, receiver: self)
+        }
+        return true
     }
 }

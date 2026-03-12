@@ -165,6 +165,7 @@ struct ExploreView: ViewConvertable {
         .border(color: UIColor(white: 1.0, alpha: 0.05), lineWidth: 1)
         .height(48)
         .safeArea(false)
+        .zIndex(1000)
         .position(.top)
     }
 }
