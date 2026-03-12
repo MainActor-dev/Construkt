@@ -23,8 +23,33 @@ struct HomeView: ViewConvertable {
         weak var collectionView: UICollectionView?
     }
     
+    private class AutoscrollController {
+        let currentIndex = Property(0)
+        var currentSection: Int = 0
+        var workItem: DispatchWorkItem?
+        
+        func startTimer(collectionView: UICollectionView?, totalItems: Int) {
+            stopTimer()
+            guard let collectionView = collectionView, totalItems > 0 else { return }
+            
+            let item = DispatchWorkItem { [weak self, weak collectionView] in
+                guard let self = self, let cv = collectionView else { return }
+                let nextIndex = (self.currentIndex.wrappedValue + 1) % totalItems
+                cv.scrollToItem(at: IndexPath(item: nextIndex, section: self.currentSection), at: .centeredHorizontally, animated: nextIndex != 0)
+            }
+            self.workItem = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.5, execute: item)
+        }
+        
+        func stopTimer() {
+            workItem?.cancel()
+            workItem = nil
+        }
+    }
+    
     private let scrollBinding = ScrollBinding()
     private let handles = ViewHandles()
+    private let autoscrollController = AutoscrollController()
     
     // MARK: - Layout Constants
     
@@ -78,13 +103,20 @@ struct HomeView: ViewConvertable {
         .onHostDidLoad {
             viewModel.loadHomeData()
         }
+        .onHostWillAppear { [handles, autoscrollController] _ in
+            let totalItems = handles.collectionView?.numberOfItems(inSection: autoscrollController.currentSection) ?? 0
+            autoscrollController.startTimer(collectionView: handles.collectionView, totalItems: totalItems)
+        }
+        .onHostWillDisappear { [autoscrollController] _ in
+            autoscrollController.stopTimer()
+        }
         .asViews()
     }
     
     // MARK: - Sections
 
     private var heroSection: AnySection {
-        AnySection(id: HomeSection.hero, items: viewModel.nowPlayingMovies) { movie in
+        AnySection(id: HomeSection.hero, items: viewModel.nowPlayingMovies.map { Array($0.prefix(5)) }) { movie in
             AnyCell(movie, id: "hero-\(movie.id)") { movie in
                 Modified(HeroContentView()) { view in
                     view.configure(with: movie)
@@ -101,6 +133,21 @@ struct HomeView: ViewConvertable {
                 handleHeroScroll(items: items, offset: offset, env: env)
             }
             return layout
+        }
+        .footer { [weak autoscrollController, weak viewModel] in
+            Footer(id: "page-control") {
+                if let vm = viewModel, let ac = autoscrollController {
+                    DynamicContainerView(vm.nowPlayingMovies.map { Array($0.prefix(5)) }) { movies in
+                        if movies.count > 0 {
+                            CustomPageControl(count: movies.count, currentIndex: ac.currentIndex)
+                        } else {
+                            ContainerView()
+                        }
+                    }
+                } else {
+                    ContainerView()
+                }
+            }
         }
         .shimmer(count: 1, when: viewModel.isNowPlayingLoading) {
             Modified(HeroContentView()) { $0.configure(with: .placeholder) }
@@ -244,6 +291,22 @@ struct HomeView: ViewConvertable {
             if let cell = collectionView.cellForItem(at: item.indexPath),
                let heroView = findAllHeroViews(in: cell).first {
                 heroView.setScrollProgress(progress)
+            }
+        }
+        
+        if let centeredItem = items.min(by: { abs($0.center.x - visibleRectCenter) < abs($1.center.x - visibleRectCenter) }) {
+            let nextIndex = centeredItem.indexPath.item
+            let nextSection = centeredItem.indexPath.section
+            let totalItems = collectionView.numberOfItems(inSection: nextSection)
+            
+            let isNewIndex = autoscrollController.currentIndex.wrappedValue != nextIndex
+            
+            DispatchQueue.main.async { [weak autoscrollController] in
+                if isNewIndex {
+                    autoscrollController?.currentIndex.wrappedValue = nextIndex
+                }
+                autoscrollController?.currentSection = nextSection
+                autoscrollController?.startTimer(collectionView: collectionView, totalItems: totalItems)
             }
         }
         

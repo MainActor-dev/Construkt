@@ -118,8 +118,13 @@ public struct CollectionLayoutSectionBuilder {
     }
     
     @discardableResult
-    public func supplementaryHeader(height: NSCollectionLayoutDimension, isSticky: Bool = false) -> Self {
+    public func supplementaryHeader(
+        height: NSCollectionLayoutDimension,
+        contentInsets: NSDirectionalEdgeInsets = .zero,
+        isSticky: Bool = false
+    ) -> Self {
         let header = NSCollectionLayoutBoundarySupplementaryItem.header(height: height, isSticky: isSticky)
+        header.contentInsets = contentInsets
         var newSupplementaries = section.boundarySupplementaryItems
         newSupplementaries.append(header)
         section.boundarySupplementaryItems = newSupplementaries
@@ -127,13 +132,19 @@ public struct CollectionLayoutSectionBuilder {
     }
     
     @discardableResult
-    public func supplementaryFooter(height: NSCollectionLayoutDimension, isSticky: Bool = false) -> Self {
+    public func supplementaryFooter(
+        height: NSCollectionLayoutDimension,
+        contentInsets: NSDirectionalEdgeInsets = .zero,
+        isSticky: Bool = false
+    ) -> Self {
         let footer = NSCollectionLayoutBoundarySupplementaryItem.footer(height: height, isSticky: isSticky)
+        footer.contentInsets = contentInsets
         var newSupplementaries = section.boundarySupplementaryItems
         newSupplementaries.append(footer)
         section.boundarySupplementaryItems = newSupplementaries
         return self
     }
+    
     @discardableResult
     public func decorationItems(_ items: [NSCollectionLayoutDecorationItem]) -> Self {
         section.decorationItems = items
