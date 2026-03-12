@@ -131,6 +131,7 @@ struct MovieDetailView: ViewConvertable {
                 }
             )
         }
+        .contentUnderNavBar(false)
         .backgroundColor(UIColor("#0A0A0A"))
         .onHostDidLoad {
             viewModel.selectMovie(movie)

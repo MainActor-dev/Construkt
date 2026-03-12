@@ -98,8 +98,8 @@ struct HomeView: ViewConvertable {
                 }
             )
         }
+        .contentUnderNavBar(false)
         .margins(bottom: 100)
-        // Bind genuine UIKit View Lifecycle via ConstruktKit!
         .onHostDidLoad {
             viewModel.loadHomeData()
         }
