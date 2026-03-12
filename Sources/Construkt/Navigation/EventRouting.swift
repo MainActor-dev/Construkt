@@ -176,3 +176,34 @@ final class TargetedClosureRouteReceiver<E, Target: AnyObject>: RouteReceiving {
         return handler(target, event)
     }
 }
+
+@MainActor
+final class SenderClosureRouteReceiver<E>: RouteReceiving {
+    typealias Event = E
+    private let handler: (E, UIResponder?) -> Bool
+    
+    init(handler: @escaping @MainActor (E, UIResponder?) -> Bool) {
+        self.handler = handler
+    }
+    
+    func canReceive(_ event: E, sender: Any?) -> Bool {
+        return handler(event, sender as? UIResponder)
+    }
+}
+
+@MainActor
+final class TargetedSenderClosureRouteReceiver<E, Target: AnyObject>: RouteReceiving {
+    typealias Event = E
+    private weak var target: Target?
+    private let handler: (Target, E, UIResponder?) -> Bool
+    
+    init(target: Target, handler: @escaping @MainActor (Target, E, UIResponder?) -> Bool) {
+        self.target = target
+        self.handler = handler
+    }
+    
+    func canReceive(_ event: E, sender: Any?) -> Bool {
+        guard let target = target else { return false }
+        return handler(target, event, sender as? UIResponder)
+    }
+}

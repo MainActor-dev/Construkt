@@ -61,6 +61,10 @@ open class LifecycleHostController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        print("[CONSTRUKT 🔨] LifecycleHostController deinit")
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground

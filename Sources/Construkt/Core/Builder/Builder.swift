@@ -86,6 +86,20 @@ public extension ViewConvertable {
             RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, target: target, handler: handler) })
         }
     }
+    
+    /// Declaratively catch and handle events bubbling up from child views, exposing the sender.
+    func onReceiveRoute<E>(_ eventType: E.Type, handler: @escaping @MainActor (E, UIResponder?) -> Bool) -> [View] {
+        return self.asViews().map { element in
+            RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, handler: handler) })
+        }
+    }
+    
+    /// Declaratively catch and handle events bubbling up from child views, injecting an unretained target safely, and exposing the sender.
+    func onReceiveRoute<E, Target: AnyObject>(_ eventType: E.Type, on target: Target, handler: @escaping @MainActor (Target, E, UIResponder?) -> Bool) -> [View] {
+        return self.asViews().map { element in
+            RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, target: target, handler: handler) })
+        }
+    }
 }
 
 /// An internal wrapper that securely attaches an `.onReceiveRoute` listener to an arbitrary `View`.
@@ -120,6 +134,16 @@ public struct RouteReceivingModifier: ModifiableView {
     @MainActor
     fileprivate static func configure<E, Target: AnyObject>(_ view: UIView, target: Target, handler: @escaping @MainActor (Target, E) -> Bool) {
         view.associatedReceiver = TargetedClosureRouteReceiver(target: target, handler: handler)
+    }
+    
+    @MainActor
+    fileprivate static func configure<E>(_ view: UIView, handler: @escaping @MainActor (E, UIResponder?) -> Bool) {
+        view.associatedReceiver = SenderClosureRouteReceiver(handler: handler)
+    }
+    
+    @MainActor
+    fileprivate static func configure<E, Target: AnyObject>(_ view: UIView, target: Target, handler: @escaping @MainActor (Target, E, UIResponder?) -> Bool) {
+        view.associatedReceiver = TargetedSenderClosureRouteReceiver(target: target, handler: handler)
     }
 }
 
