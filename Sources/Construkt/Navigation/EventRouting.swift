@@ -34,11 +34,11 @@ public extension UIResponder {
         // 1. Check if the current responder can handle it Directly
         if let h = self as? AnyRouteReceiving, h.__receive(event, sender: sender) { return true }
         
-        // 2. Check if a UIView has a declarative .onReceiveRoute listener attached
-        if let view = self as? UIView,
-           let receiver = view.associatedReceiver,
-           receiver.__receive(event, sender: sender) {
-            return true
+        // 2. Check if a UIView has declarative .onReceiveRoute listeners attached
+        if let view = self as? UIView {
+            for receiver in view.associatedReceivers {
+                if receiver.__receive(event, sender: sender) { return true }
+            }
         }
         
         // 3. If it's a View Controller, check if it has an isolated Route Handler attached
@@ -85,11 +85,18 @@ private struct ReceiverLinkKey {
     static var receiverKey: UInt8 = 0
 }
 
+/// A wrapper to store an array of receivers via `objc_setAssociatedObject` (requires `AnyObject`).
+private final class ReceiverBox: NSObject {
+    let receivers: [AnyRouteReceiving]
+    init(_ receivers: [AnyRouteReceiving]) { self.receivers = receivers }
+}
+
 public extension UIView {
-    /// A strongly retained reference to a declarative route received attached to this view.
-    internal var associatedReceiver: AnyRouteReceiving? {
-        get { objc_getAssociatedObject(self, &ReceiverLinkKey.receiverKey) as? AnyRouteReceiving }
-        set { objc_setAssociatedObject(self, &ReceiverLinkKey.receiverKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    /// An ordered list of declarative route receivers attached to this view.
+    /// Multiple `.onReceiveRoute` calls append to this list; events are dispatched first-match-wins.
+    internal var associatedReceivers: [AnyRouteReceiving] {
+        get { (objc_getAssociatedObject(self, &ReceiverLinkKey.receiverKey) as? ReceiverBox)?.receivers ?? [] }
+        set { objc_setAssociatedObject(self, &ReceiverLinkKey.receiverKey, ReceiverBox(newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
     }
     
     private func owningViewController() -> UIViewController? {
