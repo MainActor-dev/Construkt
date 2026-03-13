@@ -63,6 +63,27 @@ public protocol ViewConvertable {
 // Allows an array of views to be used with ViewResultBuilder
 extension Array: ViewConvertable where Element == View {
     public func asViews() -> [View] { self }
+    
+    /// Convenience: build a `[View]` into a single `UIView`.
+    /// For a single-element array, returns that element's built view directly.
+    /// For multiple elements, wraps them in a container.
+    @MainActor
+    public func build() -> UIView {
+        if count == 1 { return self[0].build() }
+        let container = UIView()
+        forEach { view in
+            let built = view.build()
+            built.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(built)
+            NSLayoutConstraint.activate([
+                built.topAnchor.constraint(equalTo: container.topAnchor),
+                built.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+                built.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+                built.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            ])
+        }
+        return container
+    }
 }
 
 // Allows an array of an array of views to be used with ViewResultBuilder
@@ -100,6 +121,17 @@ public extension ViewConvertable {
             RouteReceivingModifier(view: element, configurator: { RouteReceivingModifier.configure($0, target: target, handler: handler) })
         }
     }
+    
+    /// Subscribe to events delivered through a `RouteChannel` (for cross-VC communication).
+    ///
+    /// Use this when events need to travel across separate presentation contexts
+    /// (e.g. from a presented bottom sheet back to the presenting screen).
+    /// The subscription is automatically cleaned up when the built view is deallocated.
+    func onReceiveChannel<E>(_ channel: RouteChannel<E>, handler: @escaping @MainActor (E, UIResponder?) -> Bool) -> [View] {
+        return self.asViews().map { element in
+            ChannelSubscribingModifier(view: element, channel: channel, handler: handler)
+        }
+    }
 }
 
 /// An internal wrapper that securely attaches an `.onReceiveRoute` listener to an arbitrary `View`.
@@ -128,25 +160,49 @@ public struct RouteReceivingModifier: ModifiableView {
     @MainActor
     fileprivate static func configure<E>(_ view: UIView, handler: @escaping @MainActor (E) -> Bool) {
         // We use the same closure receiver used by EventRouting.swift ModifiableView.onReceiveRoute
-        view.associatedReceiver = ClosureRouteReceiver(handler: handler)
+        view.associatedReceivers.append(ClosureRouteReceiver(handler: handler))
     }
     
     @MainActor
     fileprivate static func configure<E, Target: AnyObject>(_ view: UIView, target: Target, handler: @escaping @MainActor (Target, E) -> Bool) {
-        view.associatedReceiver = TargetedClosureRouteReceiver(target: target, handler: handler)
+        view.associatedReceivers.append(TargetedClosureRouteReceiver(target: target, handler: handler))
     }
     
     @MainActor
     fileprivate static func configure<E>(_ view: UIView, handler: @escaping @MainActor (E, UIResponder?) -> Bool) {
-        view.associatedReceiver = SenderClosureRouteReceiver(handler: handler)
+        view.associatedReceivers.append(SenderClosureRouteReceiver(handler: handler))
     }
     
     @MainActor
     fileprivate static func configure<E, Target: AnyObject>(_ view: UIView, target: Target, handler: @escaping @MainActor (Target, E, UIResponder?) -> Bool) {
-        view.associatedReceiver = TargetedSenderClosureRouteReceiver(target: target, handler: handler)
+        view.associatedReceivers.append(TargetedSenderClosureRouteReceiver(target: target, handler: handler))
     }
 }
 
+/// An internal wrapper that subscribes to a `RouteChannel` when the view is built.
+///
+/// The built `UIView` is used as the weak owner for the channel subscription,
+/// ensuring the listener is automatically cleaned up when the view is deallocated.
+public struct ChannelSubscribingModifier<E>: ModifiableView {
+    public typealias Base = UIView
+    
+    private let view: View
+    private let channel: RouteChannel<E>
+    private let handler: @MainActor (E, UIResponder?) -> Bool
+    
+    public init(view: View, channel: RouteChannel<E>, handler: @escaping @MainActor (E, UIResponder?) -> Bool) {
+        self.view = view
+        self.channel = channel
+        self.handler = handler
+    }
+    
+    @MainActor
+    public var modifiableView: UIView {
+        let built = view.build()
+        channel.subscribe(owner: built, handler: handler)
+        return built
+    }
+}
 
 
 /// An abstract representation of a UI component that knows how to build a tangible `UIView`.
