@@ -18,16 +18,96 @@ enum ProfileSection: String, SectionConfigIdentifier {
 
 struct ProfileView: ViewConvertable {
     
+    // MARK: - State
+    
+    private class ViewHandles {
+        weak var collectionView: UICollectionView?
+    }
+    
+    private let handles = ViewHandles()
+    
+    // MARK: - Walkthrough
+    
+    private enum WalkthroughStepId: String {
+        case hero = "profile-hero"
+        case premium = "profile-premium"
+        case general = "profile-general"
+        case account = "profile-account"
+    }
+    
+    private var walkthroughSteps: [WalkthroughStep] {
+        guard let collectionView = handles.collectionView else { return [] }
+        return [
+            WalkthroughStep(
+                target: .collectionViewSection(collectionView: collectionView, sectionIndex: 0),
+                title: "Your Profile",
+                description: "View and edit your profile picture and display name.",
+                tooltipPosition: .below,
+                spotlightPadding: 8
+            ),
+            WalkthroughStep(
+                target: .collectionViewSection(collectionView: collectionView, sectionIndex: 1),
+                title: "Go Premium",
+                description: "Unlock exclusive features with a premium membership.",
+                tooltipPosition: .below,
+                spotlightPadding: 8
+            ),
+            WalkthroughStep(
+                target: .collectionViewSection(collectionView: collectionView, sectionIndex: 2),
+                title: "General Settings",
+                description: "Manage downloads, notifications, and appearance.",
+                tooltipPosition: .above,
+                spotlightPadding: 0,
+                prepare: {
+                    await MainActor.run { [weak handles] in
+                        guard let cv = handles?.collectionView else { return }
+                        let targetY = min(300.0, cv.contentSize.height - cv.bounds.height)
+                        cv.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+                    }
+                }
+            ),
+            WalkthroughStep(
+                target: .collectionViewSection(collectionView: collectionView, sectionIndex: 3),
+                title: "Account & Security",
+                description: "Manage payment methods, security settings, or log out.",
+                tooltipPosition: .below,
+                spotlightPadding: 0,
+                prepare: {
+                    await MainActor.run { [weak handles] in
+                        guard let cv = handles?.collectionView else { return }
+                        let targetY = max(0, cv.contentSize.height - cv.bounds.height)
+                        cv.setContentOffset(CGPoint(x: 0, y: targetY), animated: true)
+                    }
+                }
+            )
+        ]
+    }
+    
+    // MARK: - Body
+    
     func asViews() -> [View] {
         Screen {
-            CollectionView {
-                heroSection
-                premiumSection
-                generalSettingsSection
-                accountSettingsSection
-                versionSection
+            ZStackView {
+                CollectionView {
+                    heroSection
+                    premiumSection
+                    generalSettingsSection
+                    accountSettingsSection
+                    versionSection
+                }
+                .with { [handles] cv in
+                    handles.collectionView = cv.collectionView
+                   
+                }
+                WalkthroughOverlay()
+                    .with { overlay in
+                        overlay.setSteps(walkthroughSteps)
+                        overlay.start()
+                    }
             }
+           
         }
+
         .backgroundColor(UIColor("#0A0A0A"))
         .asViews()
     }
