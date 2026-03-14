@@ -74,7 +74,7 @@ struct EventRoutingTests {
         }
         
         var target: RefCountedTarget? = RefCountedTarget()
-        weak var weakTarget = target
+        weak let weakTarget = target
         
         let container = ContainerView()
             .onReceiveRoute(TestRoute.self, on: target!) { ref, event in
@@ -102,4 +102,102 @@ struct EventRoutingTests {
         let handled = button.route(TestRoute.page2(id: 100), sender: button)
         #expect(handled == false)
     }
+    
+    // MARK: - Multi-handler tests
+    
+    @Test("Multiple .onReceiveRoute handlers for different enum types both fire")
+    func testMultipleOnReceiveRouteHandlersDifferentTypes() {
+        var trappedTestRoute: TestRoute? = nil
+        var trappedSecondRoute: TestRoute2? = nil
+        
+        let container = ContainerView()
+            .onReceiveRoute(TestRoute.self, handler: { event in
+                trappedTestRoute = event
+                return true
+            })
+            .onReceiveRoute(TestRoute2.self, handler: { event in
+                trappedSecondRoute = event
+                return true
+            })
+            .build()
+        
+        let button = ButtonView("Action").build() as! UIButton
+        container.addSubview(button)
+        
+        // Send first enum type
+        button.route(TestRoute.page1, sender: button)
+        #expect(trappedTestRoute == .page1)
+        #expect(trappedSecondRoute == nil)
+        
+        // Send second enum type
+        button.route(TestRoute2.settings, sender: button)
+        #expect(trappedSecondRoute == .settings)
+    }
+    
+    @Test("Multiple .onReceiveRoute handlers for the same type: first registered wins")
+    func testMultipleOnReceiveRouteSameTypePriority() {
+        var firstCalled = false
+        var secondCalled = false
+        
+        let container = ContainerView()
+            .onReceiveRoute(TestRoute.self, handler: { _ in
+                firstCalled = true
+                return true   // handled → stops dispatch
+            })
+            .onReceiveRoute(TestRoute.self, handler: { _ in
+                secondCalled = true
+                return true
+            })
+            .build()
+        
+        let button = ButtonView("Action").build() as! UIButton
+        container.addSubview(button)
+        
+        button.route(TestRoute.page1, sender: button)
+        #expect(firstCalled == true)
+        #expect(secondCalled == false)
+    }
+    
+    // MARK: - RouteChannel tests
+    
+    @Test("RouteChannel delivers events to subscribers")
+    func testRouteChannelBasicDelivery() {
+        let channel = RouteChannel<TestRoute>()
+        var received: TestRoute? = nil
+        
+        // Use a strong owner so the listener stays alive
+        let owner = NSObject()
+        channel.subscribe(owner: owner, handler: { event, sender in
+            received = event
+            return true
+        })
+        
+        let handled = channel.send(.page2(id: 42))
+        #expect(handled == true)
+        #expect(received == .page2(id: 42))
+    }
+    
+    @Test("RouteChannel auto-cleans listeners when owner is deallocated")
+    func testRouteChannelListenerCleanup() {
+        let channel = RouteChannel<TestRoute>()
+        var received = false
+        
+        var owner: NSObject? = NSObject()
+        channel.subscribe(owner: owner!, handler: { _, _ in
+            received = true
+            return true
+        })
+        
+        // Deallocate owner
+        owner = nil
+        
+        let handled = channel.send(.page1)
+        #expect(handled == false)
+        #expect(received == false)
+    }
+}
+
+private enum TestRoute2: Equatable {
+    case settings
+    case logout
 }
