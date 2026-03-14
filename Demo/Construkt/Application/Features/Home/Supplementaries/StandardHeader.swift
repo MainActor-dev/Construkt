@@ -4,6 +4,7 @@ import ConstruktKit
 struct StandardHeader: ViewBuilder {
     let title: String
     let actionTitle: String?
+    var sectionId: String? = nil
     
     var body: View {
         HStackView() {
@@ -23,6 +24,11 @@ struct StandardHeader: ViewBuilder {
             }
         }
         .alignment(.center)
+        .with { view in
+            if let id = sectionId {
+                view.accessibilityIdentifier = id
+            }
+        }
     }
 }
 

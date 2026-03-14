@@ -18,6 +18,8 @@ enum ProfileSection: String, SectionConfigIdentifier {
 
 struct ProfileView: ViewConvertable {
     
+    // MARK: - Body
+    
     func asViews() -> [View] {
         Screen {
             CollectionView {

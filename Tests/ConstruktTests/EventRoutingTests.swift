@@ -52,7 +52,7 @@ struct EventRoutingTests {
                 trappedRoute = event
                 return true
             })
-            .build()
+            .first!.build()
             
         let button = ButtonView("Action")
             .onRoute(TestRoute.page1)
@@ -86,7 +86,7 @@ struct EventRoutingTests {
                     return false
                 }
             }
-            .build()
+            .first!.build()
             
         let button = ButtonView("Action").build() as! UIButton
         container.addSubview(button)
