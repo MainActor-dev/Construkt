@@ -101,8 +101,11 @@ struct ProfileView: ViewConvertable {
                 }
                 WalkthroughOverlay()
                     .with { overlay in
-                        overlay.setSteps(walkthroughSteps)
-                        overlay.start()
+                        // Defer evaluation and start until after layout settles + handle is ready
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            overlay.setSteps(self.walkthroughSteps)
+                            overlay.start()
+                        }
                     }
             }
            
