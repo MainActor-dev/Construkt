@@ -1,0 +1,14 @@
+# Custom modifiers and UIView bridging
+- Any `UIView` is already bridged: `UIView` conforms to `ModifiableView`.
+- Custom component pattern:
+  - Create a UIKit subclass (if needed), then expose a wrapper struct conforming to `ModifiableView`.
+  - Provide `public let modifiableView: BaseUIView` and initialize defaults in `init()`.
+- Adding custom modifiers:
+  - Extend `ModifiableView` with chainable methods returning `ViewModifier<Base>`.
+  - Constrain extension by base type when appropriate (e.g., `where Base: UILabel`).
+  - Use key-path modifier init for simple property sets and closure-based modifier init for complex changes.
+- Existing examples:
+  - `CircleView` wraps `_CircleView`.
+  - `GradientView` in demo wraps `GradientViewInternal`.
+- Practical rule:
+  - Use wrappers + `ModifiableView` when bridging existing UIKit classes into declarative Construkt APIs.

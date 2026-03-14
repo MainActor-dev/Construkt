@@ -1,0 +1,18 @@
+# Declarative UI playbook (Construkt)
+- Core protocols:
+  - `View`: buildable unit returning a `UIView`.
+  - `ModifiableView`: `View` with `modifiableView` base for chainable modifiers.
+  - `ViewBuilder`: reusable component style with `var body: View`.
+  - `ViewConvertable`: composition type that returns `[View]` via `asViews()`.
+- Builders/composition:
+  - `@ViewResultBuilder` flattens nested `ViewConvertable` values to `[View]`.
+  - Use `VStackView`, `HStackView`, `ZStackView`/`ContainerView`, `Screen` for structure.
+  - Use `ForEach`/`Group` for repeated or grouped composition.
+- Screen composition guidance:
+  - Prefer `ViewConvertable` + `Screen { ... }` for top-level features.
+  - Convert to view controller with `.toPresentable()`.
+- Reactive binding guidance:
+  - Bind observable state using `.onReceive(...)`, `.bind(...)`, `.hidden(bind:)`, `.userInteractionEnabled(bind:)`.
+  - Use `@Variable` in view models and `$property` projection in view code.
+- UIKit escape hatch:
+  - Use `.with { ... }` when direct UIKit configuration is required while staying declarative.

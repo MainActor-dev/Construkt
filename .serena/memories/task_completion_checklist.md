@@ -1,0 +1,11 @@
+# Task completion checklist
+- Build/verify impacted target(s):
+  - Framework changes: run `swift build` and `swift test`.
+  - Demo/UI flow changes: run relevant `xcodebuild ... build` and ideally `... test` on demo scheme.
+- Validate declarative patterns:
+  - Use Construkt components/modifiers (avoid raw imperative constraints unless necessary).
+  - Keep routing consistent (`route`/`onRoute`/`onReceiveRoute`) and use `RouteChannel` for cross-VC communication.
+- Confirm no regressions in event handling and reactive bindings.
+- If navigation code changed, manually verify route paths in demo (Home/Explore/Detail/Search/Profile).
+- Check git diff for scope and consistency before commit.
+- Follow existing naming and extension-based modifier conventions.

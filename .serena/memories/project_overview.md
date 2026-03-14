@@ -1,0 +1,14 @@
+# Construkt project overview
+- Purpose: Construkt is a declarative UIKit framework with SwiftUI-like syntax that builds native UIView hierarchies.
+- Package/product: Swift Package named `Construkt`, product `ConstruktKit`.
+- Platforms: iOS 14+.
+- Core idea: compose `View`/`ViewConvertable` values with `@ViewResultBuilder`, then materialize to UIKit via `.build()` / `.toPresentable()`.
+- Repository includes:
+  - `Sources/Construkt`: framework source (builder DSL, reactive core, navigation/event routing, components).
+  - `Tests/ConstruktTests`: package tests (Testing framework).
+  - `Demo/Construkt`: full demo iOS app showcasing routing, sections, screens, and modifiers.
+- Main paradigms:
+  - `ViewBuilder` for reusable declarative components (`body: View`).
+  - `ViewConvertable` for screen composition (`asViews() -> [View]`).
+  - `ModifiableView` wrappers over UIKit views enabling chainable modifiers.
+  - Reactive bindings via `Property`, `Signal`, and `@Variable`.

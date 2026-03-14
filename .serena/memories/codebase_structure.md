@@ -1,0 +1,13 @@
+# Codebase structure
+- `Sources/Construkt/Core/Builder`
+  - DSL foundation (`Builder.swift`), modifiers (`Builder+*.swift`), layout containers (`HStackView`, `VStackView`, `ContainerView`, `Screen`), collection/table builders.
+- `Sources/Construkt/Core/Reactive`
+  - `Binding`, `Property`, `Signal`, operators, lifecycle cancellation helpers.
+- `Sources/Construkt/Navigation`
+  - `EventRouting` (`route`, `onRoute`, RouteReceiving), `RouteChannel`, coordinator/router abstractions, `LifecycleHostController` and `toPresentable` bridging.
+- `Sources/Construkt/Components`
+  - Reusable controls/views (BlurView, LinearGradient, ActivityIndicator, Toggle, Slider, TextEditor, etc.).
+- `Tests/ConstruktTests`
+  - Builder/modifier behavior, constraints/padding, reactive tests, lifecycle and event routing tests.
+- `Demo/Construkt`
+  - Real app architecture: feature modules (`Home`, `Explore`, `Detail`, `List`, `Profile`, `Search`), route handling, coordinators, networking and shared UI components.

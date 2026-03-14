@@ -1,0 +1,17 @@
+# Style and conventions
+- Language: Swift (SPM tools 5.9, package declares Swift language version v5).
+- UI construction style:
+  - Prefer declarative Construkt components (`LabelView`, `ImageView`, `VStackView`, `CollectionView`, etc.), not imperative constraint-heavy UIKit.
+  - Compose small reusable structs conforming to `ViewBuilder` for local components.
+  - Use `ViewConvertable` for screen-level composition and conversion to UIViewController.
+- Modifier style:
+  - Chain Construkt modifiers on `ModifiableView`; avoid inventing unsupported SwiftUI modifiers.
+  - Add custom modifiers by extending `ModifiableView` (optionally constrained by `Base`).
+- Reactive style:
+  - Use `@Variable`, `Property`, and `Signal` plus binding modifiers (`onReceive`, `bind`, `hidden(bind:)`, etc.).
+- Navigation/event style:
+  - Use typed route enums and responder-chain routing (`route`, `onRoute`, `onReceiveRoute`).
+  - Use `RouteChannel`/`onReceiveChannel` for cross-view-controller boundaries.
+- Naming and organization:
+  - Feature-oriented files in Demo app.
+  - Types and modifiers use explicit UIKit naming and clear semantic suffixes (`View`, `Coordinator`, `RouteHandler`).
